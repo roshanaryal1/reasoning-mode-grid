@@ -1,0 +1,48 @@
+[build-system]
+requires = ["hatchling>=1.25"]
+build-backend = "hatchling.build"
+
+[project]
+name = "modegrid"
+version = "0.1.0"
+description = "Model x mode grid harness for LA-P4: does reasoning mode matter more than model identity?"
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+authors = [{ name = "Roshan Aryal", email = "roshanaryaal@gmail.com" }]
+dependencies = ["numpy>=1.26", "pyyaml>=6.0"]
+
+[project.optional-dependencies]
+# Only needed to call vendor APIs. The analysis side runs without them.
+providers = ["anthropic>=0.70", "openai>=1.50"]
+dev = ["pytest>=8", "pytest-cov>=5", "ruff>=0.6", "mypy>=1.11", "types-PyYAML", "krippendorff>=0.8", "pre-commit>=3.8"]
+
+[project.scripts]
+modegrid = "modegrid.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/modegrid"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py310"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "SIM", "RUF"]
+ignore = ["RUF001", "RUF002", "RUF003"]
+
+[tool.mypy]
+packages = ["modegrid"]
+mypy_path = "src"
+ignore_missing_imports = true
+warn_unused_ignores = true
+strict_optional = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q --strict-markers"
+
+[tool.coverage.run]
+source = ["modegrid"]
+omit = ["src/modegrid/providers.py"]

@@ -1,0 +1,33 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+build/
+dist/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+coverage.xml
+htmlcov/
+
+# Secrets
+.env
+
+# Derived rater material. Rebuild with `modegrid blind`.
+packets/
+
+# The blinding key stays out of git until every rater sheet is final.
+# Keep a copy somewhere safe outside the repo. Then: git add -f data/blinding/key.csv
+data/blinding/key.csv
+
+# OS and editors
+.DS_Store
+.idea/
+.vscode/
+
+# Exports (double-blind hygiene: never commit a PDF with author metadata)
+*.pdf
+*.docx
