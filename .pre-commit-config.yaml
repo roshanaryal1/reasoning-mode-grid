@@ -1,0 +1,27 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: check-yaml
+      - id: check-toml
+      - id: check-added-large-files
+        args: ["--maxkb=500"]
+      - id: detect-private-key
+      - id: end-of-file-fixer
+        exclude: ^(data/captures|data/pilot|vendor)/
+      - id: trailing-whitespace
+        exclude: ^(data/captures|data/pilot|vendor)/|\.md$
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.6.9
+    hooks:
+      - id: ruff
+        args: [--fix]
+      - id: ruff-format
+  - repo: local
+    hooks:
+      - id: vendored-hashes
+        name: vendored files unchanged
+        entry: bash -c 'cd vendor/llm-architects && sha256sum -c --quiet SHA256SUMS'
+        language: system
+        pass_filenames: false
+        files: ^vendor/
