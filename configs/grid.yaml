@@ -1,0 +1,128 @@
+# LA-P4 model x mode grid. This file IS the experimental design.
+#
+# Rules
+# - Weights stay fixed inside a family. A mode changes how the same model runs,
+#   never which model runs. "Gemini Flash vs Gemini Pro" is a model switch, not a
+#   mode switch, and would break the claim. Use one model with thinking off vs on.
+# - Every family has exactly two PRIMARY modes: fast and reasoning. Extra vendor
+#   modes are allowed with `primary: false` and are analysed as exploratory only.
+# - FILL-ME and VERIFY are placeholders. `modegrid run` refuses to call a family
+#   that still holds one. Check each vendor's current API docs on the day you run,
+#   write the exact value here, and commit it BEFORE the first run of that family.
+# - After the first real capture, this file is frozen. Any change gets a dated
+#   entry in docs/preregistration.md "Deviations".
+
+study: LA-P4
+seed: 20261001
+replicates: 5          # pre-registered (power analysis in docs/power.md). Floor is 3.
+max_tokens: 32000      # generous so reasoning modes are not truncated
+
+prompts:
+  - id: p1-v1
+    path: vendor/llm-architects/prompts/prompt-v1.md
+    sha256: ba2acba8868b254a96897e0552dd62ccd00443bc6afd084df419ba37ba0370e0
+    extract: between-markers
+
+# Masked in rater packets on top of each family's vendor/model/redact_terms.
+global_redact_terms: [ChatGPT, OpenAI, Anthropic, Claude, Gemini, Google, Qwen, Alibaba, DeepSeek, Grok, xAI]
+
+families:
+  - id: claude
+    vendor: Anthropic
+    channel: api
+    adapter: anthropic
+    model: claude-sonnet-5
+    notes: >-
+      Sonnet 5 accepts thinking disabled. Do not swap in Opus 5.5 or Sonnet 5.5 without
+      re-reading the API docs: on those models thinking cannot be fully disabled, so the
+      "fast" cell would become "low effort", a different treatment. Record it if you do.
+    modes:
+      fast:
+        native_label: "extended thinking off (thinking.type=disabled)"
+        params: {thinking: {type: disabled}}
+      reasoning:
+        native_label: "adaptive thinking, effort high"
+        params: {thinking: {type: adaptive}, output_config: {effort: high}}
+
+  - id: gpt
+    vendor: OpenAI
+    channel: api
+    adapter: openai_compatible
+    base_url: https://api.openai.com/v1
+    api_key_env: OPENAI_API_KEY
+    model: FILL-ME            # one reasoning-capable GPT model that accepts both settings below
+    modes:
+      fast:
+        native_label: "reasoning effort at its lowest supported setting"
+        params: {_token_field: max_completion_tokens, reasoning_effort: VERIFY-lowest-supported-value}
+      reasoning:
+        native_label: "reasoning effort high"
+        params: {_token_field: max_completion_tokens, reasoning_effort: high}
+
+  - id: gemini
+    vendor: Google
+    channel: api
+    adapter: openai_compatible
+    base_url: https://generativelanguage.googleapis.com/v1beta/openai/
+    api_key_env: GEMINI_API_KEY
+    model: FILL-ME            # ONE model that supports thinking on and off. Not flash vs pro.
+    modes:
+      fast:
+        native_label: "thinking off"
+        params: {reasoning_effort: VERIFY-value-that-disables-thinking}
+      reasoning:
+        native_label: "thinking high"
+        params: {reasoning_effort: high}
+
+  - id: qwen
+    vendor: Alibaba
+    channel: api
+    adapter: openai_compatible
+    base_url: https://dashscope-intl.aliyuncs.com/compatible-mode/v1
+    api_key_env: DASHSCOPE_API_KEY
+    model: FILL-ME            # a hybrid-thinking Qwen model
+    notes: >-
+      Some Qwen endpoints only return thinking output when streamed. If a non-streamed
+      call rejects enable_thinking=true, add streaming to OpenAICompatibleAdapter first.
+    modes:
+      fast:
+        native_label: "instant (enable_thinking=false)"
+        params: {enable_thinking: false}
+      reasoning:
+        native_label: "thinking (enable_thinking=true)"
+        params: {enable_thinking: true}
+
+  - id: deepseek
+    vendor: DeepSeek
+    channel: api
+    adapter: openai_compatible
+    base_url: https://api.deepseek.com
+    api_key_env: DEEPSEEK_API_KEY
+    model: FILL-ME            # set per mode below; confirm both names serve the same weights
+    notes: >-
+      The pilot (data/pilot/) used the web app with DeepSeek-V4-Pro in three modes. The API
+      exposes the mode as two model names. Confirm on the run date that both resolve to the
+      same base model, and record the evidence in the capture notes.
+    modes:
+      fast:
+        native_label: "non-thinking"
+        model: VERIFY-non-thinking-model-name
+        params: {}
+      reasoning:
+        native_label: "thinking"
+        model: VERIFY-thinking-model-name
+        params: {}
+
+  - id: grok
+    vendor: xAI
+    channel: web             # the Fast vs Expert switch is a UI mode. Captured by hand.
+    adapter: null
+    model: as shown in the grok.com model picker on the run date
+    redact_terms: [Elon, X Premium]
+    modes:
+      fast:
+        native_label: "grok.com Fast mode"
+        params: {}
+      reasoning:
+        native_label: "grok.com Expert mode"
+        params: {}
