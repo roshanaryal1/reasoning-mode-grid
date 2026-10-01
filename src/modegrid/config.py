@@ -24,6 +24,11 @@ class Mode:
     params: dict[str, Any]
     primary: bool = True
     model: str | None = None  # per-mode override, for vendors that expose a mode as a model name
+    web_label: str | None = None  # what to select in the chat app, for web runs
+
+    @property
+    def chat_label(self) -> str:
+        return self.web_label or self.native_label
 
 
 @dataclass(frozen=True)
@@ -32,7 +37,7 @@ class Family:
 
     id: str
     vendor: str
-    channel: str  # "api" or "web"
+    channel: str  # channel for the main runs: "web" (chat app) or "api"
     adapter: str | None
     model: str
     modes: dict[str, Mode]
@@ -75,6 +80,7 @@ class Grid:
     prompts: tuple[PromptSpec, ...]
     families: tuple[Family, ...]
     global_redact_terms: tuple[str, ...] = field(default_factory=tuple)
+    api_check_replicates: int = 0  # API calls per family x mode, outside the main grid
 
     def family(self, family_id: str) -> Family:
         for fam in self.families:
@@ -125,6 +131,7 @@ def load_grid(path: str | Path) -> Grid:
                     params=m.get("params") or {},
                     primary=bool(m.get("primary", True)),
                     model=str(m["model"]) if m.get("model") else None,
+                    web_label=m.get("web_label"),
                 )
                 for mid, m in f["modes"].items()
             }
@@ -150,6 +157,7 @@ def load_grid(path: str | Path) -> Grid:
             prompts=prompts,
             families=tuple(families),
             global_redact_terms=tuple(data.get("global_redact_terms") or ()),
+            api_check_replicates=int((data.get("api_check") or {}).get("replicates", 0)),
         )
     except KeyError as exc:
         raise ConfigError(f"missing required key: {exc}") from exc
@@ -162,6 +170,8 @@ def check_grid(grid: Grid) -> None:
     """Structural rules. Placeholders are allowed here and caught by `unready_families`."""
     if grid.replicates < 3:
         raise ConfigError("replicates must be >= 3 (pre-registered minimum)")
+    if grid.api_check_replicates < 0:
+        raise ConfigError("api_check.replicates must be >= 0")
     ids = [f.id for f in grid.families]
     if len(ids) != len(set(ids)):
         raise ConfigError("family ids must be unique")
@@ -170,6 +180,8 @@ def check_grid(grid: Grid) -> None:
             raise ConfigError(f"{fam.id}: channel must be 'api' or 'web'")
         if fam.channel == "api" and fam.adapter not in {"anthropic", "openai_compatible"}:
             raise ConfigError(f"{fam.id}: api families need adapter anthropic|openai_compatible")
+        if fam.adapter not in {None, "anthropic", "openai_compatible"}:
+            raise ConfigError(f"{fam.id}: unknown adapter {fam.adapter!r}")
         primary = {m.id for m in fam.modes.values() if m.primary}
         if primary != {"fast", "reasoning"}:
             raise ConfigError(
@@ -179,7 +191,7 @@ def check_grid(grid: Grid) -> None:
 
 
 def unready_families(grid: Grid) -> list[str]:
-    """Families whose config still holds FILL-ME / VERIFY placeholders."""
+    """Families whose API settings still hold FILL-ME / VERIFY placeholders."""
     out = []
     for fam in grid.families:
         fields: list[Any] = [fam.model, fam.base_url or ""]

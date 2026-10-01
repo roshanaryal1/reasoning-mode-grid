@@ -34,7 +34,7 @@ def test_grid_rejects_missing_primary_mode(tmp_path, grid_path):
     shutil.copytree(grid_path.parent.parent / "vendor", root / "vendor")
     (root / "configs").mkdir()
     text = grid_path.read_text().replace(
-        '      reasoning:\n        native_label: "adaptive', '      deep:\n        native_label: "adaptive', 1
+        '      reasoning:\n        web_label: "claude.ai', '      deep:\n        web_label: "claude.ai', 1
     )
     (root / "configs" / "grid.yaml").write_text(text)
     with pytest.raises(ConfigError):
@@ -44,9 +44,15 @@ def test_grid_rejects_missing_primary_mode(tmp_path, grid_path):
 def test_manifest_is_complete_and_deterministic(grid_path, tmp_path):
     grid = load_grid(grid_path)
     runs = build_manifest(grid)
+    main = [r for r in runs if r.set == "main"]
+    checks = [r for r in runs if r.set == "api_check"]
     expected = sum(len(f.modes) for f in grid.families) * len(grid.prompts) * grid.replicates
-    assert len(runs) == expected
-    assert len({r.run_id for r in runs}) == expected
+    assert len(main) == expected
+    assert all(r.channel == "web" for r in main), "main runs are chat captures"
+    api_families = [f for f in grid.families if f.adapter]
+    assert len(checks) == len(api_families) * 2 * grid.api_check_replicates
+    assert all(r.channel == "api" for r in checks)
+    assert len({r.run_id for r in runs}) == len(runs)
     assert [r.run_id for r in runs] == [r.run_id for r in build_manifest(grid)]
     write_manifest(runs, tmp_path / "runs.csv")
     assert read_manifest(tmp_path / "runs.csv") == runs
@@ -156,6 +162,7 @@ def test_cli_run_refuses_placeholders(tmp_path, monkeypatch, capsys):
     manifest = tmp_path / "runs.csv"
     assert main(["--manifest", str(manifest), "plan"]) == 0
     code = main(["--manifest", str(manifest), "--captures", str(tmp_path / "c"), "run", "--dry-run"])
+    # every non-Claude family still has FILL-ME/VERIFY API settings
     assert code == 2
     assert (
         main(["--manifest", str(manifest), "--captures", str(tmp_path / "c"), "run", "--dry-run", "--family", "claude"])
@@ -166,3 +173,79 @@ def test_cli_run_refuses_placeholders(tmp_path, monkeypatch, capsys):
 def test_write_scores_adds_total(tmp_path):
     write_scores({"r1": {f"D{i}": 1 for i in range(1, 10)}}, tmp_path / "a.csv")
     assert "9" in (tmp_path / "a.csv").read_text().splitlines()[1]
+
+
+def _cap(run_id, words=3, **meta):
+    base = {
+        "run_id": run_id,
+        "family": "x",
+        "mode": "fast",
+        "native_label": "n",
+        "channel": "web",
+        "model_requested": "m",
+        "model_returned": "m",
+        "prompt_id": "p1-v1",
+        "prompt_sha256": "h",
+        "replicate": 1,
+        "date_run": "2026-10-01",
+        "run_by": "me",
+    }
+    return Capture(meta={**base, **meta}, final_answer=" ".join(["word"] * words))
+
+
+def test_fill_in_left_in_capture_is_flagged():
+    assert check_capture(_cap("a", model_returned="FILL IN: the model name"))
+
+
+def test_api_check_runs_are_not_analysed(grid_path):
+    grid = load_grid(grid_path)
+    design = build_design(build_manifest(grid), "p1-v1")
+    assert not any("apicheck" in str(rid) for rid in design.run_ids.ravel())
+
+
+def test_blind_skips_api_check_captures(tmp_path, monkeypatch):
+    root = Path(__file__).resolve().parent.parent
+    monkeypatch.chdir(root)
+    manifest = tmp_path / "runs.csv"
+    caps_dir = tmp_path / "caps"
+    assert main(["--manifest", str(manifest), "plan"]) == 0
+    runs = read_manifest(manifest)
+    main_run = next(r for r in runs if r.set == "main")
+    check_run = next(r for r in runs if r.set == "api_check")
+    write_capture(_cap(main_run.run_id), caps_dir)
+    write_capture(_cap(check_run.run_id), caps_dir)
+    out, key = tmp_path / "packets", tmp_path / "key.csv"
+    args = ["--manifest", str(manifest), "--captures", str(caps_dir), "blind", "--out", str(out), "--key", str(key)]
+    assert main(args) == 0
+    assert len(list((out / "answers").glob("*.md"))) == 1
+
+
+def test_new_capture_refuses_api_runs(tmp_path, monkeypatch):
+    monkeypatch.chdir(Path(__file__).resolve().parent.parent)
+    manifest = tmp_path / "runs.csv"
+    assert main(["--manifest", str(manifest), "plan"]) == 0
+    check_run = next(r for r in read_manifest(manifest) if r.set == "api_check")
+    web_run = next(r for r in read_manifest(manifest) if r.set == "main")
+    common = ["--manifest", str(manifest), "--captures", str(tmp_path / "c")]
+    assert main([*common, "new-capture", check_run.run_id]) == 2
+    assert main([*common, "new-capture", web_run.run_id]) == 0
+    created = read_capture(tmp_path / "c" / f"{web_run.run_id}.md")
+    assert created.meta["channel"] == "web" and created.meta["set"] == "main"
+
+
+def test_check_modes_confirms_a_working_switch(tmp_path, monkeypatch):
+    monkeypatch.chdir(Path(__file__).resolve().parent.parent)
+    manifest = tmp_path / "runs.csv"
+    assert main(["--manifest", str(manifest), "plan"]) == 0
+    caps_dir = tmp_path / "caps"
+    for r in read_manifest(manifest):
+        if r.set == "api_check" and r.family == "claude":
+            rt = 0 if r.mode == "fast" else 900
+            write_capture(
+                _cap(r.run_id, words=100 if r.mode == "fast" else 300, usage={"reasoning_tokens": rt}), caps_dir
+            )
+    out = tmp_path / "mode_check.md"
+    assert main(["--manifest", str(manifest), "--captures", str(caps_dir), "check-modes", "--out", str(out)]) == 0
+    text = out.read_text()
+    assert "| claude | 100 | 300 | 0 | 900 |" in text and "switch confirmed" in text
+    assert "missing capture(s)" in text  # the other families have no captures yet

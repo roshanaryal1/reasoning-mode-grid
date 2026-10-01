@@ -1,21 +1,32 @@
 # LA-P4 model x mode grid. This file IS the experimental design.
 #
+# Two sets of runs come out of it:
+#
+#   main       60 runs in each vendor's CHAT APP (channel: web). These are scored
+#              blind and analysed. 6 families x 2 modes x 5 replicates.
+#   api_check  1 API call per family x mode (12 calls). Evidence that each mode
+#              switch does what docs/mode-registry.md claims. Never scored.
+#
 # Rules
 # - Weights stay fixed inside a family. A mode changes how the same model runs,
-#   never which model runs. "Gemini Flash vs Gemini Pro" is a model switch, not a
-#   mode switch, and would break the claim. Use one model with thinking off vs on.
+#   never which model runs. "Flash vs Pro" is a model switch, not a mode switch.
 # - Every family has exactly two PRIMARY modes: fast and reasoning. Extra vendor
-#   modes are allowed with `primary: false` and are analysed as exploratory only.
-# - FILL-ME and VERIFY are placeholders. `modegrid run` refuses to call a family
-#   that still holds one. Check each vendor's current API docs on the day you run,
-#   write the exact value here, and commit it BEFORE the first run of that family.
+#   modes are allowed with `primary: false` and are exploratory only.
+# - web_label is what you select in the chat app. native_label and params are
+#   the API equivalent used by the api_check run.
+# - FILL-ME and VERIFY are placeholders for the API check. `modegrid run` refuses
+#   to call a family that still holds one. Check the vendor's API docs on the day,
+#   write the value here, and commit it before the first run of that family.
 # - After the first real capture, this file is frozen. Any change gets a dated
 #   entry in docs/preregistration.md "Deviations".
 
 study: LA-P4
 seed: 20261001
 replicates: 5          # pre-registered (power analysis in docs/power.md). Floor is 3.
-max_tokens: 32000      # generous so reasoning modes are not truncated
+max_tokens: 32000      # API check only. Generous so reasoning modes are not truncated.
+
+api_check:
+  replicates: 1        # per family x mode, run through the API
 
 prompts:
   - id: p1-v1
@@ -29,54 +40,64 @@ global_redact_terms: [ChatGPT, OpenAI, Anthropic, Claude, Gemini, Google, Qwen, 
 families:
   - id: claude
     vendor: Anthropic
-    channel: api
+    channel: web
     adapter: anthropic
     model: claude-sonnet-5
     notes: >-
-      Sonnet 5 accepts thinking disabled. Do not swap in Opus 5.5 or Sonnet 5.5 without
-      re-reading the API docs: on those models thinking cannot be fully disabled, so the
-      "fast" cell would become "low effort", a different treatment. Record it if you do.
+      Chat: claude.ai, pick Sonnet 5 in the model menu, toggle extended thinking.
+      API: Sonnet 5 accepts thinking disabled. Opus 5.5 and Sonnet 5.5 do not, so do
+      not swap them in without re-reading the API docs. Never enable server-side
+      fallbacks, they answer from a different model.
     modes:
       fast:
+        web_label: "claude.ai, Sonnet 5, extended thinking OFF"
         native_label: "extended thinking off (thinking.type=disabled)"
         params: {thinking: {type: disabled}}
       reasoning:
+        web_label: "claude.ai, Sonnet 5, extended thinking ON"
         native_label: "adaptive thinking, effort high"
         params: {thinking: {type: adaptive}, output_config: {effort: high}}
 
   - id: gpt
     vendor: OpenAI
-    channel: api
+    channel: web
     adapter: openai_compatible
     base_url: https://api.openai.com/v1
     api_key_env: OPENAI_API_KEY
-    model: FILL-ME            # one reasoning-capable GPT model that accepts both settings below
+    model: FILL-ME            # the API model behind the chat model you pick
+    notes: >-
+      Chat: avoid "auto" pickers that route between models. Pick one named model
+      and switch only its thinking setting.
     modes:
       fast:
+        web_label: "FILL-ME: chat model with thinking off / instant"
         native_label: "reasoning effort at its lowest supported setting"
         params: {_token_field: max_completion_tokens, reasoning_effort: VERIFY-lowest-supported-value}
       reasoning:
+        web_label: "FILL-ME: same chat model with thinking on"
         native_label: "reasoning effort high"
         params: {_token_field: max_completion_tokens, reasoning_effort: high}
 
   - id: gemini
     vendor: Google
-    channel: api
+    channel: web
     adapter: openai_compatible
     base_url: https://generativelanguage.googleapis.com/v1beta/openai/
     api_key_env: GEMINI_API_KEY
     model: FILL-ME            # ONE model that supports thinking on and off. Not flash vs pro.
     modes:
       fast:
+        web_label: "FILL-ME: Gemini app, one model, thinking off"
         native_label: "thinking off"
         params: {reasoning_effort: VERIFY-value-that-disables-thinking}
       reasoning:
+        web_label: "FILL-ME: Gemini app, same model, thinking on"
         native_label: "thinking high"
         params: {reasoning_effort: high}
 
   - id: qwen
     vendor: Alibaba
-    channel: api
+    channel: web
     adapter: openai_compatible
     base_url: https://dashscope-intl.aliyuncs.com/compatible-mode/v1
     api_key_env: DASHSCOPE_API_KEY
@@ -86,43 +107,54 @@ families:
       call rejects enable_thinking=true, add streaming to OpenAICompatibleAdapter first.
     modes:
       fast:
+        web_label: "chat.qwen.ai, FILL-ME model, Thinking OFF"
         native_label: "instant (enable_thinking=false)"
         params: {enable_thinking: false}
       reasoning:
+        web_label: "chat.qwen.ai, same model, Thinking ON"
         native_label: "thinking (enable_thinking=true)"
         params: {enable_thinking: true}
 
   - id: deepseek
     vendor: DeepSeek
-    channel: api
+    channel: web
     adapter: openai_compatible
     base_url: https://api.deepseek.com
     api_key_env: DEEPSEEK_API_KEY
     model: FILL-ME            # set per mode below; confirm both names serve the same weights
     notes: >-
-      The pilot (data/pilot/) used the web app with DeepSeek-V4-Pro in three modes. The API
-      exposes the mode as two model names. Confirm on the run date that both resolve to the
-      same base model, and record the evidence in the capture notes.
+      The pilot used chat.deepseek.com with DeepSeek-V4-Pro, so the main runs stay
+      there. The API exposes the mode as two model names. Confirm they serve the
+      same base model and record the evidence in the mode registry.
     modes:
       fast:
+        web_label: "chat.deepseek.com, DeepThink OFF"
         native_label: "non-thinking"
         model: VERIFY-non-thinking-model-name
         params: {}
       reasoning:
+        web_label: "chat.deepseek.com, DeepThink ON"
         native_label: "thinking"
         model: VERIFY-thinking-model-name
         params: {}
 
   - id: grok
     vendor: xAI
-    channel: web             # the Fast vs Expert switch is a UI mode. Captured by hand.
-    adapter: null
-    model: as shown in the grok.com model picker on the run date
+    channel: web
+    adapter: openai_compatible
+    base_url: https://api.x.ai/v1
+    api_key_env: XAI_API_KEY
+    model: FILL-ME            # the API model closest to the chat app's model
     redact_terms: [Elon, X Premium]
+    notes: >-
+      Fast vs Expert is a chat-app switch. The API check can only approximate it
+      with a reasoning setting on one model. Say so in the mode registry.
     modes:
       fast:
-        native_label: "grok.com Fast mode"
-        params: {}
+        web_label: "grok.com, Fast"
+        native_label: "API, lowest reasoning setting"
+        params: {reasoning_effort: VERIFY-lowest-supported-value}
       reasoning:
-        native_label: "grok.com Expert mode"
-        params: {}
+        web_label: "grok.com, Expert"
+        native_label: "API, highest reasoning setting"
+        params: {reasoning_effort: VERIFY-highest-supported-value}

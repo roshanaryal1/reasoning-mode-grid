@@ -9,7 +9,10 @@ from pathlib import Path
 
 from .config import Grid
 
-MANIFEST_FIELDS = ["order", "run_id", "family", "mode", "primary", "prompt_id", "replicate", "channel"]
+MANIFEST_FIELDS = ["order", "run_id", "family", "mode", "primary", "prompt_id", "replicate", "channel", "set"]
+
+MAIN = "main"  # the scored grid
+API_CHECK = "api_check"  # one-off API calls that verify each mode switch, never scored
 
 
 @dataclass(frozen=True)
@@ -22,10 +25,12 @@ class Run:
     prompt_id: str
     replicate: int
     channel: str
+    set: str = MAIN
 
 
-def make_run_id(family: str, mode: str, prompt_id: str, replicate: int) -> str:
-    return f"{family}__{mode}__{prompt_id}__r{replicate}"
+def make_run_id(family: str, mode: str, prompt_id: str, replicate: int, run_set: str = MAIN) -> str:
+    tag = "r" if run_set == MAIN else "apicheck"
+    return f"{family}__{mode}__{prompt_id}__{tag}{replicate}"
 
 
 def build_manifest(grid: Grid) -> list[Run]:
@@ -33,6 +38,10 @@ def build_manifest(grid: Grid) -> list[Run]:
 
     Randomising execution order stops time-of-day or same-day vendor changes from
     lining up with one mode or one family.
+
+    API-check runs (one per family x primary mode, if `api_check.replicates` > 0)
+    are listed after the main grid. They verify that each mode switch does what the
+    mode registry claims. They are never blinded, scored or analysed with the grid.
     """
     cells = []
     for fam in grid.families:
@@ -42,7 +51,7 @@ def build_manifest(grid: Grid) -> list[Run]:
                     cells.append((fam, mode, prompt, rep))
     rng = random.Random(grid.seed)
     rng.shuffle(cells)
-    return [
+    runs = [
         Run(
             order=i,
             run_id=make_run_id(fam.id, mode.id, prompt.id, rep),
@@ -55,6 +64,30 @@ def build_manifest(grid: Grid) -> list[Run]:
         )
         for i, (fam, mode, prompt, rep) in enumerate(cells, start=1)
     ]
+    order = len(runs)
+    for fam in grid.families:
+        if fam.adapter is None:
+            continue
+        for mode in fam.modes.values():
+            if not mode.primary:
+                continue
+            for rep in range(1, grid.api_check_replicates + 1):
+                order += 1
+                prompt = grid.prompts[0]
+                runs.append(
+                    Run(
+                        order=order,
+                        run_id=make_run_id(fam.id, mode.id, prompt.id, rep, API_CHECK),
+                        family=fam.id,
+                        mode=mode.id,
+                        primary=True,
+                        prompt_id=prompt.id,
+                        replicate=rep,
+                        channel="api",
+                        set=API_CHECK,
+                    )
+                )
+    return runs
 
 
 def write_manifest(runs: list[Run], path: str | Path) -> None:
@@ -79,6 +112,7 @@ def read_manifest(path: str | Path) -> list[Run]:
                 prompt_id=r["prompt_id"],
                 replicate=int(r["replicate"]),
                 channel=r["channel"],
+                set=r.get("set") or MAIN,
             )
             for r in csv.DictReader(fh)
         ]

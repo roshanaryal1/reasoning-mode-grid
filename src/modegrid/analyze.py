@@ -11,7 +11,7 @@ import numpy as np
 
 from . import DIM_NAMES, DIMS, PRIMARY_MODES
 from .anova import bootstrap, cell_spreads, decompose, permutation_p, rank_transform, residualise
-from .plan import Run
+from .plan import MAIN, Run
 from .scores import Scores
 
 # Pre-registered directional hypotheses (docs/preregistration.md).
@@ -57,7 +57,7 @@ class Design:
 
 
 def build_design(runs: list[Run], prompt_id: str) -> Design:
-    primary = [r for r in runs if r.primary and r.prompt_id == prompt_id and r.mode in PRIMARY_MODES]
+    primary = [r for r in runs if r.set == MAIN and r.primary and r.prompt_id == prompt_id and r.mode in PRIMARY_MODES]
     if not primary:
         raise AnalysisError(f"no primary runs for prompt {prompt_id!r}")
     families = sorted({r.family for r in primary})

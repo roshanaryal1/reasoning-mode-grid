@@ -101,12 +101,19 @@ def check_capture(capture: Capture) -> list[str]:
     problems = [f"missing front-matter key {k!r}" for k in REQUIRED_KEYS if k not in capture.meta]
     if not capture.final_answer or capture.final_answer.startswith("<!--"):
         problems.append("final answer is empty")
+    for key, value in capture.meta.items():
+        if isinstance(value, str) and "FILL IN" in value:
+            problems.append(f"front-matter {key!r} still says FILL IN")
     return problems
+
+
+def word_count(text: str) -> int:
+    return len(text.split())
 
 
 def manual_template(meta: dict[str, Any]) -> str:
     """Template for a web-UI run. The operator pastes the answer verbatim."""
-    meta = {**meta, "model_returned": meta.get("model_returned", "as shown in UI, else 'not shown'")}
+    meta = {**meta, "model_returned": meta.get("model_returned", "as shown in the app, else 'not shown'")}
     cap = Capture(
         meta=meta,
         final_answer="<!-- Paste the model's final answer VERBATIM. Do not edit. -->",

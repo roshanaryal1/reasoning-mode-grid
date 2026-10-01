@@ -11,13 +11,13 @@ import sys
 import tempfile
 from pathlib import Path
 
-from . import DIMS, __version__
+from . import DIMS, PRIMARY_MODES, __version__
 from .agreement import exact_agreement, krippendorff_alpha
 from .analyze import run_analysis, write_outputs
 from .blind import build_packets
-from .capture import Capture, check_capture, manual_template, read_capture, write_capture
+from .capture import Capture, check_capture, manual_template, read_capture, word_count, write_capture
 from .config import load_grid, unready_families
-from .plan import build_manifest, read_manifest, write_manifest
+from .plan import API_CHECK, MAIN, build_manifest, read_manifest, write_manifest
 from .providers import adapter_for, with_retries
 from .scores import disagreements, load_key, load_scores, unblind, write_scores
 from .synthetic import Effect, power, synthetic_scores
@@ -73,6 +73,7 @@ def cmd_run(args: argparse.Namespace) -> int:
         comp = with_retries(lambda a=adapter, t=text, m=model, p=params: a.complete(t, m, p, grid.max_tokens))
         meta = {
             "run_id": r.run_id,
+            "set": r.set,
             "family": fam.id,
             "vendor": fam.vendor,
             "mode": mode.id,
@@ -112,14 +113,20 @@ def cmd_new_capture(args: argparse.Namespace) -> int:
     if path.exists():
         print(f"{path} exists, captures are write-once")
         return 2
+    if r.channel != "web":
+        print(f"{r.run_id} is an API run. Use `modegrid run` for it.")
+        return 2
+    mode = fam.modes[r.mode]
     meta = {
         "run_id": r.run_id,
+        "set": r.set,
         "family": fam.id,
         "vendor": fam.vendor,
         "mode": r.mode,
-        "native_label": fam.modes[r.mode].native_label,
+        "native_label": mode.chat_label,
         "channel": "web",
-        "model_requested": fam.modes[r.mode].model or fam.model,
+        "model_requested": f"{fam.vendor} chat app, {mode.chat_label}",
+        "model_returned": "FILL IN: the model name the app shows, or 'not shown'",
         "prompt_id": prompt.id,
         "prompt_sha256": prompt.sha256,
         "replicate": r.replicate,
@@ -167,7 +174,8 @@ def cmd_validate(args: argparse.Namespace) -> int:
 
 def cmd_blind(args: argparse.Namespace) -> int:
     grid = load_grid(args.config)
-    caps = [read_capture(p) for p in sorted(Path(args.captures).glob("*.md"))]
+    main_ids = {r.run_id for r in read_manifest(args.manifest) if r.set == MAIN}
+    caps = [read_capture(p) for p in sorted(Path(args.captures).glob("*.md")) if p.stem in main_ids]
     caps = [c for c in caps if not check_capture(c)]
     terms = list(grid.global_redact_terms)
     for fam in grid.families:
@@ -209,19 +217,74 @@ def cmd_agreement(args: argparse.Namespace) -> int:
 def cmd_analyze(args: argparse.Namespace) -> int:
     runs = read_manifest(args.manifest)
     scores = load_scores(args.scores, id_col="run_id")
+    # Answer length in words. Chat apps report no token counts, and words are
+    # comparable across vendors whose tokenizers differ.
     lengths = None
     if args.captures and Path(args.captures).exists():
-        lengths = {}
-        for p in Path(args.captures).glob("*.md"):
-            usage = read_capture(p).meta.get("usage") or {}
-            if usage.get("output_tokens"):
-                lengths[p.stem] = float(usage["output_tokens"])
+        lengths = {p.stem: float(word_count(read_capture(p).final_answer)) for p in Path(args.captures).glob("*.md")}
     design, rows = run_analysis(
         runs, scores, args.prompt, n_boot=args.boot, n_perm=args.perm, seed=args.seed, lengths=lengths
     )
     write_outputs(design, rows, args.out, note=args.note)
     print(Path(args.out, "variance_table.md").read_text(encoding="utf-8"))
     return 0
+
+
+def cmd_check_modes(args: argparse.Namespace) -> int:
+    """Summarise the API-check runs: did each mode switch do what the registry claims?"""
+    runs = [r for r in read_manifest(args.manifest) if r.set == API_CHECK]
+    caps = {p.stem: read_capture(p) for p in Path(args.captures).glob("*.md")}
+    rows = []
+    for fam in sorted({r.family for r in runs}):
+        cells = {}
+        for mode in PRIMARY_MODES:
+            ids = [r.run_id for r in runs if r.family == fam and r.mode == mode and r.run_id in caps]
+            cells[mode] = [caps[i] for i in ids]
+        if not cells["fast"] or not cells["reasoning"]:
+            rows.append((fam, "-", "-", "-", "-", "-", "missing capture(s)"))
+            continue
+
+        def stats(capset: list[Capture]) -> tuple[float, float | None, str]:
+            words = sum(word_count(c.final_answer) for c in capset) / len(capset)
+            rt = [(c.meta.get("usage") or {}).get("reasoning_tokens") for c in capset]
+            rt_num = [x for x in rt if isinstance(x, int)]
+            reasoning = sum(rt_num) / len(rt_num) if rt_num else None
+            models = ",".join(sorted({str(c.meta.get("model_returned")) for c in capset}))
+            return words, reasoning, models
+
+        fw, fr, fm = stats(cells["fast"])
+        rw, rr, rm = stats(cells["reasoning"])
+        has_trace = any(c.reasoning_trace not in {"", "NONE"} for c in cells["reasoning"])
+        if fr is not None and rr is not None:
+            ok = fr == 0 and rr > 0
+            verdict = "switch confirmed" if ok else "CHECK: reasoning tokens do not separate the modes"
+        elif has_trace:
+            verdict = "trace present in reasoning mode, confirm fast mode by hand"
+        else:
+            verdict = "no reasoning token count, confirm from vendor console"
+        if fm != rm:
+            verdict += f"; models differ ({fm} vs {rm}), confirm same weights"
+        rows.append((fam, f"{fw:.0f}", f"{rw:.0f}", _n(fr), _n(rr), fm if fm == rm else f"{fm} / {rm}", verdict))
+
+    lines = [
+        "# Mode check (API)",
+        "",
+        "One API call per family and mode. Evidence that each mode switch works. Not scored.",
+        "",
+        "| Family | Words fast | Words reasoning | Reasoning tokens fast | Reasoning tokens reasoning "
+        "| Model returned | Verdict |",
+        "|---|---|---|---|---|---|---|",
+        *[f"| {' | '.join(row)} |" for row in rows],
+    ]
+    out = Path(args.out)
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    print("\n".join(lines))
+    return 0
+
+
+def _n(v: float | None) -> str:
+    return "n/a" if v is None else f"{v:.0f}"
 
 
 def cmd_demo(args: argparse.Namespace) -> int:
@@ -277,6 +340,10 @@ def build_parser() -> argparse.ArgumentParser:
     n.add_argument("run_id")
     n.add_argument("--run-by", default=getpass.getuser())
     n.set_defaults(func=cmd_new_capture)
+
+    k = sub.add_parser("check-modes", help="summarise the API mode-check runs")
+    k.add_argument("--out", default="results/mode_check.md")
+    k.set_defaults(func=cmd_check_modes)
 
     sub.add_parser("validate", help="check config, prompts, captures and score files").set_defaults(func=cmd_validate)
 
