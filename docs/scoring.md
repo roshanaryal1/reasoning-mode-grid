@@ -10,6 +10,8 @@
 - This file.
 
 Raters never receive the key file, the captures, the manifest, or the reasoning traces.
+A rater who is also a co-author has no repo access until scoring is locked
+(see [collaboration.md](collaboration.md)).
 
 ## How to score
 
