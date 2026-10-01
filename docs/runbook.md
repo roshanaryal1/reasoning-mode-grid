@@ -38,17 +38,21 @@ This is the phase that decides whether the paper survives review. Take it slowly
    - If a vendor no longer lets you turn reasoning fully off, use its lowest setting and
      record that. Claude's newest models are an example: on Opus 5.5 and Sonnet 5.5 thinking
      cannot be disabled, which is why the grid uses Sonnet 5.
-2. **Smoke-test each API family with one call** before freezing. Use a throwaway prompt
-   so no real cell is spent:
+2. **Fill the chat labels.** For each mode, write the exact app, model and switch you
+   will select into `web_label` (for example "claude.ai, Sonnet 5, extended thinking ON").
+   Avoid "auto" model pickers, they can route to a different model.
+3. **Run the 12 API mode checks.** One API call per family and mode. This costs a few
+   dollars in total and is the evidence that each switch does what you claim.
 
    ```bash
-   modegrid run --family claude --limit 1 --dry-run
+   modegrid run --dry-run       # lists only the 12 api_check runs
+   modegrid run                 # needs the keys in .env for each vendor
+   modegrid check-modes         # writes results/mode_check.md
    ```
 
-   Then make one real call per family and mode from a scratch script and confirm that
-   the fast call returns no reasoning tokens and the reasoning call does. Record the
-   usage numbers in the mode registry as evidence that the switch works.
-3. **Freeze the pre-registration.** Read [preregistration.md](preregistration.md) end to
+   Every row should say "switch confirmed". If a row says CHECK, fix the setting or
+   drop the family before freezing. Copy the table into the mode registry.
+4. **Freeze the pre-registration.** Read [preregistration.md](preregistration.md) end to
    end, change anything you disagree with now, then commit and tag:
 
    ```bash
@@ -58,49 +62,49 @@ This is the phase that decides whether the paper survives review. Take it slowly
 
    Optional but stronger: upload the same file to OSF Registries or AsPredicted and put
    the link in the file. A dated public registration is what reviewers trust.
-4. **Regenerate the manifest** after the config is final: `modegrid plan`. Commit
+5. **Regenerate the manifest** after the config is final: `modegrid plan`. Commit
    `data/manifest/runs.csv`.
 
 Check: `modegrid validate` prints `ok`, `modegrid plan` reports no open placeholders,
 and the `prereg-v1` tag exists.
 
-## Phase 2. Collect the 60 captures (3 to 5 days)
+## Phase 2. Collect the 60 chat captures (3 to 5 days)
 
-Run in manifest order. The order is random on purpose, so vendor-side changes during the
-week do not line up with one mode.
+All 60 scored runs happen in the vendors' chat apps. Work through
+`data/manifest/runs.csv` in order (rows with `set` = `main`). The order is random on
+purpose, so vendor-side changes during the week do not line up with one mode.
 
-**API families** (Claude, GPT, Gemini, Qwen, DeepSeek):
-
-```bash
-modegrid run --dry-run        # list what will execute
-modegrid run                  # executes every API run without a capture
-modegrid validate
-```
-
-The command skips runs that already have a capture, so you can stop and restart it.
-If a run ends with a finish reason other than a normal stop, the capture notes say so.
-Do not delete it. Follow the exclusion rules in the pre-registration.
-
-**Web families** (Grok Fast vs Expert):
+For each run:
 
 ```bash
-modegrid new-capture grok__fast__p1-v1__r1
+modegrid new-capture claude__fast__p1-v1__r1
 ```
 
-Then, for each web run:
+Then:
 
-- Open a fresh chat. Signed in, no custom instructions, memory off, no files attached.
-- Select the mode named in the capture's `native_label`.
+- Open a fresh chat. Signed in, no custom instructions, memory off, no files attached,
+  web search off where the app allows it.
+- Select exactly what the capture's `native_label` says.
 - Paste the prompt text between the `=== PROMPT START ===` and `=== PROMPT END ===`
   lines of `vendor/llm-architects/prompts/prompt-v1.md`, and nothing else.
 - If the model asks a question, reply only: "Please proceed with reasonable assumptions
   and state them." Note it in Run notes.
-- Paste the answer verbatim into the capture. Take a screenshot of the mode selector and
-  keep it outside the repo.
+- Paste the final answer verbatim into the capture. If the app shows a thinking panel,
+  paste it under the reasoning trace heading. Raters never see that section.
+- Replace the `FILL IN` value in `model_returned` with the model name the app shows.
+- Take a screenshot of the model and mode selector. Keep screenshots outside the repo,
+  named by run id.
 
-Commit captures in small batches: `git commit -m "captures: claude r1-r5"`.
+Tips that save time:
 
-Check: 60 files in `data/captures/`, `modegrid validate` prints `ok`.
+- Do one family per sitting, in manifest order. A family's 10 runs take about an hour.
+- Finish each family inside 48 hours, so a silent vendor update cannot split it.
+- `modegrid validate` catches a missing section or a leftover `FILL IN`.
+
+Commit in small batches: `git commit -m "data: claude chat captures r1-r5"`.
+
+Check: 60 main captures plus 12 API checks in `data/captures/`, and
+`modegrid validate` prints `ok`.
 
 ## Phase 3. Score blind (1 to 2 weeks, the long pole)
 
@@ -165,8 +169,10 @@ Before submitting:
 
 ## Cost control
 
-- Run one family end to end first (Claude, 10 runs) and look at the token usage in the
-  captures before running the rest.
-- The prompt is about 13 KB of input. Reasoning modes can produce long outputs. The
-  `max_tokens` cap is 32,000 so answers are not cut off.
-- Never use server-side model fallbacks. A fallback puts a different model in a cell.
+- The 60 scored runs use the chat apps, so they cost only your subscriptions and time.
+  Free tiers can hide the reasoning mode or cap usage, so check each app has the mode
+  before you start.
+- The 12 API checks cost a few dollars in total. The prompt is about 3,500 tokens and a
+  long reasoning answer is about 15,000. Run Claude's 2 calls first and read the usage
+  in the captures before running the rest.
+- Never use server-side model fallbacks. A fallback answers from a different model.

@@ -22,9 +22,9 @@ portable across a grid.
 |---|---|
 | Stage | Harness built and tested. Pre-registration drafted. **No grid data collected yet.** |
 | Pilot | n = 1 family (DeepSeek, 3 modes, web app, v1 rubric). See [the pilot note](data/pilot/README.md): the adjudicated pilot scores do **not** yet support the claim. |
-| Design | 6 families x 2 modes x 5 replicates = 60 runs, 12 cells |
+| Design | 6 families x 2 modes x 5 replicates = 60 chat-app runs, 12 cells, plus 12 API calls that verify each mode switch |
 | Venue | Short paper, LLM evaluation workshop |
-| Blocking the first run | Fill the `FILL-ME` / `VERIFY` values in [`configs/grid.yaml`](configs/grid.yaml) from each vendor's docs, then freeze the pre-registration |
+| Blocking the first run | Fill the chat labels and the `FILL-ME` / `VERIFY` API values in [`configs/grid.yaml`](configs/grid.yaml), run the 12 API checks, then freeze the pre-registration |
 
 ## What you get
 
@@ -33,7 +33,8 @@ portable across a grid.
 - A pre-registered analysis: a two-way variance decomposition (model family, mode,
   interaction, residual) per rubric dimension, with bootstrap CIs, permutation tests,
   a rank-based check and a length-adjusted check.
-- Vendor adapters where the reasoning switch lives in YAML, not code.
+- Chat-app capture templates for the 60 scored runs, plus API adapters for a 12-call
+  check that each mode switch works. The reasoning switch lives in YAML, not code.
 - Blinded rater packets, so raters never see which model or mode wrote an answer.
 - CI that runs lint, types, tests on Python 3.10 to 3.13, and validates the data.
 
@@ -48,7 +49,8 @@ pip install -e ".[dev,providers]"
 make check          # lint, types, tests, data validation
 modegrid demo       # full pipeline on SYNTHETIC data, no API calls, no cost
 modegrid plan       # writes data/manifest/runs.csv (60 runs, random order)
-modegrid run --family claude --dry-run
+modegrid new-capture claude__fast__p1-v1__r1   # template for one chat run
+modegrid run --dry-run                          # the 12 API mode checks
 ```
 
 The full step-by-step guide is [docs/runbook.md](docs/runbook.md).
@@ -56,7 +58,7 @@ The full step-by-step guide is [docs/runbook.md](docs/runbook.md).
 ## How the study works
 
 ```text
-configs/grid.yaml --plan--> runs.csv --run / new-capture--> data/captures/*.md
+configs/grid.yaml --plan--> runs.csv --new-capture (60 chat) / run (12 API)--> data/captures/*.md
                                                                   |
                                                                 blind
                                                                   v
@@ -96,6 +98,7 @@ configs/grid.yaml --plan--> runs.csv --run / new-capture--> data/captures/*.md
 - [Analysis](docs/analysis.md): the statistics in plain language
 - [Power](docs/power.md): why 5 replicates
 - [Threats to validity](docs/threats-to-validity.md)
+- [Collaboration](docs/collaboration.md): who does what, and how blinding survives a co-author
 - [Paper plan](docs/paper-plan.md) and [outline](paper/outline.md)
 
 ## Citation

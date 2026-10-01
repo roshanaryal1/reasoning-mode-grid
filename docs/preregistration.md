@@ -35,12 +35,20 @@ Anything else is "inconclusive".
   with mode (2 levels: fast, reasoning). Within a family the weights are fixed. The
   vendor-specific settings for each level are in `configs/grid.yaml` and
   [mode-registry.md](mode-registry.md).
-- **Replicates.** 5 independent runs per cell, fresh session each time. 60 runs total.
-  Rationale in [power.md](power.md).
+- **Channel.** All 60 scored runs are captured in each vendor's own chat app, the way
+  people use these models and the way LA-P1 was captured. Fresh chat each time, signed
+  in, memory off, no custom instructions, no files. A screenshot of the mode selector is
+  kept for every run.
+- **Replicates.** 5 independent runs per cell. 60 runs total. Rationale in [power.md](power.md).
+- **API mode check.** Separately, 1 API call per family and mode (12 calls) with the
+  documented API equivalent of each chat mode. These show that each mode switch changes
+  reasoning (reasoning tokens or a reasoning trace) and record which model answered.
+  They are never scored, never blinded and never pooled with the 60 chat runs. Results
+  go to `results/mode_check.md` and the paper appendix.
 - **Prompt.** `prompt-v1` from LA-P1, unchanged, sha256 pinned in the config.
 - **Order.** Execution order is randomised with seed 20261001 (`data/manifest/runs.csv`).
-- **Settings.** Vendor default sampling settings. Browsing and tools off where the
-  interface allows it. `max_tokens` 32,000.
+- **Settings.** Vendor defaults. Web search and tools off where the app allows it. If an
+  app cannot turn search off, that is recorded in the capture and the mode registry.
 
 ## 4. Measurement
 
@@ -80,7 +88,8 @@ separate pre-stated prediction. The 6 non-directional dimensions are descriptive
 ## 6. Robustness checks (pre-registered, reported regardless of result)
 
 1. Rank transform: the same analysis on ranked scores.
-2. Length adjustment: residualise scores on log output tokens, then re-run. If the mode
+2. Length adjustment: residualise scores on log answer length in words, then re-run.
+   Words, not tokens, because chat apps report no token counts and tokenizers differ. If the mode
    effect vanishes, the paper reports that reasoning modes score higher because they write
    longer answers, not because they reason better.
 3. Rater-level analysis: run the decomposition on each rater's raw scores separately.
@@ -88,8 +97,9 @@ separate pre-stated prediction. The 6 non-directional dimensions are descriptive
 ## 7. Exclusions and replacements
 
 - A run is **replaced** (re-run once, same cell, new run id suffix `-rerun`) only if:
-  the API returned an error, the output was truncated by `max_tokens`, or the vendor
-  refused the request outright. The original capture stays in the repo with a note.
+  the app or API returned an error, the answer was visibly cut off, the vendor refused
+  outright, or the app silently used a different model or mode than the one selected
+  (visible in the screenshot). The original capture stays in the repo with a note.
 - A run is **never** replaced because its score is low or the answer is odd.
 - If a family cannot complete both modes (vendor removes the mode, account blocked),
   the whole family is dropped and reported. The design stays balanced.

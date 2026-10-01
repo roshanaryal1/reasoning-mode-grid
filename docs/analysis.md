@@ -38,8 +38,8 @@ shuffle produces a mode effect as large as the real one. No distribution assumpt
 ## The three robustness checks
 
 1. **Ranks.** Re-run on ranked scores. Guards against the 0/1/2 scale doing odd things.
-2. **Length.** Reasoning modes write more. Remove the linear effect of log output length
-   and re-run. If the mode effect disappears, the honest finding is about length.
+2. **Length.** Reasoning modes write more. Remove the linear effect of log answer length
+   in words and re-run. If the mode effect disappears, the honest finding is about length.
 3. **Per rater.** Re-run on each rater's raw scores. A result that exists only after
    adjudication is fragile.
 

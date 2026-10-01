@@ -7,7 +7,8 @@ Each threat has a mitigation and the place in the paper where it is reported.
 | Threat | Mitigation |
 |---|---|
 | "Mode" is not the same control across vendors. One vendor's off is another's low. | Mode registry documents each setting with evidence. Harmonised to two levels. Discussed as a limitation. |
-| A vendor routes fast mode to a smaller model. | Rule: same weights only. Record `model_returned` in every capture. Flag any mismatch. |
+| A vendor routes fast mode to a smaller model. | Rule: same weights only. Record the model the app shows in every capture, plus a screenshot. The API check records which model answered. |
+| Chat apps are less controlled than an API (hidden system prompt, snapshot changes). | Matches real use and LA-P1. API check per mode as evidence of the switch. Limitation stated in the paper. |
 | The rubric measures length, not quality. | Length-adjusted robustness check. |
 | One prompt. | Optional second prompt as a pre-registered replication. Prompt-sensitivity data from LA-P1 (v2, v3 paraphrases) cited. |
 
@@ -17,7 +18,8 @@ Each threat has a mitigation and the place in the paper where it is reported.
 |---|---|
 | Raters know which mode wrote an answer. Reasoning answers can look different. | Blinded packets, identity redaction, rater guesses recorded and reported as a blinding-failure rate. |
 | Vendors change models during data collection. | Randomised run order. All runs for a family inside a short window. Dated captures. |
-| Personalisation in web UIs. | Fresh chat, memory off, no custom instructions, recorded in each capture. |
+| Personalisation in chat apps. | Fresh chat, memory off, no custom instructions, recorded in each capture. |
+| A co-author or rater sees the captures before scoring. | Raters get only the blinded packet. Repo access for raters only after unblinding (see collaboration.md). |
 | Raters with old training data flag real new tools as fake (the LA-P2 effect). | Mandatory web verification for D3 and D4. UNRESOLVED scores as 1. |
 | Analysis choices made after seeing data. | Pre-registration tagged before the first capture. Deviations logged. |
 
