@@ -1,6 +1,6 @@
 # Reasoning Mode Beats Model Identity
 
-[![CI](https://github.com/roshanaryal1/reasoning-mode-vs-model/actions/workflows/ci.yml/badge.svg)](https://github.com/roshanaryal1/reasoning-mode-vs-model/actions/workflows/ci.yml)
+[![CI](https://github.com/roshanaryal1/reasoning-mode-grid/actions/workflows/ci.yml/badge.svg)](https://github.com/roshanaryal1/reasoning-mode-grid/actions/workflows/ci.yml)
 ![Python](https://img.shields.io/badge/python-3.10%2B-blue)
 ![Code: MIT](https://img.shields.io/badge/code-MIT-green)
 ![Data: CC--BY--4.0](https://img.shields.io/badge/data-CC--BY--4.0-lightgrey)
@@ -40,8 +40,8 @@ portable across a grid.
 ## Quick start
 
 ```bash
-git clone https://github.com/roshanaryal1/reasoning-mode-vs-model
-cd reasoning-mode-vs-model
+git clone https://github.com/roshanaryal1/reasoning-mode-grid
+cd reasoning-mode-grid
 python -m venv .venv && source .venv/bin/activate
 pip install -e ".[dev,providers]"
 

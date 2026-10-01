@@ -6,7 +6,7 @@ Only the latest commit on `main` is supported.
 
 ## Reporting
 
-Email <roshanaryaal@gmail.com> with "SECURITY reasoning-mode-vs-model" in the subject.
+Email <roshanaryaal@gmail.com> with "SECURITY reasoning-mode-grid" in the subject.
 Do not open a public issue. You will get a reply within 7 days.
 
 ## In scope
