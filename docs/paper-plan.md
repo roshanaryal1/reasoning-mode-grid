@@ -2,12 +2,12 @@
 
 ## Target
 
-- **Format:** short paper, 4 pages plus references and appendix.
-- **Venue:** an LLM evaluation workshop (NeurIPS, ICLR, COLM or ACL workshops). Non-archival
-  workshops let the full version go to a journal later.
-- **Also:** arXiv preprint the day it is submission-ready. Zenodo DOI for the data release.
-- **Re-verify every deadline on the official call for papers.** Do not rely on any date
-  written in this repo.
+Full research and dates in [venues.md](venues.md). In short:
+
+- **arXiv** preprint when the analysis is done (January 2027).
+- **ICLR 2027 workshop**, 4-page non-archival short paper (submit about 1 Feb 2027).
+- **TMLR** for the archival version, submitted at the same time.
+- Optional extended version for the **NeurIPS 2027 Evaluations & Datasets** track.
 
 ## Dependencies
 
@@ -28,13 +28,13 @@ From this study, report:
 
 ## Timeline
 
-| Week | Work |
+| When | Work |
 |---|---|
-| 1 | Phase 1 of the runbook. Freeze the pre-registration |
-| 2 | Collect 60 captures |
-| 3 to 4 | Blind scoring by at least two raters |
-| 5 | Adjudicate, unblind, analyse |
-| 6 to 7 | Write, internal review, metadata strip, submit |
+| Oct 2026 | Fill settings, API checks, freeze the pre-registration |
+| Nov 2026 | 60 chat captures, blind scoring starts |
+| Dec 2026 | Scoring and adjudication locked, unblind, analyse |
+| Jan 2027 | Write, arXiv, submit to TMLR |
+| about 1 Feb 2027 | Submit the 4-page version to an ICLR 2027 workshop |
 
 ## Salami test
 
