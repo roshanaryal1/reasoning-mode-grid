@@ -1,0 +1,38 @@
+name: Capture problem
+description: A run failed, was truncated, refused, or the mode switch did not behave as documented
+labels: [data]
+body:
+  - type: input
+    id: run_id
+    attributes:
+      label: run_id
+      placeholder: claude__fast__p1-v1__r3
+    validations:
+      required: true
+  - type: dropdown
+    id: kind
+    attributes:
+      label: What happened
+      options:
+        - API error
+        - Truncated at max_tokens
+        - Vendor refusal
+        - model_returned differs from model_requested
+        - Mode switch had no visible effect
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: detail
+    attributes:
+      label: Detail and evidence
+      description: Paste the finish_reason, usage block, or describe the UI. Do not paste API keys.
+    validations:
+      required: true
+  - type: checkboxes
+    id: rule
+    attributes:
+      label: Pre-registration
+      options:
+        - label: I checked section 7 (exclusions and replacements) of docs/preregistration.md
+          required: true
