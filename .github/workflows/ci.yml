@@ -1,0 +1,85 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: Test (Python ${{ matrix.python }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ["3.10", "3.11", "3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python }}
+          cache: pip
+      - name: Install
+        run: python -m pip install -e ".[dev]"
+      - name: Lint
+        run: |
+          ruff check src tests --output-format=github
+          ruff format --check src tests
+      - name: Type check
+        run: mypy
+      - name: Tests
+        run: pytest --cov --cov-report=term-missing --cov-fail-under=75
+
+  data:
+    name: Data integrity
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: python -m pip install -e .
+      - name: Vendored files unchanged
+        run: cd vendor/llm-architects && sha256sum -c SHA256SUMS
+      - name: Validate config, prompts, captures, scores
+        run: modegrid validate
+      - name: Manifest matches config
+        run: |
+          modegrid --manifest /tmp/runs.csv plan
+          diff -u data/manifest/runs.csv /tmp/runs.csv
+      - name: Synthetic end-to-end run
+        run: modegrid demo --boot 300 --out /tmp/demo
+      - name: Blinding key is not committed early
+        run: |
+          if git ls-files --error-unmatch data/blinding/key.csv >/dev/null 2>&1; then
+            n=$(ls data/scores/rater*.csv 2>/dev/null | wc -l)
+            if [ "$n" -lt 2 ]; then
+              echo "::error::data/blinding/key.csv is committed but fewer than two rater sheets exist"
+              exit 1
+            fi
+          fi
+
+  markdown:
+    name: Markdown lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: "22"
+      # Verbatim model output is exempt. It must never be reflowed.
+      - run: >
+          npx --yes markdownlint-cli@0.45.0 '**/*.md'
+          --ignore node_modules
+          --ignore 'data/captures/**'
+          --ignore 'data/pilot/**'
+          --ignore 'vendor/**'

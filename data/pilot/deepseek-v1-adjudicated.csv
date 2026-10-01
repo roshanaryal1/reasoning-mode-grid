@@ -1,0 +1,4 @@
+slug,mode_harmonised,D1,D2,D3,D4,D5,D6,D7,D8,D9,total,rubric,source
+deepseek-expert,reasoning,1,1,1,1,1,0,1,2,0,8,v1,llm-architects@d5e39e7 analysis/scoring/scores-adjudicated-2026-09-01.csv
+deepseek-instant,fast,1,2,1,2,0,0,1,2,0,9,v1,llm-architects@d5e39e7 analysis/scoring/scores-adjudicated-2026-09-01.csv
+deepseek-instant-deepthink,exploratory,0,2,1,0,0,0,1,1,1,6,v1,llm-architects@d5e39e7 analysis/scoring/scores-adjudicated-2026-09-01.csv

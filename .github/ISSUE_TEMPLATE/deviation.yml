@@ -1,0 +1,25 @@
+name: Deviation from pre-registration
+description: Propose a change to the frozen design, rubric, prompt or analysis
+labels: [deviation]
+body:
+  - type: textarea
+    id: change
+    attributes:
+      label: Proposed change
+    validations:
+      required: true
+  - type: textarea
+    id: reason
+    attributes:
+      label: Why it is needed
+    validations:
+      required: true
+  - type: dropdown
+    id: seen
+    attributes:
+      label: Has any real score data been seen?
+      options:
+        - "No"
+        - "Yes"
+    validations:
+      required: true

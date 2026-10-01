@@ -1,0 +1,24 @@
+# Data and documentation licence
+
+The research data (`data/`), prompts (`vendor/llm-architects/prompts/`), results
+(`results/`), documentation (`docs/`, `paper/`, `README.md`) and configuration
+(`configs/`) in this repository are licensed under the
+
+**Creative Commons Attribution 4.0 International License (CC-BY-4.0)**
+<https://creativecommons.org/licenses/by/4.0/>
+
+Credit: Roshan Aryal, *Reasoning Mode Beats Model Identity: model x mode grid*, 2026.
+https://github.com/roshanaryal1/reasoning-mode-vs-model
+
+## Third-party content
+
+Files under `data/captures/` and `data/pilot/` contain verbatim output from third-party AI
+systems, reproduced for research, criticism and comparative review. Each is delimited
+under a `## Final answer` heading, attributed in front-matter to its originating system
+and capture date, and unmodified except for clearly marked notes. These excerpts remain
+the product of their respective systems. Inclusion here does not transfer any rights in
+the underlying output. If you reuse a capture, keep its front-matter.
+
+## Code
+
+Original code is under the MIT License. See `LICENSE`.

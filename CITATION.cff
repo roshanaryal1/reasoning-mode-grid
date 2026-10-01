@@ -1,0 +1,34 @@
+# https://citation-file-format.github.io/
+cff-version: 1.2.0
+message: "If you use this harness or dataset, please cite it as below, and cite LA-P1 (the source of the prompt and rubric)."
+title: "Reasoning Mode Beats Model Identity: a controlled model x mode grid (harness and dataset)"
+abstract: >-
+  A pre-registered model x mode grid. Six LLM families are each run in a fast and a
+  reasoning mode on one frozen, constrained systems-design prompt, five replicates per
+  cell. Answers are scored blind with a nine-dimension rubric and the variance in each
+  dimension is decomposed into model, mode, interaction and residual shares.
+type: software
+authors:
+  - family-names: Aryal
+    given-names: Roshan
+    email: roshanaryaal@gmail.com
+    affiliation: "Independent Researcher, Auckland, New Zealand"
+repository-code: "https://github.com/roshanaryal1/reasoning-mode-vs-model"
+license: MIT
+version: "0.1.0"
+date-released: "2026-10-01"
+keywords:
+  - large language models
+  - reasoning mode
+  - test-time compute
+  - LLM evaluation
+  - variance decomposition
+  - pre-registration
+references:
+  - type: dataset
+    title: "Large Language Models as Systems Architects (dataset and analysis code)"
+    authors:
+      - family-names: Aryal
+        given-names: Roshan
+    doi: 10.5281/zenodo.22245991
+    repository-code: "https://github.com/roshanaryal1/llm-architects"
