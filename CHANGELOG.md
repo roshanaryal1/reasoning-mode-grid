@@ -5,6 +5,22 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions follo
 
 ## [Unreleased]
 
+### Changed
+
+- The 60 scored runs are now captured in each vendor's chat app (`channel: web`), to
+  match LA-P1 and real use. Each mode has a `web_label` naming what to select.
+- The length robustness check uses answer length in words, comparable across chat apps
+  and tokenizers.
+
+### Added
+
+- `api_check` run set: 1 API call per family and mode (12 calls) to verify each mode
+  switch. Never blinded, scored or analysed with the grid.
+- `modegrid check-modes`, which writes `results/mode_check.md`.
+- `modegrid validate` flags a capture that still says `FILL IN`.
+- `docs/collaboration.md` and `AUTHORS.md`: co-author split, access rules that keep
+  scoring blind, CRediT roles.
+
 ## [0.1.0] - 2026-10-01
 
 ### Added
