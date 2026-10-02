@@ -7,6 +7,9 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions follo
 
 ### Changed
 
+- Filled researched API settings for GPT (gpt-5.5) and DeepSeek (deepseek-v4-pro, whose
+  old API names were retired on 24 Jul 2026). Gemini, Qwen and Grok still need a
+  model decision; research notes and sources are in the mode registry.
 - The 60 scored runs are now captured in each vendor's chat app (`channel: web`), to
   match LA-P1 and real use. Each mode has a `web_label` naming what to select.
 - The length robustness check uses answer length in words, comparable across chat apps

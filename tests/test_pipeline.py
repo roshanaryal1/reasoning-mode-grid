@@ -26,7 +26,7 @@ def test_placeholders_are_reported(grid_path):
     grid = load_grid(grid_path)
     unready = unready_families(grid)
     assert "claude" not in unready
-    assert "gpt" in unready
+    assert "gemini" in unready
 
 
 def test_grid_rejects_missing_primary_mode(tmp_path, grid_path):
