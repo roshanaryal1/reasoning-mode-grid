@@ -95,13 +95,17 @@ families:
       true off vs on, but an older model; or (b) a current Gemini 3.x Flash, lowest
       level vs high, recorded as "lowest available" like the Claude rule. In the
       Gemini app, make sure Fast and Thinking use the same model, not Flash vs Pro.
+      Researched 2026-10-02: in the Gemini app, Fast and Thinking are both Gemini
+      3 Flash, and Pro is a separate model. So app Fast vs Thinking is a same-model
+      comparison; never use Pro. For the API check, use the exact Flash version the
+      app runs, lowest accepted reasoning_effort vs high.
     modes:
       fast:
-        web_label: "FILL-ME: Gemini app, one model, thinking off"
+        web_label: "gemini.google.com, Fast (Gemini 3 Flash)"
         native_label: "thinking off"
         params: {reasoning_effort: VERIFY-value-that-disables-thinking}
       reasoning:
-        web_label: "FILL-ME: Gemini app, same model, thinking on"
+        web_label: "gemini.google.com, Thinking (Gemini 3 Flash)"
         native_label: "thinking high"
         params: {reasoning_effort: high}
 
@@ -111,7 +115,7 @@ families:
     adapter: openai_compatible
     base_url: https://dashscope-intl.aliyuncs.com/compatible-mode/v1
     api_key_env: DASHSCOPE_API_KEY
-    model: FILL-ME            # a hybrid-thinking Qwen3.5 to 3.7 model; LA-P1 used Qwen 3.7 Plus in chat
+    model: qwen3.7-plus       # researched 2026-10-02; LA-P1 used Qwen 3.7 Plus in chat
     notes: >-
       Researched 2026-10-02: enable_thinking is documented for Qwen3, 3.5, 3.6 and
       3.7 hybrid models on DashScope's OpenAI-compatible endpoint, passed in the
@@ -120,11 +124,11 @@ families:
       call rejects enable_thinking=true, add streaming to OpenAICompatibleAdapter first.
     modes:
       fast:
-        web_label: "chat.qwen.ai, FILL-ME model, Thinking OFF"
+        web_label: "chat.qwen.ai, Qwen3.7-Plus, Thinking OFF"
         native_label: "instant (enable_thinking=false)"
         params: {enable_thinking: false}
       reasoning:
-        web_label: "chat.qwen.ai, same model, Thinking ON"
+        web_label: "chat.qwen.ai, Qwen3.7-Plus, Thinking ON"
         native_label: "thinking (enable_thinking=true)"
         params: {enable_thinking: true}
 
@@ -163,7 +167,8 @@ families:
       with a reasoning setting on one model. Researched 2026-10-02: grok-4.3 accepts
       reasoning_effort none to xhigh; grok-4.5 low to high; grok-4.6 and 4.7 low to
       xhigh (no none). Pick the API model the app's Fast and Expert most likely use,
-      and record the mismatch in the mode registry.
+      and record the mismatch in the mode registry. In the app, Fast skips reasoning
+      and Expert forces deep reasoning; avoid Auto, which routes between them.
     modes:
       fast:
         web_label: "grok.com, Fast"

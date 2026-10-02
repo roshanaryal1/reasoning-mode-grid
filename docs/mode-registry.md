@@ -13,8 +13,8 @@ documented API equivalent, run once per mode as evidence (`modegrid check-modes`
 |---|---|---|---|---|---|---|---|
 | Claude | claude.ai, Sonnet 5, extended thinking off | claude.ai, Sonnet 5, extended thinking on | `claude-sonnet-5` | `thinking: {type: disabled}` | `thinking: {type: adaptive}`, effort high | | |
 | GPT | chatgpt.com (paid), GPT-5.5 Instant picked by hand | GPT-5.5 Thinking picked by hand | `gpt-5.5` | `reasoning_effort: none` | `reasoning_effort: high` | | |
-| Gemini | FILL-ME, one model, thinking off | same model, thinking on | FILL-ME | thinking off | thinking high | | |
-| Qwen | chat.qwen.ai, Thinking off | chat.qwen.ai, Thinking on | FILL-ME | `enable_thinking: false` | `enable_thinking: true` | | |
+| Gemini | gemini.google.com, Fast (3 Flash) | gemini.google.com, Thinking (3 Flash) | FILL-ME, the Flash version the app runs | lowest accepted level | thinking high | | |
+| Qwen | chat.qwen.ai, Qwen3.7-Plus, Thinking off | chat.qwen.ai, Qwen3.7-Plus, Thinking on | `qwen3.7-plus` | `enable_thinking: false` | `enable_thinking: true` | | |
 | DeepSeek | chat.deepseek.com, DeepThink off | chat.deepseek.com, DeepThink on | `deepseek-v4-pro` | `thinking: {type: disabled}` | thinking on (default), effort high | | |
 | Grok | grok.com, Fast | grok.com, Expert | FILL-ME | lowest reasoning setting | highest reasoning setting | | |
 
@@ -61,6 +61,9 @@ the day of the API check, and the API check itself is the evidence.
 | Gemini | Gemini 3.x cannot turn thinking off. Gemini 2.5 Flash can (budget 0 or `reasoning_effort: none`). Some 3.x Flash models reject `minimal` | Decide between an older model with true off, or a current model at its lowest level |
 | Qwen | `enable_thinking` toggles thinking on Qwen3 to 3.7 hybrid models via DashScope's OpenAI-compatible endpoint. Thinking returns as `reasoning_content` | Settings as configured, pick the model |
 | DeepSeek | `deepseek-chat` and `deepseek-reasoner` stopped resolving on 24 Jul 2026. V4 models think by default. `thinking: {type: disabled}` turns it off. `reasoning_effort: none` returns 400 | Use `deepseek-v4-pro`, the same base model as the pilot |
+| Gemini app | Fast and Thinking are both Gemini 3 Flash. Pro is a different model | App Fast vs Thinking is valid. Never use Pro |
+| Qwen | API model `qwen3.7-plus`, `enable_thinking` in the request body. chat.qwen.ai has a Thinking toggle | Fully specified |
+| Grok app | Fast skips reasoning, Expert forces deep reasoning, Auto routes between them | Use Fast and Expert, never Auto |
 | Grok | `grok-4.3` accepts `reasoning_effort` none to xhigh. 4.5: low to high. 4.6 and 4.7: low to xhigh | Only 4.3 has a true off. The chat app's Fast vs Expert may not map to one API model |
 
 Sources:
@@ -74,3 +77,6 @@ Sources:
 - DeepSeek legacy name retirement: <https://www.developersdigest.tech/blog/deepseek-chat-to-v4-migration-guide>
 - DeepSeek V4 thinking disabled (400 on reasoning_effort none): <https://github.com/OpenWhispr/openwhispr/issues/1260>
 - xAI reasoning: <https://docs.x.ai/developers/model-capabilities/text/reasoning>
+- Gemini app Fast and Thinking on 3 Flash: <https://9to5google.com/2025/12/17/gemini-app-3-flash-rollout/>
+- Qwen3.7-Plus: <https://qwen.ai/blog?id=qwen3.7-plus>
+- Grok modes: <https://mundobytes.com/en/What-are-the-heavy--expert--fast--and-auto-modes-in-Grok-used-for/>
