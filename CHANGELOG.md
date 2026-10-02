@@ -21,6 +21,8 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions follo
   switch. Never blinded, scored or analysed with the grid.
 - `modegrid check-modes`, which writes `results/mode_check.md`.
 - `modegrid validate` flags a capture that still says `FILL IN`.
+- `docs/related-work.md` with the closest prior work (HRBench, hybrid-thinking
+  leakage, reasoning-model hallucination) and a competing prediction for H3.
 - `docs/venues.md`: venue research with dates and sources, and the submission timeline.
 - `docs/collaboration.md` and `AUTHORS.md`: co-author split, access rules that keep
   scoring blind, CRediT roles.

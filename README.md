@@ -100,6 +100,7 @@ configs/grid.yaml --plan--> runs.csv --new-capture (60 chat) / run (12 API)--> d
 - [Threats to validity](docs/threats-to-validity.md)
 - [Collaboration](docs/collaboration.md): who does what, and how blinding survives a co-author
 - [Venues and timeline](docs/venues.md): where to submit and how long each route takes
+- [Related work](docs/related-work.md): closest prior work and how this study differs
 - [Paper plan](docs/paper-plan.md) and [outline](paper/outline.md)
 
 ## Citation

@@ -25,6 +25,13 @@ Measured with the LA-P1 rubric (v2 anchors), nine dimensions scored 0, 1 or 2.
 D2, D4, D5, D6, D7, D8 are reported with the same statistics but carry no directional
 prediction.
 
+**Competing prediction for H3.** Studies of reasoning models report more hallucination
+than their non-reasoning counterparts (for example arXiv 2505.24630: 10 to 13 points
+on average). If that holds here, mode would matter for D3 too, in the direction of
+reasoning scoring lower. H3 stays as stated. A result of "mode > model" on D3 with
+reasoning lower would support the hallucination account, and the paper will say so.
+See [related-work.md](related-work.md).
+
 "Mode > model" on a dimension means the primary statistic below is positive and its
 95% CI excludes zero. "Model > mode" means it is negative and the CI excludes zero.
 Anything else is "inconclusive".
