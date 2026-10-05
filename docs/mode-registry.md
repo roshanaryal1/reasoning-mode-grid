@@ -28,7 +28,10 @@ documented API equivalent, run once per mode as evidence (`modegrid check-modes`
    Claude Opus 5.5 rejects `thinking: disabled`, so the grid uses Sonnet 5, which accepts it.
 3. **Evidence.** Two kinds. For every chat run, a dated screenshot of the model and mode
    selector. For every family, the API check: reasoning tokens should be zero or absent
-   in fast mode and non-zero in reasoning mode. Paste the `modegrid check-modes` table here.
+   in fast mode and non-zero in reasoning mode. For a "lowest available" family (Gemini,
+   Grok), fast reasoning tokens are expected to be above zero but below reasoning mode;
+   `check-modes` reports this as "lowest available" and both counts go in the paper.
+   Paste the `modegrid check-modes` table here.
 4. **Chat and API are not identical.** A chat app adds its own system prompt and may
    use a different snapshot. The API check proves the switch exists and what it does.
    It does not prove the chat app ran the same weights. Say this in the paper.

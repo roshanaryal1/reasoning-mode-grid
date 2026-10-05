@@ -284,8 +284,13 @@ def cmd_check_modes(args: argparse.Namespace) -> int:
         rw, rr, rm = stats(cells["reasoning"])
         has_trace = any(c.reasoning_trace not in {"", "NONE"} for c in cells["reasoning"])
         if fr is not None and rr is not None:
-            ok = fr == 0 and rr > 0
-            verdict = "switch confirmed" if ok else "CHECK: reasoning tokens do not separate the modes"
+            if fr == 0 and rr > 0:
+                verdict = "switch confirmed"
+            elif 0 < fr < rr:
+                # vendors that cannot disable reasoning: fast is the lowest available level
+                verdict = "lowest available: fast reasons less, not zero; record both counts"
+            else:
+                verdict = "CHECK: reasoning tokens do not separate the modes"
         elif has_trace:
             verdict = "trace present in reasoning mode, confirm fast mode by hand"
         else:

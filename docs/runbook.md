@@ -41,6 +41,11 @@ This is the phase that decides whether the paper survives review. Take it slowly
 2. **Fill the chat labels.** For each mode, write the exact app, model and switch you
    will select into `web_label` (for example "claude.ai, Sonnet 5, extended thinking ON").
    Avoid "auto" model pickers, they can route to a different model.
+   Open each app on the plan you will use and confirm the switch exists as labelled.
+   Gemini matters most: as of 2026-10-05 the app's thinking control on Flash is changing
+   from an "Extended thinking" option to low, medium and high levels. Write the exact
+   control names you see into `web_label`. If the control differs from the config, revise
+   the mapping before the freeze.
 3. **Run the 12 API mode checks.** One API call per family and mode. This costs a few
    dollars in total and is the evidence that each switch does what you claim.
 
@@ -50,8 +55,9 @@ This is the phase that decides whether the paper survives review. Take it slowly
    modegrid check-modes         # writes results/mode_check.md
    ```
 
-   Every row should say "switch confirmed". If a row says CHECK, fix the setting or
-   drop the family before freezing. Copy the table into the mode registry.
+   Every row should say "switch confirmed", except Gemini and Grok, which cannot disable
+   reasoning and should say "lowest available" (fast uses fewer reasoning tokens, not
+   zero). If a row says CHECK, fix the setting or drop the family before freezing. Copy the table into the mode registry.
 4. **Freeze the pre-registration.** Read [preregistration.md](preregistration.md) end to
    end, change anything you disagree with now, then commit and tag:
 

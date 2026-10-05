@@ -262,6 +262,24 @@ def test_check_modes_confirms_a_working_switch(tmp_path, monkeypatch):
     assert "missing capture(s)" in text  # the other families have no captures yet
 
 
+def test_check_modes_separates_lowest_available_from_a_broken_switch(tmp_path, monkeypatch):
+    monkeypatch.chdir(Path(__file__).resolve().parent.parent)
+    manifest = tmp_path / "runs.csv"
+    assert main(["--manifest", str(manifest), "plan"]) == 0
+    caps_dir = tmp_path / "caps"
+    # gemini: fast cannot be disabled but uses far fewer tokens; grok: fast uses more
+    tokens = {("gemini", "fast"): 200, ("gemini", "reasoning"): 3000, ("grok", "fast"): 500, ("grok", "reasoning"): 300}
+    for r in read_manifest(manifest):
+        if r.set == "api_check" and (r.family, r.mode) in tokens:
+            write_capture(_cap(r.run_id, usage={"reasoning_tokens": tokens[(r.family, r.mode)]}), caps_dir)
+    out = tmp_path / "mode_check.md"
+    assert main(["--manifest", str(manifest), "--captures", str(caps_dir), "check-modes", "--out", str(out)]) == 0
+    rows = {line.split("|")[1].strip(): line for line in out.read_text().splitlines() if line.startswith("| g")}
+    assert "lowest available" in rows["gemini"] and "CHECK" not in rows["gemini"]
+    assert "switch confirmed" not in rows["gemini"]
+    assert "CHECK: reasoning tokens do not separate the modes" in rows["grok"]
+
+
 def test_agreement_writes_gate_csv(tmp_path, monkeypatch):
     monkeypatch.chdir(Path(__file__).resolve().parent.parent)
     sheets = []
