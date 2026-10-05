@@ -22,11 +22,23 @@ def test_grid_loads_and_prompt_hash_matches(grid_path):
     assert "Mac mini" in text and "=== PROMPT" not in text
 
 
-def test_placeholders_are_reported(grid_path):
-    grid = load_grid(grid_path)
-    unready = unready_families(grid)
-    assert "claude" not in unready
-    assert "gemini" in unready
+def _grid_with_gemini_placeholder(tmp_path, grid_path):
+    shutil.copytree(grid_path.parent.parent / "vendor", tmp_path / "vendor")
+    (tmp_path / "configs").mkdir()
+    text = grid_path.read_text().replace("model: gemini-3.8-flash", "model: FILL-ME", 1)
+    assert "model: FILL-ME" in text
+    out = tmp_path / "configs" / "grid.yaml"
+    out.write_text(text)
+    return out
+
+
+def test_real_grid_has_no_placeholders(grid_path):
+    assert unready_families(load_grid(grid_path)) == []
+
+
+def test_placeholders_are_reported(tmp_path, grid_path):
+    unready = unready_families(load_grid(_grid_with_gemini_placeholder(tmp_path, grid_path)))
+    assert unready == ["gemini"]
 
 
 def test_grid_rejects_missing_primary_mode(tmp_path, grid_path):
@@ -157,17 +169,16 @@ def test_cli_demo_and_power(tmp_path, monkeypatch, capsys):
     assert main(["power", "--families", "5", "--replicates", "3", "--sims", "10"]) == 0
 
 
-def test_cli_run_refuses_placeholders(tmp_path, monkeypatch, capsys):
+def test_cli_run_refuses_placeholders(tmp_path, monkeypatch, capsys, grid_path):
+    config = str(_grid_with_gemini_placeholder(tmp_path, grid_path))
     monkeypatch.chdir(Path(__file__).resolve().parent.parent)
     manifest = tmp_path / "runs.csv"
-    assert main(["--manifest", str(manifest), "plan"]) == 0
-    code = main(["--manifest", str(manifest), "--captures", str(tmp_path / "c"), "run", "--dry-run"])
-    # every non-Claude family still has FILL-ME/VERIFY API settings
-    assert code == 2
-    assert (
-        main(["--manifest", str(manifest), "--captures", str(tmp_path / "c"), "run", "--dry-run", "--family", "claude"])
-        == 0
-    )
+    base = ["--config", config, "--manifest", str(manifest), "--captures", str(tmp_path / "c")]
+    assert main([*base, "plan"]) == 0
+    # gemini holds a FILL-ME, so a run that includes it is refused
+    assert main([*base, "run", "--dry-run"]) == 2
+    assert "gemini" in capsys.readouterr().out
+    assert main([*base, "run", "--dry-run", "--family", "claude"]) == 0
 
 
 def test_write_scores_adds_total(tmp_path):

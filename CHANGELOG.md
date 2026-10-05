@@ -7,6 +7,12 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions follo
 
 ### Changed
 
+- Decided Gemini (`gemini-3.8-flash`, reasoning effort low vs high) and Grok
+  (`grok-4.6`, low vs xhigh). Neither can disable reasoning, so fast is the lowest
+  available level. Gemini chat labels follow the app's new picker (Flash plus a
+  thinking level; Fast and Thinking were removed on 17 May 2026). No `FILL-ME` or
+  `VERIFY` values remain. Two new threats to validity cover the Grok app mapping
+  and "lowest available" fast modes.
 - Filled researched API settings for GPT (gpt-5.5) and DeepSeek (deepseek-v4-pro, whose
   old API names were retired on 24 Jul 2026). Gemini, Qwen and Grok still need a
   model decision; research notes and sources are in the mode registry.

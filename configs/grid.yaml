@@ -87,26 +87,26 @@ families:
     adapter: openai_compatible
     base_url: https://generativelanguage.googleapis.com/v1beta/openai/
     api_key_env: GEMINI_API_KEY
-    model: FILL-ME            # ONE model in both modes. Not Flash vs Pro.
+    model: gemini-3.8-flash   # decided 2026-10-05; ONE model in both modes, never Pro
     notes: >-
-      Researched 2026-10-02. Gemini 3.x models cannot turn thinking off; the floor
-      is minimal or low depending on the model. Gemini 2.5 Flash can turn it off
-      (reasoning_effort none, or thinking budget 0). Decide: (a) Gemini 2.5 Flash,
-      true off vs on, but an older model; or (b) a current Gemini 3.x Flash, lowest
-      level vs high, recorded as "lowest available" like the Claude rule. In the
-      Gemini app, make sure Fast and Thinking use the same model, not Flash vs Pro.
-      Researched 2026-10-02: in the Gemini app, Fast and Thinking are both Gemini
-      3 Flash, and Pro is a separate model. So app Fast vs Thinking is a same-model
-      comparison; never use Pro. For the API check, use the exact Flash version the
-      app runs, lowest accepted reasoning_effort vs high.
+      Decided 2026-10-05: Gemini 3.8 Flash, lowest level vs high. Thinking cannot be
+      turned off on 3.8 Flash (levels low, medium default, high; minimal returns an
+      error), so fast is "lowest available", like the Claude rule. Gemini 2.5 Flash
+      has a true off but is not in the Gemini app, so it would break the chat-first
+      design. App: since 17 May 2026 the picker lists Flash-Lite, Flash and Pro, and
+      thinking is a level set on the chosen model; Fast and Thinking are gone. Pick
+      Flash in both modes. An October 2026 update adds low, medium and high effort
+      levels in the app, so write the exact level label shown into each capture and
+      run all 10 Gemini captures in one 48-hour window. Flash needs Google AI Plus or
+      higher from 9 Oct 2026; free accounts get Flash-Lite only.
     modes:
       fast:
-        web_label: "gemini.google.com, Fast (Gemini 3 Flash)"
-        native_label: "thinking off"
-        params: {reasoning_effort: VERIFY-value-that-disables-thinking}
+        web_label: "gemini.google.com, AI Plus or higher, Flash, lowest thinking level"
+        native_label: "thinking level low (lowest available, cannot be disabled)"
+        params: {reasoning_effort: low}
       reasoning:
-        web_label: "gemini.google.com, Thinking (Gemini 3 Flash)"
-        native_label: "thinking high"
+        web_label: "gemini.google.com, AI Plus or higher, Flash, highest thinking level"
+        native_label: "thinking level high"
         params: {reasoning_effort: high}
 
   - id: qwen
@@ -160,21 +160,24 @@ families:
     adapter: openai_compatible
     base_url: https://api.x.ai/v1
     api_key_env: XAI_API_KEY
-    model: FILL-ME            # the API model closest to the chat app's model
+    model: grok-4.6           # decided 2026-10-05; the model the app runs on every plan
     redact_terms: [Elon, X Premium]
     notes: >-
-      Fast vs Expert is a chat-app switch. The API check can only approximate it
-      with a reasoning setting on one model. Researched 2026-10-02: grok-4.3 accepts
-      reasoning_effort none to xhigh; grok-4.5 low to high; grok-4.6 and 4.7 low to
-      xhigh (no none). Pick the API model the app's Fast and Expert most likely use,
-      and record the mismatch in the mode registry. In the app, Fast skips reasoning
-      and Expert forces deep reasoning; avoid Auto, which routes between them.
+      Decided 2026-10-05: grok-4.6, reasoning_effort low vs xhigh. xAI docs: grok-4.6
+      accepts low, medium, high (default), xhigh, and reasoning cannot be disabled, so
+      fast is "lowest available". A secondary source (15 Sep 2026) says every grok.com
+      plan runs Grok 4.6; grok-4.7 (21 Sep 2026) launched for Cursor, Grok Build and
+      the API, not the app. xAI does not document whether app Fast is 4.6 at low
+      effort or a separate non-reasoning model, so the API check approximates the app
+      switch; this is a stated threat to validity. In the app, use Fast and Expert,
+      never Auto (it routes between them) or Heavy. Record the model name the app
+      shows in every capture.
     modes:
       fast:
         web_label: "grok.com, Fast"
-        native_label: "API, lowest reasoning setting"
-        params: {reasoning_effort: VERIFY-lowest-supported-value}
+        native_label: "reasoning effort low (lowest available, cannot be disabled)"
+        params: {reasoning_effort: low}
       reasoning:
         web_label: "grok.com, Expert"
-        native_label: "API, highest reasoning setting"
-        params: {reasoning_effort: VERIFY-highest-supported-value}
+        native_label: "reasoning effort xhigh (highest available)"
+        params: {reasoning_effort: xhigh}

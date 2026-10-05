@@ -13,10 +13,10 @@ documented API equivalent, run once per mode as evidence (`modegrid check-modes`
 |---|---|---|---|---|---|---|---|
 | Claude | claude.ai, Sonnet 5, extended thinking off | claude.ai, Sonnet 5, extended thinking on | `claude-sonnet-5` | `thinking: {type: disabled}` | `thinking: {type: adaptive}`, effort high | | |
 | GPT | chatgpt.com (paid), GPT-5.5 Instant picked by hand | GPT-5.5 Thinking picked by hand | `gpt-5.5` | `reasoning_effort: none` | `reasoning_effort: high` | | |
-| Gemini | gemini.google.com, Fast (3 Flash) | gemini.google.com, Thinking (3 Flash) | FILL-ME, the Flash version the app runs | lowest accepted level | thinking high | | |
+| Gemini | gemini.google.com (AI Plus or higher), Flash, lowest thinking level | gemini.google.com (AI Plus or higher), Flash, highest thinking level | `gemini-3.8-flash` | `reasoning_effort: low` (lowest available) | `reasoning_effort: high` | <https://ai.google.dev/gemini-api/docs/latest-model>, 2026-10-05 | |
 | Qwen | chat.qwen.ai, Qwen3.7-Plus, Thinking off | chat.qwen.ai, Qwen3.7-Plus, Thinking on | `qwen3.7-plus` | `enable_thinking: false` | `enable_thinking: true` | | |
 | DeepSeek | chat.deepseek.com, DeepThink off | chat.deepseek.com, DeepThink on | `deepseek-v4-pro` | `thinking: {type: disabled}` | thinking on (default), effort high | | |
-| Grok | grok.com, Fast | grok.com, Expert | FILL-ME | lowest reasoning setting | highest reasoning setting | | |
+| Grok | grok.com, Fast | grok.com, Expert | `grok-4.6` | `reasoning_effort: low` (lowest available) | `reasoning_effort: xhigh` | <https://docs.x.ai/developers/model-capabilities/text/reasoning>, 2026-10-05 | |
 
 ## Rules
 
@@ -80,3 +80,32 @@ Sources:
 - Gemini app Fast and Thinking on 3 Flash: <https://9to5google.com/2025/12/17/gemini-app-3-flash-rollout/>
 - Qwen3.7-Plus: <https://qwen.ai/blog?id=qwen3.7-plus>
 - Grok modes: <https://mundobytes.com/en/What-are-the-heavy--expert--fast--and-auto-modes-in-Grok-used-for/>
+
+## Research notes and decisions, 2026-10-05
+
+Gemini and Grok decided. Vendor docs were read on 2026-10-05; app details come from press
+and secondary sources and are marked as such.
+
+| Family | Finding | Source type | Decision |
+|---|---|---|---|
+| Gemini | `gemini-3.8-flash` is GA. Thinking levels low, medium (default), high. `minimal` returns an error. Thinking cannot be disabled | Vendor docs | Fast = `low` (lowest available), reasoning = `high` |
+| Gemini | On the OpenAI-compatible endpoint, `none` works only on Gemini 2.5. Reasoning cannot be turned off for 2.5 Pro or any Gemini 3 model | Vendor docs | 2.5 Flash rejected: true off, but not in the app |
+| Gemini app | Since 17 May 2026 the picker lists Flash-Lite, Flash and Pro. Thinking is a level set on the chosen model. Fast and Thinking are gone, so the 2026-10-02 app note is out of date | Secondary | Use Flash in both modes, never Pro |
+| Gemini app | An October 2026 update adds low, medium and high effort levels per model. From 9 Oct 2026 free accounts get Flash-Lite only, and AI Plus keeps Flash | Press | Use AI Plus or higher. Write the exact level label into each capture. All 10 Gemini runs in one 48-hour window |
+| Gemini app | 3.8 Flash went GA on 2 Sep 2026 and became the app's default Flash | Secondary, [UNVERIFIED] by Google | Confirm the model name the app shows on capture day |
+| Grok | `grok-4.6` accepts `reasoning_effort` low, medium, high (default), xhigh. Reasoning cannot be disabled on 4.5, 4.6, 4.7 | Vendor docs | Fast = `low` (lowest available), reasoning = `xhigh` |
+| Grok | `grok-4.3` is still listed on the models page but no longer on the reasoning page, which supersedes the 2026-10-02 note that it accepts `none` | Vendor docs | Not used. It is not the app model |
+| Grok app | Every grok.com plan runs Grok 4.6. Grok 4.7 (21 Sep 2026) launched for Cursor, Grok Build and the API, with no app announcement | Secondary (15 Sep 2026) and vendor news | API model `grok-4.6` |
+| Grok app | xAI does not document whether app Fast is 4.6 at low effort or a separate non-reasoning model | None found | Kept as a threat to validity. Record the app's model name in every capture |
+
+Sources:
+
+- Gemini 3.8 Flash: <https://ai.google.dev/gemini-api/docs/latest-model>
+- Gemini thinking levels per model: <https://ai.google.dev/gemini-api/docs/generate-content/thinking>
+- Gemini OpenAI compatibility, `reasoning_effort` mapping: <https://ai.google.dev/gemini-api/docs/openai>
+- Gemini app tier limits and effort levels, Oct 2026: <https://9to5google.com/2026/10/03/gemini-model-limits-oct-26/>
+- Gemini app picker change, 17 May 2026 (secondary): <https://www.izzedo.chat/blog/gemini-thinking-vs-pro>
+- xAI reasoning: <https://docs.x.ai/developers/model-capabilities/text/reasoning>
+- xAI models: <https://docs.x.ai/developers/models>
+- Grok 4.7 launch: <https://x.ai/news/grok-4-7>
+- Grok app runs 4.6 on every plan (secondary): <https://www.ai-toolbox.co/grok-models/grok-models-explained-2026>
