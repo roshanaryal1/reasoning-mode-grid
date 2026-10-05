@@ -120,17 +120,17 @@ families:
       Researched 2026-10-02: enable_thinking is documented for Qwen3, 3.5, 3.6 and
       3.7 hybrid models on DashScope's OpenAI-compatible endpoint, passed in the
       request body. Thinking text comes back as reasoning_content.
-      Some Qwen endpoints only return thinking output when streamed. If a non-streamed
-      call rejects enable_thinking=true, add streaming to OpenAICompatibleAdapter first.
+      Some Qwen endpoints only return thinking output when streamed, so both Qwen
+      modes stream (_stream: true). Streaming changes transport only, not the answer.
     modes:
       fast:
         web_label: "chat.qwen.ai, Qwen3.7-Plus, Thinking OFF"
         native_label: "instant (enable_thinking=false)"
-        params: {enable_thinking: false}
+        params: {_stream: true, enable_thinking: false}
       reasoning:
         web_label: "chat.qwen.ai, Qwen3.7-Plus, Thinking ON"
         native_label: "thinking (enable_thinking=true)"
-        params: {enable_thinking: true}
+        params: {_stream: true, enable_thinking: true}
 
   - id: deepseek
     vendor: DeepSeek

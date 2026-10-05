@@ -87,3 +87,30 @@ def test_does_not_retry_client_errors(monkeypatch):
     with pytest.raises(RuntimeError):
         with_retries(bad)
     assert state["n"] == 1
+
+
+def test_openai_adapter_streams_and_reassembles():
+    calls = []
+
+    def chunk(content=None, reasoning=None, finish=None, usage=None):
+        choices = [] if usage else [NS(delta=NS(content=content, reasoning_content=reasoning), finish_reason=finish)]
+        return NS(model="qwen-returned", choices=choices, usage=usage)
+
+    chunks = [
+        chunk(reasoning="think "),
+        chunk(reasoning="more"),
+        chunk(content="final "),
+        chunk(content="answer", finish="stop"),
+        chunk(usage=NS(prompt_tokens=5, completion_tokens=9, completion_tokens_details=NS(reasoning_tokens=4))),
+    ]
+    client = NS(chat=NS(completions=NS(create=lambda **kw: (calls.append(kw), iter(chunks))[1])))
+    comp = OpenAICompatibleAdapter(None, None, client=client).complete(
+        "hi", "qwen3.7-plus", {"_stream": True, "enable_thinking": True}, 100
+    )
+    assert calls[0]["stream"] is True
+    assert "_stream" not in calls[0]["extra_body"]
+    assert calls[0]["extra_body"] == {"max_tokens": 100, "enable_thinking": True}
+    assert comp.text == "final answer"
+    assert comp.reasoning == "think more"
+    assert comp.finish_reason == "stop"
+    assert comp.usage == {"input_tokens": 5, "output_tokens": 9, "reasoning_tokens": 4}

@@ -101,6 +101,11 @@ class OpenAICompatibleAdapter:
         # Some reasoning models reject max_tokens and want max_completion_tokens.
         # Let the config decide; default to max_tokens.
         token_field = params.pop("_token_field", "max_tokens")
+        # Some vendors only return the thinking text when the response is streamed
+        # (DashScope documents this for some Qwen models). `_stream: true` in the
+        # mode params switches to streaming and reassembles the same Completion.
+        if params.pop("_stream", False):
+            return self._complete_streamed(prompt, model, params, max_tokens, token_field)
         start = time.monotonic()
         resp = self.client.chat.completions.create(
             model=model,
@@ -120,6 +125,47 @@ class OpenAICompatibleAdapter:
             usage={
                 "input_tokens": getattr(usage, "prompt_tokens", None),
                 "output_tokens": getattr(usage, "completion_tokens", None),
+                "reasoning_tokens": getattr(details, "reasoning_tokens", None) if details else None,
+            },
+            latency_s=round(latency, 2),
+        )
+
+    def _complete_streamed(
+        self, prompt: str, model: str, params: dict[str, Any], max_tokens: int, token_field: str
+    ) -> Completion:
+        start = time.monotonic()
+        stream = self.client.chat.completions.create(
+            model=model,
+            messages=[{"role": "user", "content": prompt}],
+            stream=True,
+            stream_options={"include_usage": True},
+            extra_body={token_field: max_tokens, **params},
+        )
+        text: list[str] = []
+        reasoning: list[str] = []
+        model_returned, finish_reason, usage = model, None, None
+        for chunk in stream:
+            model_returned = getattr(chunk, "model", None) or model_returned
+            if getattr(chunk, "usage", None) is not None:
+                usage = chunk.usage
+            for choice in getattr(chunk, "choices", None) or []:
+                delta = choice.delta
+                if getattr(delta, "content", None):
+                    text.append(delta.content)
+                if getattr(delta, "reasoning_content", None):
+                    reasoning.append(delta.reasoning_content)
+                if choice.finish_reason:
+                    finish_reason = choice.finish_reason
+        latency = time.monotonic() - start
+        details = getattr(usage, "completion_tokens_details", None) if usage else None
+        return Completion(
+            text="".join(text),
+            reasoning="".join(reasoning) or None,
+            model_returned=model_returned,
+            finish_reason=finish_reason,
+            usage={
+                "input_tokens": getattr(usage, "prompt_tokens", None) if usage else None,
+                "output_tokens": getattr(usage, "completion_tokens", None) if usage else None,
                 "reasoning_tokens": getattr(details, "reasoning_tokens", None) if details else None,
             },
             latency_s=round(latency, 2),
