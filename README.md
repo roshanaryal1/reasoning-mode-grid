@@ -24,7 +24,7 @@ portable across a grid.
 | Pilot | n = 1 family (DeepSeek, 3 modes, web app, v1 rubric). See [the pilot note](data/pilot/README.md): the adjudicated pilot scores do **not** yet support the claim. |
 | Design | 6 families x 2 modes x 5 replicates = 60 chat-app runs, 12 cells, plus 12 API calls that verify each mode switch |
 | Venue | arXiv, then an ICLR 2027 workshop (about Feb 2027) plus TMLR. See [venues](docs/venues.md) |
-| Blocking the first run | Fill the chat labels and the `FILL-ME` / `VERIFY` API values in [`configs/grid.yaml`](configs/grid.yaml), run the 12 API checks, then freeze the pre-registration |
+| Blocking the first run | Run the 12 API checks (settings in [`configs/grid.yaml`](configs/grid.yaml) are filled), then freeze the pre-registration |
 
 ## What you get
 
