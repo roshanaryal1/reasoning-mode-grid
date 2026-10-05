@@ -123,8 +123,10 @@ Check: 60 main captures plus 12 API checks in `data/captures/`, and
    agreement:
 
    ```bash
-   modegrid agreement data/scores/rater1.csv data/scores/rater2.csv
+   modegrid agreement data/scores/rater1.csv data/scores/rater2.csv --out results/agreement.csv
    ```
+
+   `results/agreement.csv` is also LA-P5's input: `specbench gate --alpha` reads it.
 
    Pre-registered bar: Krippendorff's ordinal alpha of at least 0.667 per dimension.
    A dimension below the bar is still reported, but its hypothesis test is labelled
@@ -151,10 +153,29 @@ This writes `results/variance_table.md` and `results/variance_table.csv`. Report
 dimension and every hypothesis, including the ones that fail. A clean "model > mode" on
 the headline would still be a publishable result, because LA-P1 implied the opposite.
 
+Then the remaining pre-registered checks:
+
+```bash
+# Robustness check 3: the same analysis on each rater's raw scores
+modegrid unblind data/scores/rater1.csv --out data/scores/rater1-unblinded.csv
+modegrid analyze --scores data/scores/rater1-unblinded.csv --out results/rater1
+modegrid unblind data/scores/rater2.csv --out data/scores/rater2-unblinded.csv
+modegrid analyze --scores data/scores/rater2-unblinded.csv --out results/rater2
+
+# Blinding-failure rate: did raters guess family or mode better than chance?
+modegrid blinding-check data/scores/rater1.csv data/scores/rater2.csv
+```
+
+For LA-P5, hand over `results/agreement.csv` and `results/variance_table.csv`:
+
+```bash
+specbench gate --alpha ../reasoning-mode-grid/results/agreement.csv \
+               --variance ../reasoning-mode-grid/results/variance_table.csv
+```
+
 Then run the exploratory extras and label them as exploratory:
 
 - The DeepSeek third mode (instant plus DeepThink toggle) from the pilot.
-- Blinding-failure rate from the raters' `guess_family` and `guess_mode` columns.
 - Whether the rubric ranked cells the same way across raters (this is the LA-P5 gate).
 
 ## Phase 5. Write and submit (1 to 2 weeks)

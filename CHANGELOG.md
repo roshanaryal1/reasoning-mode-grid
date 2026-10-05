@@ -17,6 +17,14 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions follo
 
 ### Added
 
+- `modegrid agreement --out` writes `dimension,alpha` CSV, the input LA-P5's
+  `specbench gate --alpha` reads.
+- `modegrid blinding-check`: rater guess accuracy for family and mode against chance,
+  with an exact one-sided binomial p-value.
+- Streaming in the OpenAI-compatible adapter (`_stream: true`). Both Qwen modes use it,
+  because some Qwen endpoints only return thinking output when streamed.
+- Runbook steps for the per-rater robustness check and the LA-P5 hand-off.
+
 - `api_check` run set: 1 API call per family and mode (12 calls) to verify each mode
   switch. Never blinded, scored or analysed with the grid.
 - `modegrid check-modes`, which writes `results/mode_check.md`.
