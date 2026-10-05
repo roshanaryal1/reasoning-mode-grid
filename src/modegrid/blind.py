@@ -86,3 +86,42 @@ def build_packets(
         w.writerow(["blind_id", "run_id"])
         w.writerows(key)
     return key
+
+
+def _binom_tail(k: int, n: int, p: float) -> float:
+    """P(X >= k) for X ~ Binomial(n, p). Exact, stdlib only."""
+    from math import comb
+
+    return sum(comb(n, i) * p**i * (1 - p) ** (n - i) for i in range(k, n + 1))
+
+
+def guess_accuracy(
+    sheet: str | Path, key: dict[str, str], truth: dict[str, tuple[str, str]], n_families: int
+) -> dict[str, dict[str, float]]:
+    """How often a rater's guesses of family and mode were right, against chance.
+
+    `truth` maps run_id -> (family, mode). Blank guesses are skipped, so the
+    share of answers the rater was willing to guess is reported too. A small
+    one-sided binomial p-value means the rater beat chance, so blinding leaked.
+    """
+    out: dict[str, dict[str, float]] = {}
+    with Path(sheet).open(newline="", encoding="utf-8") as fh:
+        rows = list(csv.DictReader(fh))
+    for field, idx, chance in (("guess_family", 0, 1 / n_families), ("guess_mode", 1, 1 / 2)):
+        guessed = right = 0
+        for row in rows:
+            g = (row.get(field) or "").strip().lower()
+            run_id = key.get(row["blind_id"])
+            if not g or run_id is None:
+                continue
+            guessed += 1
+            right += int(g == truth[run_id][idx].lower())
+        out[field] = {
+            "items": float(len(rows)),
+            "guessed": float(guessed),
+            "correct": float(right),
+            "accuracy": right / guessed if guessed else float("nan"),
+            "chance": chance,
+            "p_value": _binom_tail(right, guessed, chance) if guessed else float("nan"),
+        }
+    return out

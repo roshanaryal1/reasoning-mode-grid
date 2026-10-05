@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import csv
 import datetime as dt
 import getpass
 import hashlib
@@ -14,7 +15,7 @@ from pathlib import Path
 from . import DIMS, PRIMARY_MODES, __version__
 from .agreement import exact_agreement, krippendorff_alpha
 from .analyze import run_analysis, write_outputs
-from .blind import build_packets
+from .blind import build_packets, guess_accuracy
 from .capture import Capture, check_capture, manual_template, read_capture, word_count, write_capture
 from .config import load_grid, unready_families
 from .plan import API_CHECK, MAIN, build_manifest, read_manifest, write_manifest
@@ -198,19 +199,46 @@ def cmd_agreement(args: argparse.Namespace) -> int:
     ids = sorted(set().union(*sheets))
     print(f"{len(args.files)} raters, {len(ids)} items. Pre-registered bar: alpha >= {ALPHA_BAR}\n")
     print(f"{'dim':<6}{'alpha_ordinal':>15}{'exact(1v2)':>12}  status")
-    worst = 1.0
+    rows = []
     for d in DIMS:
         data = [[s.get(i, {}).get(d) for i in ids] for s in sheets]
         alpha = krippendorff_alpha(data, "ordinal")
         exact = exact_agreement(data[0], data[1]) if len(data) > 1 else float("nan")
         status = "ok" if alpha >= ALPHA_BAR else "BELOW BAR"
-        worst = min(worst, alpha) if alpha == alpha else worst
+        rows.append((d, alpha, exact, status))
         print(f"{d:<6}{alpha:>15.3f}{exact:>12.2f}  {status}")
+    if args.out:
+        # dimension,alpha is the format arch-spec-bench's `specbench gate --alpha` reads.
+        out = Path(args.out)
+        out.parent.mkdir(parents=True, exist_ok=True)
+        with out.open("w", newline="", encoding="utf-8") as fh:
+            w = csv.writer(fh, lineterminator="\n")
+            w.writerow(["dimension", "alpha", "exact_agreement_1v2", "status"])
+            for d, alpha, exact, status in rows:
+                w.writerow([d, f"{alpha:.4f}", f"{exact:.4f}", status])
+        print(f"\nwrote {out}")
     if len(sheets) >= 2:
         queue = disagreements(sheets[0], sheets[1])
         print(f"\nadjudication queue (rater 1 vs rater 2): {len(queue)} cell(s)")
         for uid, d, x, y in queue[: args.show]:
             print(f"  {uid} {d}: {x} vs {y}")
+    return 0
+
+
+def cmd_blinding_check(args: argparse.Namespace) -> int:
+    """Did raters guess family or mode better than chance? Reported in the paper."""
+    key = load_key(args.key)
+    runs = {r.run_id: (r.family, r.mode) for r in read_manifest(args.manifest) if r.set == MAIN}
+    n_families = len({f for f, _ in runs.values()})
+    print(f"chance: family 1/{n_families}, mode 1/2. Small p = rater beat chance = blinding leaked.\n")
+    print(f"{'sheet':<28}{'guess':<14}{'guessed':>9}{'correct':>9}{'acc':>7}{'chance':>8}{'p':>8}")
+    for sheet in args.files:
+        res = guess_accuracy(sheet, key, runs, n_families)
+        for field, r in res.items():
+            print(
+                f"{Path(sheet).name:<28}{field:<14}{int(r['guessed']):>6}/{int(r['items']):<2}"
+                f"{int(r['correct']):>9}{r['accuracy']:>7.2f}{r['chance']:>8.2f}{r['p_value']:>8.3f}"
+            )
     return 0
 
 
@@ -362,7 +390,13 @@ def build_parser() -> argparse.ArgumentParser:
     a = sub.add_parser("agreement", help="Krippendorff's alpha per dimension")
     a.add_argument("files", nargs="+")
     a.add_argument("--show", type=int, default=30)
+    a.add_argument("--out", default="", help="also write dimension,alpha CSV (input for specbench gate)")
     a.set_defaults(func=cmd_agreement)
+
+    bc = sub.add_parser("blinding-check", help="rater guess accuracy vs chance")
+    bc.add_argument("files", nargs="+", help="rater score sheets with guess_family / guess_mode filled")
+    bc.add_argument("--key", default="data/blinding/key.csv")
+    bc.set_defaults(func=cmd_blinding_check)
 
     z = sub.add_parser("analyze", help="variance decomposition table")
     z.add_argument("--scores", default="data/scores/adjudicated.csv")

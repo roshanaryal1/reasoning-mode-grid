@@ -249,3 +249,42 @@ def test_check_modes_confirms_a_working_switch(tmp_path, monkeypatch):
     text = out.read_text()
     assert "| claude | 100 | 300 | 0 | 900 |" in text and "switch confirmed" in text
     assert "missing capture(s)" in text  # the other families have no captures yet
+
+
+def test_agreement_writes_gate_csv(tmp_path, monkeypatch):
+    monkeypatch.chdir(Path(__file__).resolve().parent.parent)
+    sheets = []
+    for name, shift in (("r1", 0), ("r2", 1)):
+        p = tmp_path / f"{name}.csv"
+        with p.open("w", newline="") as fh:
+            w = csv.writer(fh)
+            w.writerow(["blind_id", *[f"D{i}" for i in range(1, 10)]])
+            for b in range(1, 9):
+                w.writerow([f"B{b:03d}", *[(b + shift * (b % 3 == 0)) % 3] * 9])
+        sheets.append(str(p))
+    out = tmp_path / "alpha.csv"
+    assert main(["agreement", *sheets, "--out", str(out)]) == 0
+    rows = list(csv.DictReader(out.open()))
+    assert [r["dimension"] for r in rows] == [f"D{i}" for i in range(1, 10)]
+    assert all(-1.0 <= float(r["alpha"]) <= 1.0 for r in rows)
+
+
+def test_blinding_check_detects_leak(tmp_path, monkeypatch):
+    from modegrid.blind import guess_accuracy
+
+    truth = {f"run{i}": ("claude" if i % 2 else "gpt", "fast" if i < 10 else "reasoning") for i in range(20)}
+    key = {f"B{i:03d}": f"run{i}" for i in range(20)}
+    perfect = tmp_path / "perfect.csv"
+    blank = tmp_path / "blank.csv"
+    for path, fill in ((perfect, True), (blank, False)):
+        with path.open("w", newline="") as fh:
+            w = csv.writer(fh)
+            w.writerow(["blind_id", "guess_family", "guess_mode"])
+            for b, rid in key.items():
+                fam, mode = truth[rid]
+                w.writerow([b, fam if fill else "", mode if fill else ""])
+    res = guess_accuracy(perfect, key, truth, n_families=6)
+    assert res["guess_mode"]["accuracy"] == 1.0 and res["guess_mode"]["p_value"] < 0.001
+    assert res["guess_family"]["p_value"] < 0.001
+    empty = guess_accuracy(blank, key, truth, n_families=6)
+    assert empty["guess_mode"]["guessed"] == 0
