@@ -60,7 +60,7 @@ class AnthropicAdapter:
         ) as stream:
             msg = stream.get_final_message()
         latency = time.monotonic() - start
-        text = "".join(b.text for b in msg.content if getattr(b, "type", None) == "text")
+        text = "".join(getattr(b, "text", "") or "" for b in msg.content if getattr(b, "type", None) == "text")
         thinking = "".join(
             getattr(b, "thinking", "") or "" for b in msg.content if getattr(b, "type", None) == "thinking"
         )
