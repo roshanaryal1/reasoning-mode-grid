@@ -100,6 +100,17 @@ separate pre-stated prediction. The 6 non-directional dimensions are descriptive
    effect vanishes, the paper reports that reasoning modes score higher because they write
    longer answers, not because they reason better.
 3. Rater-level analysis: run the decomposition on each rater's raw scores separately.
+4. Split by fast-mode floor. Three families can switch reasoning fully off in fast mode
+   (GPT, Qwen, DeepSeek). Three can only lower it to a minimum (Claude Sonnet 5.5,
+   Gemini 3.6 Flash, Grok 4.6; see [mode-registry.md](mode-registry.md)). Run the
+   primary analysis on each group of three separately
+   (`modegrid analyze --families gpt,qwen,deepseek` and
+   `--families claude,gemini,grok`). Each group has 30 runs, so these are descriptive
+   and carry no hypothesis test of their own. If H1, H2 or H4 holds in the pooled
+   analysis but only in the true-off group, the paper reports the claim as holding for
+   reasoning off vs on, not for reasoning minimised vs on. If a family is dropped
+   under section 7, its group is analysed with the families that remain, and a group
+   with fewer than 2 families is not analysed.
 
 ## 7. Exclusions and replacements
 

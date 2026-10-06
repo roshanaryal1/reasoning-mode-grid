@@ -250,8 +250,16 @@ def cmd_analyze(args: argparse.Namespace) -> int:
     lengths = None
     if args.captures and Path(args.captures).exists():
         lengths = {p.stem: float(word_count(read_capture(p).final_answer)) for p in Path(args.captures).glob("*.md")}
+    families = [f.strip() for f in args.families.split(",") if f.strip()] if args.families else None
     design, rows = run_analysis(
-        runs, scores, args.prompt, n_boot=args.boot, n_perm=args.perm, seed=args.seed, lengths=lengths
+        runs,
+        scores,
+        args.prompt,
+        n_boot=args.boot,
+        n_perm=args.perm,
+        seed=args.seed,
+        lengths=lengths,
+        families=families,
     )
     write_outputs(design, rows, args.out, note=args.note)
     print(Path(args.out, "variance_table.md").read_text(encoding="utf-8"))
@@ -411,6 +419,7 @@ def build_parser() -> argparse.ArgumentParser:
     z.add_argument("--perm", type=int, default=5000)
     z.add_argument("--seed", type=int, default=20261001)
     z.add_argument("--note", default="")
+    z.add_argument("--families", default="", help="comma-separated subset, e.g. gpt,qwen,deepseek")
     z.set_defaults(func=cmd_analyze)
 
     d = sub.add_parser("demo", help="synthetic end-to-end dry run")

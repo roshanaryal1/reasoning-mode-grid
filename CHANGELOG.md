@@ -26,6 +26,10 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions follo
 
 ### Added
 
+- `modegrid analyze --families`: run the analysis on a subset of families. Used by
+  pre-registered robustness check 4, which splits the grid into families with a true
+  reasoning-off fast mode (GPT, Qwen, DeepSeek) and lowest-available ones (Claude,
+  Gemini, Grok).
 - `modegrid agreement --out` writes `dimension,alpha` CSV, the input LA-P5's
   `specbench gate --alpha` reads.
 - `modegrid blinding-check`: rater guess accuracy for family and mode against chance,

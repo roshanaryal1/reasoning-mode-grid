@@ -147,6 +147,36 @@ def test_analysis_recovers_synthetic_effects(grid_path, tmp_path):
     assert (tmp_path / "variance_table.md").read_text().count("| D") >= 9
 
 
+def test_analysis_on_a_family_subset(grid_path):
+    grid = load_grid(grid_path)
+    runs = build_manifest(grid)
+    scores = synthetic_scores(sorted({r.family for r in runs}), grid.replicates, "p1-v1", seed=7)
+    design, rows = run_analysis(runs, scores, "p1-v1", n_boot=50, n_perm=50, families=["gpt", "qwen", "deepseek"])
+    assert design.families == ["deepseek", "gpt", "qwen"]
+    assert design.run_ids.shape == (3, 2, grid.replicates)
+    assert len(rows) == 10
+    with pytest.raises(AnalysisError, match="unknown"):
+        run_analysis(runs, scores, "p1-v1", n_boot=10, n_perm=10, families=["gpt", "nope"])
+    with pytest.raises(AnalysisError, match="at least 2"):
+        run_analysis(runs, scores, "p1-v1", n_boot=10, n_perm=10, families=["gpt"])
+
+
+def test_cli_analyze_accepts_families(tmp_path, monkeypatch, grid_path):
+    monkeypatch.chdir(Path(__file__).resolve().parent.parent)
+    grid = load_grid(grid_path)
+    manifest = tmp_path / "runs.csv"
+    assert main(["--manifest", str(manifest), "plan"]) == 0
+    runs = read_manifest(manifest)
+    scores = synthetic_scores(sorted({r.family for r in runs}), grid.replicates, "p1-v1", seed=7)
+    sheet = tmp_path / "adjudicated.csv"
+    write_scores(scores, sheet)
+    out = tmp_path / "split"
+    common = ["--manifest", str(manifest), "--captures", str(tmp_path / "none")]
+    args = ["analyze", "--scores", str(sheet), "--out", str(out), "--boot", "20", "--perm", "20"]
+    assert main([*common, *args, "--families", "claude,gemini,grok"]) == 0
+    assert (out / "variance_table.md").exists()
+
+
 def test_analysis_refuses_incomplete_grid(grid_path):
     grid = load_grid(grid_path)
     runs = build_manifest(grid)
