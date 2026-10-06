@@ -155,9 +155,14 @@ def run_analysis(
 ) -> tuple[Design, list[dict[str, object]]]:
     if families is not None:
         # pre-registered subset analyses, e.g. families whose fast mode is a true off
-        unknown = sorted(set(families) - {r.family for r in runs})
+        analysable = {
+            r.family
+            for r in runs
+            if r.set == MAIN and r.primary and r.prompt_id == prompt_id and r.mode in PRIMARY_MODES
+        }
+        unknown = sorted(set(families) - analysable)
         if unknown:
-            raise AnalysisError(f"unknown families: {unknown}")
+            raise AnalysisError(f"unknown families (no primary runs for prompt {prompt_id!r}): {unknown}")
         if len(set(families)) < 2:
             raise AnalysisError("a family subset needs at least 2 families")
         runs = [r for r in runs if r.family in families]
