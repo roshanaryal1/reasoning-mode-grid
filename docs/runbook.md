@@ -183,6 +183,10 @@ done
 
 # Blinding-failure rate: did raters guess family or mode better than chance?
 modegrid blinding-check data/scores/human.csv data/scores/llm-a.csv data/scores/llm-b.csv
+
+# Robustness check 4: split by fast-mode floor (true off vs lowest available)
+modegrid analyze --families gpt,qwen,deepseek --out results/fast-off
+modegrid analyze --families claude,gemini,grok --out results/fast-lowest
 ```
 
 For LA-P5, hand over `results/agreement.csv` and `results/variance_table.csv`:
