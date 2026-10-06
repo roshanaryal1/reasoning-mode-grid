@@ -111,11 +111,11 @@ families:
       fast:
         web_label: "gemini.google.com, 3.6 Flash, Extended thinking OFF"
         native_label: "thinking level minimal (lowest available, cannot be disabled)"
-        params: {reasoning_effort: minimal}
+        params: {reasoning_effort: minimal, _reasoning_in_total: true}
       reasoning:
         web_label: "gemini.google.com, 3.6 Flash, Extended thinking ON"
         native_label: "thinking level high"
-        params: {reasoning_effort: high}
+        params: {reasoning_effort: high, _reasoning_in_total: true}
 
   - id: qwen
     vendor: Alibaba

@@ -330,3 +330,12 @@ def test_family_max_tokens_override(tmp_path, grid_path):
         (tmp_path / "configs" / "grid.yaml").write_text(bad)
         with pytest.raises(ConfigError):
             load_grid(tmp_path / "configs" / "grid.yaml")
+
+
+def test_empty_answer_allowed_only_for_truncated_api_checks():
+    # an API check that spent its whole limit on thinking is still evidence of the switch
+    truncated_check = _cap("x__reasoning__p1-v1__apicheck1", words=0, set="api_check", finish_reason="length")
+    assert check_capture(truncated_check) == []
+    # but a scored chat capture, or an API check that finished normally, must have an answer
+    assert check_capture(_cap("x__fast__p1-v1__r1", words=0, set="main", finish_reason="length"))
+    assert check_capture(_cap("x__fast__p1-v1__apicheck1", words=0, set="api_check", finish_reason="stop"))
