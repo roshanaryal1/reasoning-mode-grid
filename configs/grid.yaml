@@ -67,20 +67,23 @@ families:
     adapter: openai_compatible
     base_url: https://api.openai.com/v1
     api_key_env: OPENAI_API_KEY
-    model: gpt-5.5            # researched 2026-10-02, confirm in the API check
+    model: gpt-5.6-sol        # decided 2026-10-06; the model the author's ChatGPT runs
     notes: >-
-      GPT-5.5 accepts reasoning_effort none, low, medium (default), high, xhigh.
-      Chat: a paid plan, model picker set by hand to GPT-5.5 Instant or GPT-5.5
-      Thinking. Instant can route a request to Thinking on its own, so check each
-      fast capture for a thinking trace and record it. Free plans can fall back to
-      a smaller model (GPT-5.5 Instant Mini) when limits are hit: do not use them.
+      Decided 2026-10-06: GPT-5.6 Sol. API docs (read 2026-10-06): gpt-5.6-sol
+      accepts reasoning_effort none, low, medium (default), high, xhigh, max; none
+      turns extended reasoning off. ChatGPT (author's paid plan, seen 2026-10-06):
+      one GPT-5.6 Sol model with a "Thinking effort" slider of 3 stops, High at the
+      right. Secondary sources say the Plus stops are Instant, Medium, High and that
+      every stop runs the same Sol model; the OpenAI help page could not be fetched,
+      so confirm the leftmost label reads Instant before capture. Never use Auto
+      routing. Record any thinking trace that appears in a fast capture.
     modes:
       fast:
-        web_label: "chatgpt.com, paid plan, GPT-5.5 Instant (picked by hand)"
+        web_label: "chatgpt.com, paid plan, GPT-5.6 Sol, Thinking effort Instant (leftmost)"
         native_label: "reasoning effort none"
         params: {_token_field: max_completion_tokens, reasoning_effort: none}
       reasoning:
-        web_label: "chatgpt.com, paid plan, GPT-5.5 Thinking (picked by hand)"
+        web_label: "chatgpt.com, paid plan, GPT-5.6 Sol, Thinking effort High (rightmost)"
         native_label: "reasoning effort high"
         params: {_token_field: max_completion_tokens, reasoning_effort: high}
 

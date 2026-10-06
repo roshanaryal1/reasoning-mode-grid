@@ -12,7 +12,7 @@ documented API equivalent, run once per mode as evidence (`modegrid check-modes`
 | Family | Chat app: fast | Chat app: reasoning | API check: model | API check: fast | API check: reasoning | Doc URL and date read | API check verdict |
 |---|---|---|---|---|---|---|---|
 | Claude | claude.ai, Sonnet 5.5, Effort Low | claude.ai, Sonnet 5.5, Effort High | `claude-sonnet-5-5` | `thinking: {type: adaptive}`, effort low (lowest available) | `thinking: {type: adaptive}`, effort high | Anthropic API reference (bundled, cached 2026-09-25), 2026-10-06 | |
-| GPT | chatgpt.com (paid), GPT-5.5 Instant picked by hand | GPT-5.5 Thinking picked by hand | `gpt-5.5` | `reasoning_effort: none` | `reasoning_effort: high` | | |
+| GPT | chatgpt.com (paid), GPT-5.6 Sol, Thinking effort Instant | chatgpt.com (paid), GPT-5.6 Sol, Thinking effort High | `gpt-5.6-sol` | `reasoning_effort: none` | `reasoning_effort: high` | <https://developers.openai.com/api/docs/models/gpt-5.6-sol>, 2026-10-06 | |
 | Gemini | gemini.google.com, 3.6 Flash, Extended thinking off | gemini.google.com, 3.6 Flash, Extended thinking on | `gemini-3.6-flash` | `reasoning_effort: minimal` (lowest available) | `reasoning_effort: high` | <https://ai.google.dev/gemini-api/docs/generate-content/thinking>, 2026-10-06 | |
 | Qwen | chat.qwen.ai, Qwen3.8-Max, Fast | chat.qwen.ai, Qwen3.8-Max, Thinking | `qwen3.8-max` | `enable_thinking: false` | `enable_thinking: true` | <https://www.alibabacloud.com/help/en/model-studio/deep-thinking>, 2026-10-06 | |
 | DeepSeek | chat.deepseek.com, DeepThink off | chat.deepseek.com, DeepThink on | `deepseek-v4-pro` | `thinking: {type: disabled}` | thinking on (default), effort high | | |
@@ -124,9 +124,9 @@ Gemini decision.
 | Claude | claude.ai picker: Fable 5.1, Opus 5.5, Sonnet 5.5, Haiku 4.5. Effort menu: Low, Medium, High, Extra, Max. No Sonnet 5, no thinking on/off switch | Sonnet 5.5, Effort Low vs High. API: `claude-sonnet-5-5`, adaptive thinking, effort `low` vs `high`. `thinking: disabled` returns 400 on Sonnet 5.5, so fast is lowest available |
 | Gemini | Picker: 3.5 Flash-Lite, 3.6 Flash, 3.1 Pro, plus "Extended thinking". No 3.8 Flash | 3.6 Flash, Extended thinking off vs on. API: `gemini-3.6-flash` (Stable), `reasoning_effort` `minimal` vs `high`. Google: minimal "does not guarantee that thinking is off". The 2026-10-05 note that 3.8 Flash is the app default was wrong for this account |
 | Qwen | Picker includes Qwen3.7-Plus and Qwen3.8-Max. Mode menu on Qwen3.7-Plus: Auto, Thinking, Fast | Qwen3.8-Max, Fast vs Thinking, never Auto. API: `qwen3.8-max`, hybrid thinking on by default, `enable_thinking` false vs true. Not directly comparable with LA-P1, which used Qwen3.7-Plus |
-| GPT | Free plan seen; author will use a paid plan | Unchanged: paid plan, GPT-5.5 Instant vs Thinking picked by hand |
+| GPT | Paid plan: one GPT-5.6 Sol model with a 3-stop "Thinking effort" slider, High at the right. Secondary sources: Plus stops are Instant, Medium, High, all on Sol; Instant and Thinking were folded into Sol in Aug 2026. OpenAI help page returned 403 | GPT-5.6 Sol, Instant vs High. API: `gpt-5.6-sol`, `reasoning_effort` `none` vs `high`. True off. Confirm the leftmost label reads Instant |
 | DeepSeek | DeepThink and Search toggles. Search was on by default | Unchanged. Turn Search off for every capture |
-| Grok | Fast, Build, Auto, Expert, Heavy. SuperGrok upgrade banner on a free account | Unchanged: Fast vs Expert. Confirm Expert is usable on the plan before capture |
+| Grok | Fast, Build, Auto, Expert, Heavy. Author has a premium Grok plan | Unchanged: Fast vs Expert. Record the exact plan name in each Grok capture |
 
 Gemini API free tier: `gemini-3.6-flash` is free of charge, and free-tier content may be
 used to improve Google products. Acceptable for the 2 API-check calls, because the prompt
@@ -139,3 +139,6 @@ Sources:
 - Gemini 3.6 Flash thinking levels: <https://ai.google.dev/gemini-api/docs/generate-content/thinking>
 - Gemini API pricing and free tier: <https://ai.google.dev/gemini-api/docs/pricing>
 - Qwen3.8-Max thinking: <https://www.alibabacloud.com/help/en/model-studio/deep-thinking>
+- GPT-5.6 Sol API: <https://developers.openai.com/api/docs/models/gpt-5.6-sol>
+- ChatGPT thinking effort levels (secondary): <https://www.ai-toolbox.co/chatgpt-models/chatgpt-reasoning-modes-instant-thinking-pro-2026>
+- GPT-5.6 in ChatGPT (OpenAI help, 403 when fetched): <https://help.openai.com/en/articles/20001354-gpt-56-in-chatgpt>

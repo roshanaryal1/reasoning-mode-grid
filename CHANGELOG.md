@@ -10,7 +10,8 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions follo
 - Decided settings from the chat apps as seen on 2026-10-06: Claude moves to
   `claude-sonnet-5-5` (Effort Low vs High; Sonnet 5 is no longer in claude.ai),
   Gemini to `gemini-3.6-flash` (Extended thinking off vs on; API `minimal` vs
-  `high`), Qwen to `qwen3.8-max` (Fast vs Thinking), Grok `grok-4.6` (low vs
+  `high`), Qwen to `qwen3.8-max` (Fast vs Thinking), GPT to `gpt-5.6-sol`
+  (Thinking effort Instant vs High; API `none` vs `high`), Grok `grok-4.6` (low vs
   xhigh). Claude, Gemini and Grok cannot disable reasoning, so their fast mode is
   the lowest available level. No `FILL-ME` or `VERIFY` values remain. Threats to
   validity cover the Grok app mapping, "lowest available" fast modes and the Qwen
