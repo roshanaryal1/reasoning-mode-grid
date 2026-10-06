@@ -108,8 +108,12 @@ class OpenAICompatibleAdapter:
         # `_reasoning_in_total: true` (per family in the config) says the vendor counts
         # thinking only in total_tokens, so a zero gap is a measured 0, not "not reported".
         in_total = bool(params.pop("_reasoning_in_total", False))
+        # `_unreported_is_zero: true`: the vendor omits the reasoning count when the model
+        # did not think (DashScope), so a missing count is a measured 0.
+        unreported_zero = bool(params.pop("_unreported_is_zero", False))
+        flags = {"in_total": in_total, "unreported_zero": unreported_zero}
         if params.pop("_stream", False):
-            return self._complete_streamed(prompt, model, params, max_tokens, token_field, in_total)
+            return self._complete_streamed(prompt, model, params, max_tokens, token_field, flags)
         start = time.monotonic()
         resp = self.client.chat.completions.create(
             model=model,
@@ -128,7 +132,7 @@ class OpenAICompatibleAdapter:
             usage={
                 "input_tokens": getattr(usage, "prompt_tokens", None),
                 "output_tokens": getattr(usage, "completion_tokens", None),
-                "reasoning_tokens": _reasoning_tokens(usage, in_total),
+                "reasoning_tokens": _reasoning_tokens(usage, **flags),
             },
             latency_s=round(latency, 2),
         )
@@ -140,8 +144,9 @@ class OpenAICompatibleAdapter:
         params: dict[str, Any],
         max_tokens: int,
         token_field: str,
-        in_total: bool = False,
+        flags: dict[str, bool] | None = None,
     ) -> Completion:
+        flags = flags or {}
         start = time.monotonic()
         stream = self.client.chat.completions.create(
             model=model,
@@ -174,13 +179,13 @@ class OpenAICompatibleAdapter:
             usage={
                 "input_tokens": getattr(usage, "prompt_tokens", None) if usage else None,
                 "output_tokens": getattr(usage, "completion_tokens", None) if usage else None,
-                "reasoning_tokens": _reasoning_tokens(usage, in_total),
+                "reasoning_tokens": _reasoning_tokens(usage, **flags),
             },
             latency_s=round(latency, 2),
         )
 
 
-def _reasoning_tokens(usage: Any, in_total: bool = False) -> int | None:
+def _reasoning_tokens(usage: Any, in_total: bool = False, unreported_zero: bool = False) -> int | None:
     """Reasoning tokens from an OpenAI-style usage object, or None if not reported.
 
     Gemini's OpenAI-compatible endpoint sends no completion_tokens_details; its
@@ -199,6 +204,8 @@ def _reasoning_tokens(usage: Any, in_total: bool = False) -> int | None:
         hidden = total - prompt - completion
         if hidden > 0 or (in_total and hidden == 0):
             return hidden
+    if unreported_zero:
+        return 0
     return None
 
 
