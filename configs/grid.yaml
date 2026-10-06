@@ -188,13 +188,14 @@ families:
       effort or a separate non-reasoning model, so the API check approximates the app
       switch; this is a stated threat to validity. In the app, use Fast and Expert,
       never Auto (it routes between them) or Heavy. Record the model name the app
-      shows in every capture.
+      shows in every capture. Both modes stream (_stream: true): an xhigh call ran
+      past the 30-minute client timeout when not streamed (2026-10-07).
     modes:
       fast:
         web_label: "grok.com, Fast"
         native_label: "reasoning effort low (lowest available, cannot be disabled)"
-        params: {reasoning_effort: low}
+        params: {_stream: true, reasoning_effort: low}
       reasoning:
         web_label: "grok.com, Expert"
         native_label: "reasoning effort xhigh (highest available)"
-        params: {reasoning_effort: xhigh}
+        params: {_stream: true, reasoning_effort: xhigh}

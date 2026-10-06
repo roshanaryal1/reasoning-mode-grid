@@ -339,3 +339,23 @@ def test_empty_answer_allowed_only_for_truncated_api_checks():
     # but a scored chat capture, or an API check that finished normally, must have an answer
     assert check_capture(_cap("x__fast__p1-v1__r1", words=0, set="main", finish_reason="length"))
     assert check_capture(_cap("x__fast__p1-v1__apicheck1", words=0, set="api_check", finish_reason="stop"))
+
+
+def test_run_retries_flag_limits_attempts(tmp_path, monkeypatch, grid_path):
+    # a long reasoning call that times out must not be re-sent (and re-billed) silently
+    monkeypatch.chdir(Path(__file__).resolve().parent.parent)
+    monkeypatch.setattr("time.sleep", lambda s: None)
+    calls = {"n": 0}
+
+    class TimesOut:
+        def complete(self, *a, **kw):
+            calls["n"] += 1
+            raise TimeoutError("read timed out")
+
+    monkeypatch.setattr("modegrid.cli.adapter_for", lambda fam: TimesOut())
+    manifest = tmp_path / "runs.csv"
+    common = ["--manifest", str(manifest), "--captures", str(tmp_path / "c")]
+    assert main([*common, "plan"]) == 0
+    with pytest.raises(TimeoutError):
+        main([*common, "run", "--family", "claude", "--limit", "1", "--retries", "1"])
+    assert calls["n"] == 1

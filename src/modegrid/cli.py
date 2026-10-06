@@ -72,7 +72,9 @@ def cmd_run(args: argparse.Namespace) -> int:
         model = mode.model or fam.model
         adapter, params = adapters[fam.id], mode.params
         limit = fam.max_tokens or grid.max_tokens
-        comp = with_retries(lambda a=adapter, t=text, m=model, p=params, limit=limit: a.complete(t, m, p, limit))
+        comp = with_retries(
+            lambda a=adapter, t=text, m=model, p=params, limit=limit: a.complete(t, m, p, limit), attempts=args.retries
+        )
         meta = {
             "run_id": r.run_id,
             "set": r.set,
@@ -367,6 +369,7 @@ def build_parser() -> argparse.ArgumentParser:
     r = sub.add_parser("run", help="execute API runs that have no capture yet")
     r.add_argument("--family", action="append", help="only this family (repeatable)")
     r.add_argument("--limit", type=int, default=0)
+    r.add_argument("--retries", type=int, default=4, help="attempts per call; 1 = never re-send")
     r.add_argument("--dry-run", action="store_true")
     r.add_argument("--run-by", default=getpass.getuser())
     r.set_defaults(func=cmd_run)
