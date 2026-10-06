@@ -317,3 +317,15 @@ def test_blinding_check_detects_leak(tmp_path, monkeypatch):
     assert res["guess_family"]["p_value"] < 0.001
     empty = guess_accuracy(blank, key, truth, n_families=6)
     assert empty["guess_mode"]["guessed"] == 0
+
+
+def test_family_max_tokens_override(tmp_path, grid_path):
+    grid = load_grid(grid_path)
+    assert grid.family("gpt").max_tokens == 6000  # fits a 10,000 tokens-per-minute account limit
+    assert grid.family("claude").max_tokens is None  # falls back to the grid-wide limit
+    shutil.copytree(grid_path.parent.parent / "vendor", tmp_path / "vendor")
+    (tmp_path / "configs").mkdir()
+    bad = grid_path.read_text().replace("max_tokens: 6000", "max_tokens: 0", 1)
+    (tmp_path / "configs" / "grid.yaml").write_text(bad)
+    with pytest.raises(ConfigError):
+        load_grid(tmp_path / "configs" / "grid.yaml")
