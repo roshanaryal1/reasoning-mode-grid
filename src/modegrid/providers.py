@@ -210,6 +210,9 @@ def adapter_for(family: Family) -> Adapter:
     raise ValueError(f"{family.id}: no API adapter for channel={family.channel}, adapter={family.adapter}")
 
 
+_EXHAUSTED_MARKERS = ("PerDay", "insufficient_quota", "credit_balance", "credits remaining", "credit balance")
+
+
 def with_retries(fn: Any, attempts: int = 4, base_delay: float = 2.0) -> Any:
     """Retry transient failures with exponential backoff (2s, 4s, 8s, ...)."""
     for i in range(attempts):
@@ -218,7 +221,9 @@ def with_retries(fn: Any, attempts: int = 4, base_delay: float = 2.0) -> Any:
         except Exception as exc:
             status = getattr(exc, "status_code", None)
             transient = status is None or status == 429 or status >= 500
-            if not transient or i == attempts - 1:
+            # a daily cap or an empty balance will not clear in seconds; retrying burns quota
+            exhausted = status == 429 and any(m in str(exc) for m in _EXHAUSTED_MARKERS)
+            if not transient or exhausted or i == attempts - 1:
                 raise
             time.sleep(base_delay * 2**i)
     raise AssertionError("unreachable")
