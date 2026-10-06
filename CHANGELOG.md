@@ -7,12 +7,14 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions follo
 
 ### Changed
 
-- Decided Gemini (`gemini-3.8-flash`, reasoning effort low vs high) and Grok
-  (`grok-4.6`, low vs xhigh). Neither can disable reasoning, so fast is the lowest
-  available level. Gemini chat labels follow the app's new picker (Flash plus a
-  thinking level; Fast and Thinking were removed on 17 May 2026). No `FILL-ME` or
-  `VERIFY` values remain. Two new threats to validity cover the Grok app mapping
-  and "lowest available" fast modes.
+- Decided settings from the chat apps as seen on 2026-10-06: Claude moves to
+  `claude-sonnet-5-5` (Effort Low vs High; Sonnet 5 is no longer in claude.ai),
+  Gemini to `gemini-3.6-flash` (Extended thinking off vs on; API `minimal` vs
+  `high`), Qwen to `qwen3.8-max` (Fast vs Thinking), Grok `grok-4.6` (low vs
+  xhigh). Claude, Gemini and Grok cannot disable reasoning, so their fast mode is
+  the lowest available level. No `FILL-ME` or `VERIFY` values remain. Threats to
+  validity cover the Grok app mapping, "lowest available" fast modes and the Qwen
+  model change from LA-P1.
 - Filled researched API settings for GPT (gpt-5.5) and DeepSeek (deepseek-v4-pro, whose
   old API names were retired on 24 Jul 2026). Gemini, Qwen and Grok still need a
   model decision; research notes and sources are in the mode registry.

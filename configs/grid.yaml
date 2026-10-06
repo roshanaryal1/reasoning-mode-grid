@@ -42,19 +42,22 @@ families:
     vendor: Anthropic
     channel: web
     adapter: anthropic
-    model: claude-sonnet-5
+    model: claude-sonnet-5-5  # decided 2026-10-06; Sonnet 5 is not in the claude.ai picker
     notes: >-
-      Chat: claude.ai, pick Sonnet 5 in the model menu, toggle extended thinking.
-      API: Sonnet 5 accepts thinking disabled. Opus 5.5 and Sonnet 5.5 do not, so do
-      not swap them in without re-reading the API docs. Never enable server-side
+      Decided 2026-10-06: Sonnet 5.5, effort low vs high. The claude.ai picker
+      (checked 2026-10-06) lists Fable 5.1, Opus 5.5, Sonnet 5.5 and Haiku 4.5, with
+      an Effort menu (Low, Medium, High, Extra, Max) and no thinking on/off switch.
+      API: Sonnet 5.5 rejects thinking disabled (400), so fast is "lowest available":
+      adaptive thinking at effort low, matching the app's Effort Low. between_tools
+      is not used because the app has no equivalent. Never enable server-side
       fallbacks, they answer from a different model.
     modes:
       fast:
-        web_label: "claude.ai, Sonnet 5, extended thinking OFF"
-        native_label: "extended thinking off (thinking.type=disabled)"
-        params: {thinking: {type: disabled}}
+        web_label: "claude.ai, Sonnet 5.5, Effort Low"
+        native_label: "adaptive thinking, effort low (lowest available, cannot be disabled)"
+        params: {thinking: {type: adaptive}, output_config: {effort: low}}
       reasoning:
-        web_label: "claude.ai, Sonnet 5, extended thinking ON"
+        web_label: "claude.ai, Sonnet 5.5, Effort High"
         native_label: "adaptive thinking, effort high"
         params: {thinking: {type: adaptive}, output_config: {effort: high}}
 
@@ -87,25 +90,25 @@ families:
     adapter: openai_compatible
     base_url: https://generativelanguage.googleapis.com/v1beta/openai/
     api_key_env: GEMINI_API_KEY
-    model: gemini-3.8-flash   # decided 2026-10-05; ONE model in both modes, never Pro
+    model: gemini-3.6-flash   # decided 2026-10-06; the Flash the app shows. Never Pro
     notes: >-
-      Decided 2026-10-05: Gemini 3.8 Flash, lowest level vs high. Thinking cannot be
-      turned off on 3.8 Flash (levels low, medium default, high; minimal returns an
-      error), so fast is "lowest available", like the Claude rule. Gemini 2.5 Flash
-      has a true off but is not in the Gemini app, so it would break the chat-first
-      design. App: since 17 May 2026 the picker lists Flash-Lite, Flash and Pro, and
-      thinking is a level set on the chosen model; Fast and Thinking are gone. Pick
-      Flash in both modes. An October 2026 update adds low, medium and high effort
-      levels in the app, so write the exact level label shown into each capture and
-      run all 10 Gemini captures in one 48-hour window. Flash needs Google AI Plus or
-      higher from 9 Oct 2026; free accounts get Flash-Lite only.
+      Decided 2026-10-06: Gemini 3.6 Flash, the model the Gemini app picker showed on
+      2026-10-06 (3.5 Flash-Lite, 3.6 Flash, 3.1 Pro, plus an Extended thinking
+      option). App modes: 3.6 Flash with Extended thinking off vs on. API: 3.6 Flash
+      accepts minimal, low, medium (default), high and cannot disable thinking;
+      Google says minimal "does not guarantee that thinking is off". So fast is
+      "lowest available" (minimal) and reasoning is high. The API check can use the
+      free Gemini API tier (free-tier data may be used by Google; the prompt is
+      public). If the app picker changes before capture (an October update adds
+      effort levels), update web_label and run all 10 Gemini captures in one 48-hour
+      window. From 9 Oct 2026 Flash needs Google AI Plus or higher in the app.
     modes:
       fast:
-        web_label: "gemini.google.com, AI Plus or higher, Flash, lowest thinking level"
-        native_label: "thinking level low (lowest available, cannot be disabled)"
-        params: {reasoning_effort: low}
+        web_label: "gemini.google.com, 3.6 Flash, Extended thinking OFF"
+        native_label: "thinking level minimal (lowest available, cannot be disabled)"
+        params: {reasoning_effort: minimal}
       reasoning:
-        web_label: "gemini.google.com, AI Plus or higher, Flash, highest thinking level"
+        web_label: "gemini.google.com, 3.6 Flash, Extended thinking ON"
         native_label: "thinking level high"
         params: {reasoning_effort: high}
 
@@ -115,20 +118,24 @@ families:
     adapter: openai_compatible
     base_url: https://dashscope-intl.aliyuncs.com/compatible-mode/v1
     api_key_env: DASHSCOPE_API_KEY
-    model: qwen3.7-plus       # researched 2026-10-02; LA-P1 used Qwen 3.7 Plus in chat
+    model: qwen3.8-max        # decided 2026-10-06; LA-P1 used Qwen3.7-Plus, see notes
     notes: >-
-      Researched 2026-10-02: enable_thinking is documented for Qwen3, 3.5, 3.6 and
-      3.7 hybrid models on DashScope's OpenAI-compatible endpoint, passed in the
-      request body. Thinking text comes back as reasoning_content.
-      Some Qwen endpoints only return thinking output when streamed, so both Qwen
-      modes stream (_stream: true). Streaming changes transport only, not the answer.
+      Decided 2026-10-06: Qwen3.8-Max, the current Qwen flagship in chat.qwen.ai.
+      LA-P1 used Qwen3.7-Plus, so Qwen results are not directly comparable with
+      LA-P1; say so in the paper. API (Alibaba Model Studio docs, read 2026-10-06):
+      qwen3.8-max is a hybrid thinking model, thinking on by default, and
+      enable_thinking false turns it off. Thinking text comes back as
+      reasoning_content. Some Qwen endpoints only return thinking output when
+      streamed, so both Qwen modes stream (_stream: true). App mode menu (seen on
+      Qwen3.7-Plus 2026-10-06): Auto, Thinking, Fast. Use Fast and Thinking, never
+      Auto; confirm the same menu shows for Qwen3.8-Max.
     modes:
       fast:
-        web_label: "chat.qwen.ai, Qwen3.7-Plus, Thinking OFF"
+        web_label: "chat.qwen.ai, Qwen3.8-Max, Fast"
         native_label: "instant (enable_thinking=false)"
         params: {_stream: true, enable_thinking: false}
       reasoning:
-        web_label: "chat.qwen.ai, Qwen3.7-Plus, Thinking ON"
+        web_label: "chat.qwen.ai, Qwen3.8-Max, Thinking"
         native_label: "thinking (enable_thinking=true)"
         params: {_stream: true, enable_thinking: true}
 
