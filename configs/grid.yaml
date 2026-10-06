@@ -138,33 +138,38 @@ families:
       fast:
         web_label: "chat.qwen.ai, Qwen3.8-Max, Fast"
         native_label: "instant (enable_thinking=false)"
-        params: {_stream: true, enable_thinking: false}
+        params: {_stream: true, enable_thinking: false, _unreported_is_zero: true}
       reasoning:
         web_label: "chat.qwen.ai, Qwen3.8-Max, Thinking"
         native_label: "thinking (enable_thinking=true)"
-        params: {_stream: true, enable_thinking: true}
+        params: {_stream: true, enable_thinking: true, _unreported_is_zero: true}
 
   - id: deepseek
     vendor: DeepSeek
     channel: web
     adapter: openai_compatible
-    base_url: https://api.deepseek.com
-    api_key_env: DEEPSEEK_API_KEY
-    model: deepseek-v4-pro    # researched 2026-10-02, confirm in the API check
+    base_url: https://dashscope-intl.aliyuncs.com/compatible-mode/v1
+    api_key_env: DASHSCOPE_API_KEY
+    model: deepseek-v4-pro-0813  # decided 2026-10-07; Alibaba-hosted, free quota
     notes: >-
-      The pilot used chat.deepseek.com with DeepSeek-V4-Pro, so the main runs stay
-      there. The old API names deepseek-chat and deepseek-reasoner stopped working
-      on 24 Jul 2026. V4 models think by default; thinking type disabled turns it
-      off (reasoning_effort none is rejected with a 400 on V4).
+      The pilot used chat.deepseek.com with DeepSeek-V4-Pro, so the 10 scored runs
+      stay there. Decided 2026-10-07: the API check runs on Alibaba Model Studio's
+      hosted deepseek-v4-pro-0813 (author's free quota) instead of DeepSeek's own
+      API, to avoid a paid top-up. This is a third-party host and a dated snapshot,
+      so it shows the thinking switch works on DeepSeek V4 Pro weights, not that it
+      matches chat.deepseek.com exactly. Alibaba documents enable_thinking for
+      DeepSeek V4 hybrid models; a free test on 2026-10-07 gave 0 vs 59 reasoning
+      tokens on a short prompt. DashScope omits the reasoning count when the model
+      does not think, so _unreported_is_zero records that as 0. Both modes stream.
     modes:
       fast:
-        web_label: "chat.deepseek.com, DeepThink OFF"
-        native_label: "thinking disabled"
-        params: {thinking: {type: disabled}}
+        web_label: "chat.deepseek.com, DeepThink OFF, Search OFF"
+        native_label: "thinking off (enable_thinking=false)"
+        params: {_stream: true, enable_thinking: false, _unreported_is_zero: true}
       reasoning:
-        web_label: "chat.deepseek.com, DeepThink ON"
-        native_label: "thinking on (default), effort high"
-        params: {reasoning_effort: high}
+        web_label: "chat.deepseek.com, DeepThink ON, Search OFF"
+        native_label: "thinking on (enable_thinking=true)"
+        params: {_stream: true, enable_thinking: true, _unreported_is_zero: true}
 
   - id: grok
     vendor: xAI

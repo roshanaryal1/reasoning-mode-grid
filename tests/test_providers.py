@@ -197,3 +197,15 @@ def test_still_retries_per_minute_limits(monkeypatch):
         return "ok"
 
     assert with_retries(per_minute) == "ok" and state["n"] == 2
+
+
+def test_unreported_is_zero_flag():
+    # DashScope sends completion_tokens_details only when the model thought
+    usage = NS(prompt_tokens=30, completion_tokens=17, total_tokens=47, completion_tokens_details=None)
+    resp = NS(choices=[NS(message=NS(content="a"), finish_reason="stop")], model="m", usage=usage)
+    calls = []
+    client = NS(chat=NS(completions=NS(create=lambda **kw: (calls.append(kw), resp)[1])))
+    adapter = OpenAICompatibleAdapter(None, None, client=client)
+    assert adapter.complete("hi", "m", {"_unreported_is_zero": True}, 100).usage["reasoning_tokens"] == 0
+    assert "_unreported_is_zero" not in calls[0]["extra_body"]
+    assert adapter.complete("hi", "m", {}, 100).usage["reasoning_tokens"] is None

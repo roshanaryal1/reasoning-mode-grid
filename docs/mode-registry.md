@@ -15,7 +15,7 @@ documented API equivalent, run once per mode as evidence (`modegrid check-modes`
 | GPT | chatgpt.com (paid), GPT-5.6 Sol, Thinking effort Instant | chatgpt.com (paid), GPT-5.6 Sol, Thinking effort High | `gpt-5.6-sol` | `reasoning_effort: none` | `reasoning_effort: high` | <https://developers.openai.com/api/docs/models/gpt-5.6-sol>, 2026-10-06 | |
 | Gemini | gemini.google.com, 3.6 Flash, Extended thinking off | gemini.google.com, 3.6 Flash, Extended thinking on | `gemini-3.6-flash` | `reasoning_effort: minimal` (lowest available) | `reasoning_effort: high` | <https://ai.google.dev/gemini-api/docs/generate-content/thinking>, 2026-10-06 | |
 | Qwen | chat.qwen.ai, Qwen3.8-Max, Fast | chat.qwen.ai, Qwen3.8-Max, Thinking | `qwen3.8-max` | `enable_thinking: false` | `enable_thinking: true` | <https://www.alibabacloud.com/help/en/model-studio/deep-thinking>, 2026-10-06 | |
-| DeepSeek | chat.deepseek.com, DeepThink off | chat.deepseek.com, DeepThink on | `deepseek-v4-pro` | `thinking: {type: disabled}` | thinking on (default), effort high | | |
+| DeepSeek | chat.deepseek.com, DeepThink off, Search off | chat.deepseek.com, DeepThink on, Search off | `deepseek-v4-pro-0813` via Alibaba Model Studio | `enable_thinking: false` | `enable_thinking: true` | <https://www.alibabacloud.com/help/en/model-studio/deepseek-api>, 2026-10-07 | |
 | Grok | grok.com, Fast | grok.com, Expert | `grok-4.6` | `reasoning_effort: low` (lowest available) | `reasoning_effort: xhigh` | <https://docs.x.ai/developers/model-capabilities/text/reasoning>, 2026-10-05 | |
 
 ## Rules
@@ -149,3 +149,17 @@ Sources:
 - GPT-5.6 Sol API: <https://developers.openai.com/api/docs/models/gpt-5.6-sol>
 - ChatGPT thinking effort levels (secondary): <https://www.ai-toolbox.co/chatgpt-models/chatgpt-reasoning-modes-instant-thinking-pro-2026>
 - GPT-5.6 in ChatGPT (OpenAI help, 403 when fetched): <https://help.openai.com/en/articles/20001354-gpt-56-in-chatgpt>
+
+## DeepSeek API check host, 2026-10-07
+
+The DeepSeek API check runs on Alibaba Model Studio's hosted `deepseek-v4-pro-0813`, on
+the author's free quota, instead of DeepSeek's own API. The 10 scored DeepSeek runs still
+come from chat.deepseek.com. Limits of this evidence: a third-party host and a dated
+snapshot, so it shows that the thinking switch works on DeepSeek V4 Pro weights, not that
+the chat app runs the same snapshot. Alibaba's docs list `deepseek-v4-pro` as a hybrid
+thinking model switched by `enable_thinking`; the `-0813` snapshot is not named there, so
+a free test was run first: 0 vs 59 reasoning tokens on a short prompt. DashScope omits the
+reasoning count when the model does not think, so `_unreported_is_zero` records it as 0
+(also set for Qwen, on the same host).
+
+Source: <https://www.alibabacloud.com/help/en/model-studio/deepseek-api>
