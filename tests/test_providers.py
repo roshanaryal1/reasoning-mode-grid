@@ -158,3 +158,42 @@ def test_openai_adapter_reasoning_in_total_flag_keeps_a_real_zero():
     assert adapter.complete("hi", "m", {"_reasoning_in_total": True}, 100).usage["reasoning_tokens"] == 0
     assert "_reasoning_in_total" not in calls[0]["extra_body"]  # never sent to the vendor
     assert adapter.complete("hi", "m", {}, 100).usage["reasoning_tokens"] is None
+
+
+@pytest.mark.parametrize(
+    "message",
+    [
+        "Quota exceeded for metric ... quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier'",
+        "You have no credits remaining. ... 'code': 'credit_balance_exhausted'",
+        "'type': 'insufficient_quota'",
+    ],
+)
+def test_does_not_retry_exhausted_quota(monkeypatch, message):
+    # retrying a daily cap or an empty balance only burns more of the quota
+    monkeypatch.setattr("time.sleep", lambda s: None)
+    state = {"n": 0}
+
+    def exhausted():
+        state["n"] += 1
+        err = RuntimeError(message)
+        err.status_code = 429
+        raise err
+
+    with pytest.raises(RuntimeError):
+        with_retries(exhausted)
+    assert state["n"] == 1
+
+
+def test_still_retries_per_minute_limits(monkeypatch):
+    monkeypatch.setattr("time.sleep", lambda s: None)
+    state = {"n": 0}
+
+    def per_minute():
+        state["n"] += 1
+        if state["n"] < 2:
+            err = RuntimeError("quotaId': 'GenerateRequestsPerMinutePerProjectPerModel-FreeTier'")
+            err.status_code = 429
+            raise err
+        return "ok"
+
+    assert with_retries(per_minute) == "ok" and state["n"] == 2
