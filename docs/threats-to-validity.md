@@ -10,7 +10,8 @@ Each threat has a mitigation and the place in the paper where it is reported.
 | A vendor routes fast mode to a smaller model. | Rule: same weights only. Record the model the app shows in every capture, plus a screenshot. The API check records which model answered. |
 | Chat apps are less controlled than an API (hidden system prompt, snapshot changes). | Matches real use and LA-P1. API check per mode as evidence of the switch. Limitation stated in the paper. |
 | Grok app Fast may not be the same model as Expert. xAI does not document it, and the API (`grok-4.6`) cannot disable reasoning. | API check uses `grok-4.6` low vs xhigh as an approximation. Model name the app shows recorded in every capture. Grok results reported with this caveat. |
-| Gemini and Grok have no true "off", so "fast" is the lowest available level there. | Recorded per family in the mode registry. The API check shows how many reasoning tokens the lowest level still uses. |
+| Claude (Sonnet 5.5), Gemini and Grok have no true "off", so "fast" is the lowest available level for 3 of 6 families. The contrast is "low vs high reasoning" there and "off vs on" for GPT, Qwen and DeepSeek. | Recorded per family in the mode registry. The API check shows how many reasoning tokens the lowest level still uses. The paper states the claim as reasoning on or minimised vs on. |
+| Qwen uses Qwen3.8-Max, while LA-P1 used Qwen3.7-Plus. | Qwen results are not compared directly with LA-P1. Stated in the paper. |
 | The rubric measures length, not quality. | Length-adjusted robustness check. |
 | One prompt. | Optional second prompt as a pre-registered replication. Prompt-sensitivity data from LA-P1 (v2, v3 paraphrases) cited. |
 

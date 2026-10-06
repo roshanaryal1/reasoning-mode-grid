@@ -25,7 +25,7 @@ def test_grid_loads_and_prompt_hash_matches(grid_path):
 def _grid_with_gemini_placeholder(tmp_path, grid_path):
     shutil.copytree(grid_path.parent.parent / "vendor", tmp_path / "vendor")
     (tmp_path / "configs").mkdir()
-    text = grid_path.read_text().replace("model: gemini-3.8-flash", "model: FILL-ME", 1)
+    text = grid_path.read_text().replace("model: gemini-3.6-flash", "model: FILL-ME", 1)
     assert "model: FILL-ME" in text
     out = tmp_path / "configs" / "grid.yaml"
     out.write_text(text)

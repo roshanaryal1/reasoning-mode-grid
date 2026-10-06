@@ -11,10 +11,10 @@ documented API equivalent, run once per mode as evidence (`modegrid check-modes`
 
 | Family | Chat app: fast | Chat app: reasoning | API check: model | API check: fast | API check: reasoning | Doc URL and date read | API check verdict |
 |---|---|---|---|---|---|---|---|
-| Claude | claude.ai, Sonnet 5, extended thinking off | claude.ai, Sonnet 5, extended thinking on | `claude-sonnet-5` | `thinking: {type: disabled}` | `thinking: {type: adaptive}`, effort high | | |
+| Claude | claude.ai, Sonnet 5.5, Effort Low | claude.ai, Sonnet 5.5, Effort High | `claude-sonnet-5-5` | `thinking: {type: adaptive}`, effort low (lowest available) | `thinking: {type: adaptive}`, effort high | Anthropic API reference (bundled, cached 2026-09-25), 2026-10-06 | |
 | GPT | chatgpt.com (paid), GPT-5.5 Instant picked by hand | GPT-5.5 Thinking picked by hand | `gpt-5.5` | `reasoning_effort: none` | `reasoning_effort: high` | | |
-| Gemini | gemini.google.com (AI Plus or higher), Flash, lowest thinking level | gemini.google.com (AI Plus or higher), Flash, highest thinking level | `gemini-3.8-flash` | `reasoning_effort: low` (lowest available) | `reasoning_effort: high` | <https://ai.google.dev/gemini-api/docs/latest-model>, 2026-10-05 | |
-| Qwen | chat.qwen.ai, Qwen3.7-Plus, Thinking off | chat.qwen.ai, Qwen3.7-Plus, Thinking on | `qwen3.7-plus` | `enable_thinking: false` | `enable_thinking: true` | | |
+| Gemini | gemini.google.com, 3.6 Flash, Extended thinking off | gemini.google.com, 3.6 Flash, Extended thinking on | `gemini-3.6-flash` | `reasoning_effort: minimal` (lowest available) | `reasoning_effort: high` | <https://ai.google.dev/gemini-api/docs/generate-content/thinking>, 2026-10-06 | |
+| Qwen | chat.qwen.ai, Qwen3.8-Max, Fast | chat.qwen.ai, Qwen3.8-Max, Thinking | `qwen3.8-max` | `enable_thinking: false` | `enable_thinking: true` | <https://www.alibabacloud.com/help/en/model-studio/deep-thinking>, 2026-10-06 | |
 | DeepSeek | chat.deepseek.com, DeepThink off | chat.deepseek.com, DeepThink on | `deepseek-v4-pro` | `thinking: {type: disabled}` | thinking on (default), effort high | | |
 | Grok | grok.com, Fast | grok.com, Expert | `grok-4.6` | `reasoning_effort: low` (lowest available) | `reasoning_effort: xhigh` | <https://docs.x.ai/developers/model-capabilities/text/reasoning>, 2026-10-05 | |
 
@@ -25,7 +25,7 @@ documented API equivalent, run once per mode as evidence (`modegrid check-modes`
    that may pick a different model are not modes.
 2. **Lowest available, not "off".** Some vendors no longer offer a true no-reasoning
    setting. Then the fast mode is the lowest setting, and this file says so. Example:
-   Claude Opus 5.5 rejects `thinking: disabled`, so the grid uses Sonnet 5, which accepts it.
+   Claude Sonnet 5.5 rejects `thinking: disabled`, so the grid's Claude fast mode is effort low.
 3. **Evidence.** Two kinds. For every chat run, a dated screenshot of the model and mode
    selector. For every family, the API check: reasoning tokens should be zero or absent
    in fast mode and non-zero in reasoning mode. For a "lowest available" family (Gemini,
@@ -112,3 +112,30 @@ Sources:
 - xAI models: <https://docs.x.ai/developers/models>
 - Grok 4.7 launch: <https://x.ai/news/grok-4-7>
 - Grok app runs 4.6 on every plan (secondary): <https://www.ai-toolbox.co/grok-models/grok-models-explained-2026>
+
+## App check and decisions, 2026-10-06
+
+The author opened each chat app and screenshotted the model and mode menus. Where an app
+and an earlier note disagree, the app wins. This section supersedes the 2026-10-05
+Gemini decision.
+
+| Family | Seen in the app | Decision |
+|---|---|---|
+| Claude | claude.ai picker: Fable 5.1, Opus 5.5, Sonnet 5.5, Haiku 4.5. Effort menu: Low, Medium, High, Extra, Max. No Sonnet 5, no thinking on/off switch | Sonnet 5.5, Effort Low vs High. API: `claude-sonnet-5-5`, adaptive thinking, effort `low` vs `high`. `thinking: disabled` returns 400 on Sonnet 5.5, so fast is lowest available |
+| Gemini | Picker: 3.5 Flash-Lite, 3.6 Flash, 3.1 Pro, plus "Extended thinking". No 3.8 Flash | 3.6 Flash, Extended thinking off vs on. API: `gemini-3.6-flash` (Stable), `reasoning_effort` `minimal` vs `high`. Google: minimal "does not guarantee that thinking is off". The 2026-10-05 note that 3.8 Flash is the app default was wrong for this account |
+| Qwen | Picker includes Qwen3.7-Plus and Qwen3.8-Max. Mode menu on Qwen3.7-Plus: Auto, Thinking, Fast | Qwen3.8-Max, Fast vs Thinking, never Auto. API: `qwen3.8-max`, hybrid thinking on by default, `enable_thinking` false vs true. Not directly comparable with LA-P1, which used Qwen3.7-Plus |
+| GPT | Free plan seen; author will use a paid plan | Unchanged: paid plan, GPT-5.5 Instant vs Thinking picked by hand |
+| DeepSeek | DeepThink and Search toggles. Search was on by default | Unchanged. Turn Search off for every capture |
+| Grok | Fast, Build, Auto, Expert, Heavy. SuperGrok upgrade banner on a free account | Unchanged: Fast vs Expert. Confirm Expert is usable on the plan before capture |
+
+Gemini API free tier: `gemini-3.6-flash` is free of charge, and free-tier content may be
+used to improve Google products. Acceptable for the 2 API-check calls, because the prompt
+is public.
+
+Sources:
+
+- Claude Sonnet 5.5 thinking and effort: Anthropic API reference bundled with Claude Code (cached 2026-09-25); confirm with the API check
+- Gemini models and status: <https://ai.google.dev/gemini-api/docs/models>
+- Gemini 3.6 Flash thinking levels: <https://ai.google.dev/gemini-api/docs/generate-content/thinking>
+- Gemini API pricing and free tier: <https://ai.google.dev/gemini-api/docs/pricing>
+- Qwen3.8-Max thinking: <https://www.alibabacloud.com/help/en/model-studio/deep-thinking>
