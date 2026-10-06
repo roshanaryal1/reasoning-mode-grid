@@ -73,7 +73,8 @@ class AnthropicAdapter:
             usage={
                 "input_tokens": usage.input_tokens,
                 "output_tokens": usage.output_tokens,
-                "reasoning_tokens": None,  # included in output_tokens, not reported separately
+                # thinking is billed inside output_tokens; newer responses also itemise it
+                "reasoning_tokens": getattr(getattr(usage, "output_tokens_details", None), "thinking_tokens", None),
             },
             latency_s=round(latency, 2),
         )

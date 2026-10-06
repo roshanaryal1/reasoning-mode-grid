@@ -131,3 +131,18 @@ def test_openai_adapter_derives_hidden_reasoning_tokens(usage, expected):
     client = NS(chat=NS(completions=NS(create=lambda **kw: resp)))
     comp = OpenAICompatibleAdapter(None, None, client=client).complete("hi", "m", {}, 100)
     assert comp.usage["reasoning_tokens"] == expected
+
+
+@pytest.mark.parametrize(
+    ("usage", "expected"),
+    [
+        (NS(input_tokens=10, output_tokens=900, output_tokens_details=NS(thinking_tokens=700)), 700),
+        (NS(input_tokens=10, output_tokens=30, output_tokens_details=NS(thinking_tokens=0)), 0),
+        (NS(input_tokens=10, output_tokens=20), None),  # older responses without the field
+    ],
+)
+def test_anthropic_adapter_reads_thinking_tokens(usage, expected):
+    msg = NS(content=[NS(type="text", text="a")], model="m", stop_reason="end_turn", usage=usage)
+    client = NS(messages=NS(stream=lambda **kw: FakeStream(msg)))
+    comp = AnthropicAdapter(client=client).complete("hi", "m", {}, 100)
+    assert comp.usage["reasoning_tokens"] == expected
