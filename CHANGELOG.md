@@ -26,6 +26,8 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions follo
 
 ### Added
 
+- Per-family `max_tokens` for the API check (GPT 6,000 to fit a 10,000 tokens-per-minute
+  account limit); the grid default rises to 64,000. Captures record the limit used.
 - `modegrid agreement --out` writes `dimension,alpha` CSV, the input LA-P5's
   `specbench gate --alpha` reads.
 - `modegrid blinding-check`: rater guess accuracy for family and mode against chance,

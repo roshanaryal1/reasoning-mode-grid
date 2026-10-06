@@ -71,7 +71,8 @@ def cmd_run(args: argparse.Namespace) -> int:
         print(f"[{r.order}] {r.run_id} ...", flush=True)
         model = mode.model or fam.model
         adapter, params = adapters[fam.id], mode.params
-        comp = with_retries(lambda a=adapter, t=text, m=model, p=params: a.complete(t, m, p, grid.max_tokens))
+        limit = fam.max_tokens or grid.max_tokens
+        comp = with_retries(lambda a=adapter, t=text, m=model, p=params, limit=limit: a.complete(t, m, p, limit))
         meta = {
             "run_id": r.run_id,
             "set": r.set,
@@ -83,6 +84,7 @@ def cmd_run(args: argparse.Namespace) -> int:
             "model_requested": model,
             "model_returned": comp.model_returned,
             "params": json.loads(json.dumps(mode.params)),
+            "max_tokens": limit,
             "prompt_id": prompt.id,
             "prompt_sha256": prompt.sha256,
             "replicate": r.replicate,

@@ -45,6 +45,7 @@ class Family:
     api_key_env: str | None = None
     redact_terms: tuple[str, ...] = ()
     notes: str = ""
+    max_tokens: int | None = None  # API-check output limit for this family; None uses the grid's
 
 
 @dataclass(frozen=True)
@@ -147,6 +148,7 @@ def load_grid(path: str | Path) -> Grid:
                     api_key_env=f.get("api_key_env"),
                     redact_terms=tuple(f.get("redact_terms") or ()),
                     notes=f.get("notes", ""),
+                    max_tokens=int(f["max_tokens"]) if f.get("max_tokens") is not None else None,
                 )
             )
         grid = Grid(
@@ -178,6 +180,8 @@ def check_grid(grid: Grid) -> None:
     for fam in grid.families:
         if fam.channel not in {"api", "web"}:
             raise ConfigError(f"{fam.id}: channel must be 'api' or 'web'")
+        if fam.max_tokens is not None and fam.max_tokens <= 0:
+            raise ConfigError(f"{fam.id}: max_tokens must be positive")
         if fam.channel == "api" and fam.adapter not in {"anthropic", "openai_compatible"}:
             raise ConfigError(f"{fam.id}: api families need adapter anthropic|openai_compatible")
         if fam.adapter not in {None, "anthropic", "openai_compatible"}:

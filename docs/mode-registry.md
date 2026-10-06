@@ -128,6 +128,13 @@ Gemini decision.
 | DeepSeek | DeepThink and Search toggles. Search was on by default | Unchanged. Turn Search off for every capture |
 | Grok | Fast, Build, Auto, Expert, Heavy. Author has a premium Grok plan | Unchanged: Fast vs Expert. Record the exact plan name in each Grok capture |
 
+API-check output limits: 64,000 tokens per call by default. GPT uses 6,000, because
+the author's OpenAI account allows 10,000 tokens per minute (input is about 3,500). Each
+capture records its `max_tokens`. The Claude checks ran before this change at 32,000; the
+Claude reasoning answer stopped at that limit (`finish_reason: max_tokens`) after 14,864
+thinking tokens. It was not re-run, to save cost: the switch evidence (0 vs 14,864
+thinking tokens) does not depend on the answer being complete.
+
 Gemini API free tier: `gemini-3.6-flash` is free of charge, and free-tier content may be
 used to improve Google products. Acceptable for the 2 API-check calls, because the prompt
 is public.
