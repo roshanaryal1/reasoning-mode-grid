@@ -146,3 +146,15 @@ def test_anthropic_adapter_reads_thinking_tokens(usage, expected):
     client = NS(messages=NS(stream=lambda **kw: FakeStream(msg)))
     comp = AnthropicAdapter(client=client).complete("hi", "m", {}, 100)
     assert comp.usage["reasoning_tokens"] == expected
+
+
+def test_openai_adapter_reasoning_in_total_flag_keeps_a_real_zero():
+    usage = NS(prompt_tokens=28, completion_tokens=10, total_tokens=38, completion_tokens_details=None)
+    resp = NS(choices=[NS(message=NS(content="a"), finish_reason="stop")], model="m", usage=usage)
+    calls = []
+    client = NS(chat=NS(completions=NS(create=lambda **kw: (calls.append(kw), resp)[1])))
+    adapter = OpenAICompatibleAdapter(None, None, client=client)
+    # declared per family in the config: thinking is counted in total_tokens, so 0 is a measurement
+    assert adapter.complete("hi", "m", {"_reasoning_in_total": True}, 100).usage["reasoning_tokens"] == 0
+    assert "_reasoning_in_total" not in calls[0]["extra_body"]  # never sent to the vendor
+    assert adapter.complete("hi", "m", {}, 100).usage["reasoning_tokens"] is None

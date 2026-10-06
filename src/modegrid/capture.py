@@ -99,7 +99,12 @@ def read_capture(path: str | Path) -> Capture:
 
 def check_capture(capture: Capture) -> list[str]:
     problems = [f"missing front-matter key {k!r}" for k in REQUIRED_KEYS if k not in capture.meta]
-    if not capture.final_answer or capture.final_answer.startswith("<!--"):
+    truncated_check = capture.meta.get("set") == "api_check" and capture.meta.get("finish_reason") in {
+        "length",
+        "max_tokens",
+    }
+    if (not capture.final_answer or capture.final_answer.startswith("<!--")) and not truncated_check:
+        # an API check that spent its whole limit on thinking is still evidence; never scored
         problems.append("final answer is empty")
     for key, value in capture.meta.items():
         if isinstance(value, str) and "FILL IN" in value:
