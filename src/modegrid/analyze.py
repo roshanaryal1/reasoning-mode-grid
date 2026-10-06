@@ -151,7 +151,16 @@ def run_analysis(
     n_perm: int = 5000,
     seed: int = 20261001,
     lengths: dict[str, float] | None = None,
+    families: list[str] | None = None,
 ) -> tuple[Design, list[dict[str, object]]]:
+    if families is not None:
+        # pre-registered subset analyses, e.g. families whose fast mode is a true off
+        unknown = sorted(set(families) - {r.family for r in runs})
+        if unknown:
+            raise AnalysisError(f"unknown families: {unknown}")
+        if len(set(families)) < 2:
+            raise AnalysisError("a family subset needs at least 2 families")
+        runs = [r for r in runs if r.family in families]
     design = build_design(runs, prompt_id)
     length_arr = None
     if lengths is not None and all(rid in lengths for rid in design.run_ids.ravel()):

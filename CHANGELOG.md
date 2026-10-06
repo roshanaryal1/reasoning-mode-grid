@@ -30,6 +30,10 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions follo
 
 ### Added
 
+- `modegrid analyze --families`: run the analysis on a subset of families. Used by
+  pre-registered robustness check 4, which splits the grid into families with a true
+  reasoning-off fast mode (GPT, Qwen, DeepSeek) and lowest-available ones (Claude,
+  Gemini, Grok).
 - `modegrid consensus`: median of an odd number of blind rater sheets, the analysis unit
   when the author cannot adjudicate blind.
 - Per-family `max_tokens` for the API check (GPT 6,000 to fit a 10,000 tokens-per-minute
