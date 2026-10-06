@@ -157,8 +157,10 @@ the author's free quota, instead of DeepSeek's own API. The 10 scored DeepSeek r
 come from chat.deepseek.com. Limits of this evidence: a third-party host and a dated
 snapshot, so it shows that the thinking switch works on DeepSeek V4 Pro weights, not that
 the chat app runs the same snapshot. Alibaba's docs list `deepseek-v4-pro` as a hybrid
-thinking model switched by `enable_thinking`; the `-0813` snapshot is not named there, so
-a free test was run first: 0 vs 59 reasoning tokens on a short prompt. DashScope omits the
+thinking model switched by `enable_thinking`. The page names `deepseek-v4-pro-0813` as a
+dated snapshot in its model list but not in its list of hybrid thinking models, so a free
+test was run first: 0 vs 59 reasoning tokens on a short prompt. The full API check then
+gave 0 vs 10,546. DashScope omits the
 reasoning count when the model does not think, so `_unreported_is_zero` records it as 0
 (also set for Qwen, on the same host).
 
