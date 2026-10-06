@@ -116,7 +116,6 @@ class OpenAICompatibleAdapter:
         choice = resp.choices[0]
         message = choice.message
         usage = resp.usage
-        details = getattr(usage, "completion_tokens_details", None)
         return Completion(
             text=message.content or "",
             reasoning=getattr(message, "reasoning_content", None),
@@ -125,7 +124,7 @@ class OpenAICompatibleAdapter:
             usage={
                 "input_tokens": getattr(usage, "prompt_tokens", None),
                 "output_tokens": getattr(usage, "completion_tokens", None),
-                "reasoning_tokens": getattr(details, "reasoning_tokens", None) if details else None,
+                "reasoning_tokens": _reasoning_tokens(usage),
             },
             latency_s=round(latency, 2),
         )
@@ -157,7 +156,6 @@ class OpenAICompatibleAdapter:
                 if choice.finish_reason:
                     finish_reason = choice.finish_reason
         latency = time.monotonic() - start
-        details = getattr(usage, "completion_tokens_details", None) if usage else None
         return Completion(
             text="".join(text),
             reasoning="".join(reasoning) or None,
@@ -166,10 +164,32 @@ class OpenAICompatibleAdapter:
             usage={
                 "input_tokens": getattr(usage, "prompt_tokens", None) if usage else None,
                 "output_tokens": getattr(usage, "completion_tokens", None) if usage else None,
-                "reasoning_tokens": getattr(details, "reasoning_tokens", None) if details else None,
+                "reasoning_tokens": _reasoning_tokens(usage),
             },
             latency_s=round(latency, 2),
         )
+
+
+def _reasoning_tokens(usage: Any) -> int | None:
+    """Reasoning tokens from an OpenAI-style usage object, or None if not reported.
+
+    Gemini's OpenAI-compatible endpoint sends no completion_tokens_details; its
+    thinking tokens appear only in total_tokens, so they are total - prompt - completion.
+    """
+    if usage is None:
+        return None
+    details = getattr(usage, "completion_tokens_details", None)
+    reported = getattr(details, "reasoning_tokens", None) if details else None
+    if reported is not None:
+        return int(reported)
+    total, prompt, completion = (
+        getattr(usage, f, None) for f in ("total_tokens", "prompt_tokens", "completion_tokens")
+    )
+    if isinstance(total, int) and isinstance(prompt, int) and isinstance(completion, int):
+        hidden = total - prompt - completion
+        if hidden > 0:
+            return hidden
+    return None
 
 
 def adapter_for(family: Family) -> Adapter:

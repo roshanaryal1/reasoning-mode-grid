@@ -114,3 +114,20 @@ def test_openai_adapter_streams_and_reassembles():
     assert comp.reasoning == "think more"
     assert comp.finish_reason == "stop"
     assert comp.usage == {"input_tokens": 5, "output_tokens": 9, "reasoning_tokens": 4}
+
+
+@pytest.mark.parametrize(
+    ("usage", "expected"),
+    [
+        # Gemini's OpenAI-compatible endpoint: no details, thinking only in total_tokens
+        (NS(prompt_tokens=28, completion_tokens=10, total_tokens=401, completion_tokens_details=None), 363),
+        (NS(prompt_tokens=28, completion_tokens=10, total_tokens=38, completion_tokens_details=None), None),
+        # vendors that report the field keep their own number
+        (NS(prompt_tokens=1, completion_tokens=5, total_tokens=6, completion_tokens_details=NS(reasoning_tokens=4)), 4),
+    ],
+)
+def test_openai_adapter_derives_hidden_reasoning_tokens(usage, expected):
+    resp = NS(choices=[NS(message=NS(content="a"), finish_reason="stop")], model="m", usage=usage)
+    client = NS(chat=NS(completions=NS(create=lambda **kw: resp)))
+    comp = OpenAICompatibleAdapter(None, None, client=client).complete("hi", "m", {}, 100)
+    assert comp.usage["reasoning_tokens"] == expected
