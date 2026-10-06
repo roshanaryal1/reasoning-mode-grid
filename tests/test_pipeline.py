@@ -159,6 +159,10 @@ def test_analysis_on_a_family_subset(grid_path):
         run_analysis(runs, scores, "p1-v1", n_boot=10, n_perm=10, families=["gpt", "nope"])
     with pytest.raises(AnalysisError, match="at least 2"):
         run_analysis(runs, scores, "p1-v1", n_boot=10, n_perm=10, families=["gpt"])
+    # a family present only as API-check runs is not analysable for this prompt
+    no_gemini_main = [r for r in runs if not (r.family == "gemini" and r.set == "main")]
+    with pytest.raises(AnalysisError, match="unknown"):
+        run_analysis(no_gemini_main, scores, "p1-v1", n_boot=10, n_perm=10, families=["gpt", "qwen", "gemini"])
 
 
 def test_cli_analyze_accepts_families(tmp_path, monkeypatch, grid_path):
