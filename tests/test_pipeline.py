@@ -325,7 +325,8 @@ def test_family_max_tokens_override(tmp_path, grid_path):
     assert grid.family("claude").max_tokens is None  # falls back to the grid-wide limit
     shutil.copytree(grid_path.parent.parent / "vendor", tmp_path / "vendor")
     (tmp_path / "configs").mkdir()
-    bad = grid_path.read_text().replace("max_tokens: 6000", "max_tokens: 0", 1)
-    (tmp_path / "configs" / "grid.yaml").write_text(bad)
-    with pytest.raises(ConfigError):
-        load_grid(tmp_path / "configs" / "grid.yaml")
+    for value in ("0", "true", "1.5"):
+        bad = grid_path.read_text().replace("max_tokens: 6000", f"max_tokens: {value}", 1)
+        (tmp_path / "configs" / "grid.yaml").write_text(bad)
+        with pytest.raises(ConfigError):
+            load_grid(tmp_path / "configs" / "grid.yaml")

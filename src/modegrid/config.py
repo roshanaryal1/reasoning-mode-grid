@@ -148,7 +148,7 @@ def load_grid(path: str | Path) -> Grid:
                     api_key_env=f.get("api_key_env"),
                     redact_terms=tuple(f.get("redact_terms") or ()),
                     notes=f.get("notes", ""),
-                    max_tokens=int(f["max_tokens"]) if f.get("max_tokens") is not None else None,
+                    max_tokens=_family_max_tokens(f),
                 )
             )
         grid = Grid(
@@ -166,6 +166,15 @@ def load_grid(path: str | Path) -> Grid:
 
     check_grid(grid)
     return grid
+
+
+def _family_max_tokens(f: dict[str, Any]) -> int | None:
+    value = f.get("max_tokens")
+    if value is None:
+        return None
+    if type(value) is not int:  # bool is an int subclass; reject it and floats explicitly
+        raise ConfigError(f"{f.get('id')}: max_tokens must be a whole number, got {value!r}")
+    return value
 
 
 def check_grid(grid: Grid) -> None:
