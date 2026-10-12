@@ -122,8 +122,11 @@ def test_redaction_masks_identity():
 
 def test_redaction_keeps_names_used_as_content():
     # D2-D4 need the recommended models and tools visible to raters
-    text = "\n" * 12 + "Run Qwen3-Coder via Ollama, use Claude Code, and tools such as DeepSeek or Gemini CLI."
-    out = redact(text, ["Claude", "DeepSeek", "Gemini", "Qwen"])
+    text = "\n" * 12 + (
+        "Run Qwen3-Coder via Ollama, use Claude Code, and tools such as DeepSeek or Gemini CLI.\n"
+        "Gemma is a model family developed by Google."
+    )
+    out = redact(text, ["Claude", "DeepSeek", "Gemini", "Qwen", "Google"])
     assert out == text
 
 
@@ -261,10 +264,16 @@ def _cap(run_id, words=3, **meta):
         "prompt_id": "p1-v1",
         "prompt_sha256": "h",
         "replicate": 1,
+        "date_stamped": "2026-10-01",
         "date_run": "2026-10-01",
         "run_by": "me",
     }
     return Capture(meta={**base, **meta}, final_answer=" ".join(["word"] * words))
+
+
+def test_web_capture_needs_date_stamped():
+    assert check_capture(_cap("a")) == []
+    assert any("date_stamped" in p for p in check_capture(_cap("a", date_stamped="")))
 
 
 def test_fill_in_left_in_capture_is_flagged():
@@ -502,6 +511,7 @@ def test_low_variance_and_interaction_labels():
     h1, reliable = HYPOTHESES["H1"], {"D1": 0.8}
     flat = {"verdict": "uninformative (low variance)", "mode_effect_ci_low": 0.0}
     assert hypothesis_status(flat, h1, reliable) == "inconclusive (uninformative (low variance))"
+    assert hypothesis_status(flat, h1, {"D1": 0.3}).startswith("inconclusive")
     tangled = {
         "verdict": "mode > model",
         "mode_effect_ci_low": 0.3,

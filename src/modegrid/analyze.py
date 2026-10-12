@@ -197,10 +197,11 @@ def hypothesis_status(row: dict[str, object], h: Hypothesis, alphas: dict[str, f
     """Pre-registered decision for one hypothesis (preregistration sections 2 and 4)."""
     alpha = (alphas or {}).get(h.dim)
     checked = alpha is not None and math.isfinite(alpha)
-    if checked and alpha < ALPHA_BAR:  # type: ignore[operator]
-        return f"exploratory (alpha {alpha:.2f} below {ALPHA_BAR})"
+    # a dimension with (almost) no spread is inconclusive whatever its alpha
     if row["verdict"] in ("no variance", "uninformative (low variance)"):
         return f"inconclusive ({row['verdict']})"
+    if checked and alpha < ALPHA_BAR:  # type: ignore[operator]
+        return f"exploratory (alpha {alpha:.2f} below {ALPHA_BAR})"
     if row["verdict"] != h.predicted:
         return "no"
     if h.direction == "reasoning > fast" and not float(row["mode_effect_ci_low"]) > 0:  # type: ignore[arg-type]

@@ -6,8 +6,10 @@ mode shift between fast and reasoning (`mode_shift`), and run-to-run noise (sd 0
 cut into 0, 1, 2. Two success rules are reported:
 
 - **delta only**: the 95% CI for delta omega2 sits above zero.
-- **H4 rule**: that, and the 95% CI for reasoning minus fast (from the same resamples)
-  also sits above zero. This is the pre-registered rule for H4, H1 and H2.
+- **H4 rule (per-dimension proxy)**: that, and the 95% CI for reasoning minus fast (from
+  the same resamples) also sits above zero. This applies the decision rule of H4, H1 and
+  H2 to one simulated 0 to 2 dimension. H1 and H2 are single dimensions; H4 is the total of
+  nine, so for H4 this is a proxy, not its exact power (see the limits below).
 
 The mode shift's variance is `(mode_shift / 2)^2`. Family variance is `family_sd^2`.
 Mode only "beats" model when the first is clearly larger than the second.
