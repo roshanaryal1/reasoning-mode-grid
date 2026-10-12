@@ -53,7 +53,7 @@ An LLM may act as a rater if:
 ## Agreement and adjudication
 
 ```bash
-modegrid agreement data/scores/rater1.csv data/scores/rater2.csv
+modegrid agreement data/scores/human.csv data/scores/llm-a.csv data/scores/llm-b.csv
 ```
 
 - Bar: Krippendorff's ordinal alpha of at least 0.667 per dimension (pre-registered).

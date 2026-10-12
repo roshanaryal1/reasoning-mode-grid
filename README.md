@@ -62,11 +62,11 @@ configs/grid.yaml --plan--> runs.csv --new-capture (60 chat) / run (12 API)--> d
                                                                   |
                                                                 blind
                                                                   v
-              packets/answers/B001.md ... + scoresheet-rater1.csv, scoresheet-rater2.csv
+              packets/answers/B001.md ... + scoresheet-human.csv, scoresheet-llm-a.csv, scoresheet-llm-b.csv
                                                                   |
                                           raters score blind (v2 rubric + web verification)
                                                                   v
-                          agreement --> adjudicate --> unblind --> data/scores/adjudicated.csv
+                 agreement --> consensus (median of 3) --> unblind --> data/scores/adjudicated.csv
                                                                                 |
                                                                              analyze
                                                                                 v
