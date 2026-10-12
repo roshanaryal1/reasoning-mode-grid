@@ -11,12 +11,12 @@ documented API equivalent, run once per mode as evidence (`modegrid check-modes`
 
 | Family | Chat app: fast | Chat app: reasoning | API check: model | API check: fast | API check: reasoning | Doc URL and date read | API check verdict |
 |---|---|---|---|---|---|---|---|
-| Claude | claude.ai, Sonnet 5.5, Effort Low | claude.ai, Sonnet 5.5, Effort High | `claude-sonnet-5-5` | `thinking: {type: adaptive}`, effort low (lowest available) | `thinking: {type: adaptive}`, effort high | Anthropic API reference (bundled, cached 2026-09-25), 2026-10-06 | |
-| GPT | chatgpt.com (paid), GPT-5.6 Sol, Thinking effort Instant | chatgpt.com (paid), GPT-5.6 Sol, Thinking effort High | `gpt-5.6-sol` | `reasoning_effort: none` | `reasoning_effort: high` | <https://developers.openai.com/api/docs/models/gpt-5.6-sol>, 2026-10-06 | |
-| Gemini | gemini.google.com, 3.6 Flash, Extended thinking off | gemini.google.com, 3.6 Flash, Extended thinking on | `gemini-3.6-flash` | `reasoning_effort: minimal` (lowest available) | `reasoning_effort: high` | <https://ai.google.dev/gemini-api/docs/generate-content/thinking>, 2026-10-06 | |
-| Qwen | chat.qwen.ai, Qwen3.8-Max, Fast | chat.qwen.ai, Qwen3.8-Max, Thinking | `qwen3.8-max` | `enable_thinking: false` | `enable_thinking: true` | <https://www.alibabacloud.com/help/en/model-studio/deep-thinking>, 2026-10-06 | |
-| DeepSeek | chat.deepseek.com, DeepThink off, Search off | chat.deepseek.com, DeepThink on, Search off | `deepseek-v4-pro-0813` via Alibaba Model Studio | `enable_thinking: false` | `enable_thinking: true` | <https://www.alibabacloud.com/help/en/model-studio/deepseek-api>, 2026-10-07 | |
-| Grok | grok.com, Fast | grok.com, Expert | `grok-4.6` | `reasoning_effort: low` (lowest available) | `reasoning_effort: xhigh` | <https://docs.x.ai/developers/model-capabilities/text/reasoning>, 2026-10-05 | |
+| Claude | claude.ai, Sonnet 5.5, Effort Low | claude.ai, Sonnet 5.5, Effort High | `claude-sonnet-5-5` | `thinking: {type: adaptive}`, effort low (lowest available) | `thinking: {type: adaptive}`, effort high | Anthropic API reference (bundled, cached 2026-09-25), 2026-10-06 | switch confirmed (0 vs 14,864) |
+| GPT | chatgpt.com (paid), GPT-5.6 Sol, Thinking effort Instant | chatgpt.com (paid), GPT-5.6 Sol, Thinking effort High | `gpt-5.6-sol` | `reasoning_effort: none` | `reasoning_effort: high` | <https://developers.openai.com/api/docs/models/gpt-5.6-sol>, 2026-10-06 | switch confirmed (0 vs 6,000) |
+| Gemini | gemini.google.com, 3.6 Flash, Extended thinking off | gemini.google.com, 3.6 Flash, Extended thinking on | `gemini-3.6-flash` | `reasoning_effort: minimal` (lowest available) | `reasoning_effort: high` | <https://ai.google.dev/gemini-api/docs/generate-content/thinking>, 2026-10-06 | switch confirmed (0 vs 2,601) |
+| Qwen | chat.qwen.ai, Qwen3.8-Max, Fast | chat.qwen.ai, Qwen3.8-Max, Thinking | `qwen3.8-max` | `enable_thinking: false` | `enable_thinking: true` | <https://www.alibabacloud.com/help/en/model-studio/deep-thinking>, 2026-10-06 | switch confirmed (0 vs 23,805) |
+| DeepSeek | chat.deepseek.com, DeepThink off, Search off | chat.deepseek.com, DeepThink on, Search off | `deepseek-v4-pro-0813` via Alibaba Model Studio | `enable_thinking: false` | `enable_thinking: true` | <https://www.alibabacloud.com/help/en/model-studio/deepseek-api>, 2026-10-07 | switch confirmed (0 vs 10,546) |
+| Grok | grok.com, Fast | grok.com, Expert | `grok-4.6` | `reasoning_effort: low` (lowest available) | `reasoning_effort: xhigh` | <https://docs.x.ai/developers/model-capabilities/text/reasoning>, 2026-10-05 | lowest available (131 vs 4,627) |
 
 ## Rules
 
@@ -165,3 +165,22 @@ reasoning count when the model does not think, so `_unreported_is_zero` records 
 (also set for Qwen, on the same host).
 
 Source: <https://www.alibabacloud.com/help/en/model-studio/deepseek-api>
+
+## API check results, 2026-10-12
+
+One API call per family and mode (`modegrid check-modes`, `results/mode_check.md`).
+Reasoning tokens are as reported by each API, or derived where the API omits them (see
+`_reasoning_in_total` and `_unreported_is_zero` in `configs/grid.yaml`). Five families
+show zero reasoning tokens in fast mode; Grok, which cannot disable reasoning, shows far
+fewer in fast mode than in reasoning mode. GPT's reasoning answer is empty because its
+6,000-token limit (account rate limit) went on thinking; Claude's reasoning answer stopped
+at the 32,000-token limit in force when it ran. Neither affects the switch evidence.
+
+| Family | Words fast | Words reasoning | Reasoning tokens fast | Reasoning tokens reasoning | Model returned | Verdict |
+|---|---|---|---|---|---|---|
+| claude | 2108 | 6051 | 0 | 14864 | claude-sonnet-5-5 | switch confirmed |
+| deepseek | 4203 | 5188 | 0 | 10546 | deepseek-v4-pro-0813 | switch confirmed |
+| gemini | 3783 | 4411 | 0 | 2601 | gemini-3.6-flash | switch confirmed |
+| gpt | 4014 | 0 | 0 | 6000 | gpt-5.6-sol | switch confirmed |
+| grok | 1990 | 7393 | 131 | 4627 | grok-4.6 | lowest available: fast reasons less, not zero; record both counts |
+| qwen | 3315 | 7587 | 0 | 23805 | qwen3.8-max | switch confirmed |
