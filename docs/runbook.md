@@ -125,6 +125,8 @@ Check: 60 main captures plus 12 API checks in `data/captures/`, and
    Send the human rater the `packets/answers/` folder, their own score sheet, the rubric
    (`vendor/llm-architects/docs/rubric.md`, v2 anchors) and [scoring.md](scoring.md).
    Give each LLM rater the same packet and instructions, with web search on.
+   Before any scoring, record in `data/scores/raters.md` which vendor, model id and run
+   date are `llm-a` and `llm-b`. They must be two different vendors.
 2. Raters score independently. The author does not score. D3 and D4 require web
    verification of every tool and model name. This rule exists because the LA-P1 anchor
    rater wrongly flagged 14 real post-cutoff tools as fabricated.
@@ -132,7 +134,11 @@ Check: 60 main captures plus 12 API checks in `data/captures/`, and
    `data/scores/llm-b.csv` and check agreement:
 
    ```bash
+   # all three raters (the pre-registered alpha)
    modegrid agreement data/scores/human.csv data/scores/llm-a.csv data/scores/llm-b.csv --out results/agreement.csv
+   # human against each LLM (exact agreement is reported for the first two sheets)
+   modegrid agreement data/scores/human.csv data/scores/llm-a.csv --out results/agreement-human-llm-a.csv
+   modegrid agreement data/scores/human.csv data/scores/llm-b.csv --out results/agreement-human-llm-b.csv
    ```
 
    `results/agreement.csv` is also LA-P5's input: `specbench gate --alpha` reads it.
@@ -170,13 +176,13 @@ Then the remaining pre-registered checks:
 
 ```bash
 # Robustness check 3: the same analysis on each rater's raw scores
-modegrid unblind data/scores/rater1.csv --out data/scores/rater1-unblinded.csv
-modegrid analyze --scores data/scores/rater1-unblinded.csv --out results/rater1
-modegrid unblind data/scores/rater2.csv --out data/scores/rater2-unblinded.csv
-modegrid analyze --scores data/scores/rater2-unblinded.csv --out results/rater2
+for r in human llm-a llm-b; do
+  modegrid unblind data/scores/$r.csv --out data/scores/$r-unblinded.csv
+  modegrid analyze --scores data/scores/$r-unblinded.csv --out results/$r
+done
 
 # Blinding-failure rate: did raters guess family or mode better than chance?
-modegrid blinding-check data/scores/rater1.csv data/scores/rater2.csv
+modegrid blinding-check data/scores/human.csv data/scores/llm-a.csv data/scores/llm-b.csv
 ```
 
 For LA-P5, hand over `results/agreement.csv` and `results/variance_table.csv`:
