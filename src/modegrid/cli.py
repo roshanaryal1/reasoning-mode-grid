@@ -14,7 +14,7 @@ from pathlib import Path
 
 from . import DIMS, PRIMARY_MODES, __version__
 from .agreement import exact_agreement, krippendorff_alpha
-from .analyze import run_analysis, write_outputs
+from .analyze import ALPHA_BAR, run_analysis, write_outputs
 from .blind import build_packets, guess_accuracy
 from .capture import Capture, check_capture, manual_template, read_capture, word_count, write_capture
 from .config import load_grid, unready_families
@@ -26,7 +26,6 @@ from .synthetic import Effect, power, synthetic_scores
 DEFAULT_CONFIG = "configs/grid.yaml"
 DEFAULT_MANIFEST = "data/manifest/runs.csv"
 DEFAULT_CAPTURES = "data/captures"
-ALPHA_BAR = 0.667  # pre-registered; Krippendorff's lowest bar for tentative conclusions
 
 
 def cmd_plan(args: argparse.Namespace) -> int:
@@ -219,6 +218,15 @@ def cmd_agreement(args: argparse.Namespace) -> int:
         status = "ok" if alpha >= ALPHA_BAR else "BELOW BAR"
         rows.append((d, alpha, exact, status))
         print(f"{d:<6}{alpha:>15.3f}{exact:>12.2f}  {status}")
+    # total score (sum of D1-D9) at interval level: H4's reliability gate
+    totals = [
+        [sum(s[i][d] for d in DIMS) if i in s and all(d in s[i] for d in DIMS) else None for i in ids] for s in sheets
+    ]
+    t_alpha = krippendorff_alpha(totals, "interval")
+    t_exact = exact_agreement(totals[0], totals[1]) if len(totals) > 1 else float("nan")
+    t_status = "ok" if t_alpha >= ALPHA_BAR else "BELOW BAR"
+    rows.append(("total", t_alpha, t_exact, t_status))
+    print(f"{'total':<6}{t_alpha:>15.3f}{t_exact:>12.2f}  {t_status}  (interval)")
     if args.out:
         # dimension,alpha is the format arch-spec-bench's `specbench gate --alpha` reads.
         out = Path(args.out)
@@ -273,7 +281,11 @@ def cmd_analyze(args: argparse.Namespace) -> int:
         lengths=lengths,
         families=families,
     )
-    write_outputs(design, rows, args.out, note=args.note)
+    alphas = None
+    if args.agreement:
+        with Path(args.agreement).open(newline="", encoding="utf-8") as fh:
+            alphas = {r["dimension"]: float(r["alpha"]) for r in csv.DictReader(fh)}
+    write_outputs(design, rows, args.out, note=args.note, alphas=alphas)
     print(Path(args.out, "variance_table.md").read_text(encoding="utf-8"))
     return 0
 
@@ -438,6 +450,7 @@ def build_parser() -> argparse.ArgumentParser:
     z.add_argument("--seed", type=int, default=20261001)
     z.add_argument("--note", default="")
     z.add_argument("--families", default="", help="comma-separated subset, e.g. gpt,qwen,deepseek")
+    z.add_argument("--agreement", default="", help="agreement CSV; dimensions below the alpha bar become exploratory")
     z.set_defaults(func=cmd_analyze)
 
     d = sub.add_parser("demo", help="synthetic end-to-end dry run")

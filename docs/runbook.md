@@ -165,7 +165,7 @@ Check: `data/scores/adjudicated.csv` has 60 rows and `modegrid validate` prints 
 ## Phase 4. Analyse (1 day)
 
 ```bash
-modegrid analyze --note "Confirmatory analysis, prereg-v1"
+modegrid analyze --agreement results/agreement.csv --note "Confirmatory analysis, prereg-v1"
 ```
 
 This writes `results/variance_table.md` and `results/variance_table.csv`. Report every

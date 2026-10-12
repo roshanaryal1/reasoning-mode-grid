@@ -96,12 +96,16 @@ def bootstrap(y: np.ndarray, n_boot: int = 5000, seed: int = 0) -> Decomposition
     noise is resampled, which is the uncertainty the replicates were run to
     measure.
     """
+    return decompose(resample(y, n_boot=n_boot, seed=seed))
+
+
+def resample(y: np.ndarray, n_boot: int = 5000, seed: int = 0) -> np.ndarray:
+    """The bootstrap resamples behind `bootstrap`: replicates drawn with replacement per cell."""
     y = np.asarray(y, dtype=float)
     a, b, n = y.shape
     rng = np.random.default_rng(seed)
     idx = rng.integers(0, n, size=(n_boot, a, b, n))
-    resampled = np.take_along_axis(np.broadcast_to(y, (n_boot, a, b, n)), idx, axis=-1)
-    return decompose(resampled)
+    return np.take_along_axis(np.broadcast_to(y, (n_boot, a, b, n)), idx, axis=-1)
 
 
 def permutation_p(y: np.ndarray, effect: str, n_perm: int = 5000, seed: int = 0) -> float:

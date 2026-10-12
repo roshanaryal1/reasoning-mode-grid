@@ -7,6 +7,14 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions follo
 
 ### Changed
 
+- Pre-registration tightened after two outside reviews: H4 is the single confirmatory test
+  (H1-H3 secondary); H1, H2, H4 also need reasoning > fast; dimensions below alpha 0.667 are
+  exploratory, with H4 gated on the total score's alpha; refusals are kept and scored;
+  a failed re-run drops the family; exact omega squared formula, permutation null and
+  bootstrap seed stated; interaction and per-family differences reported; low-variance
+  dimensions reported as uninformative; length check reworded as non-causal; same-model
+  verification, capture window, blinding procedure, pinned inputs and single-task scope
+  written down. The arXiv 2505.24630 citation no longer quotes an unverified figure.
 - Single author (2026-10-12). The author never scores; three blind raters (one human
   who is not an author, two LLMs from different vendors) score, and the median replaces
   hand adjudication. AUTHORS.md, collaboration.md, scoring.md, the pre-registration,
@@ -30,6 +38,10 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions follo
 
 ### Added
 
+- `modegrid analyze` reports the signed mode effect (reasoning minus fast) with a bootstrap
+  CI, omega squared for the interaction, per-family differences
+  (`family_mode_effects.csv`) and hypothesis status; `--agreement` marks dimensions below
+  the alpha bar as exploratory. `modegrid agreement` adds a total-score row.
 - `modegrid analyze --families`: run the analysis on a subset of families. Used by
   pre-registered robustness check 4, which splits the grid into families with a true
   reasoning-off fast mode (GPT, Qwen, DeepSeek) and lowest-available ones (Claude,
