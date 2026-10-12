@@ -10,8 +10,9 @@
 - This file.
 
 Raters never receive the key file, the captures, the manifest, or the reasoning traces.
-A rater who is also a co-author has no repo access until scoring is locked
-(see [collaboration.md](collaboration.md)).
+The author collected the captures and therefore never scores. Three blind raters score:
+one human who is not an author and two LLMs from different vendors (see
+[collaboration.md](collaboration.md)). No rater ever gets repo access.
 
 ## How to score
 
@@ -56,6 +57,7 @@ modegrid agreement data/scores/rater1.csv data/scores/rater2.csv
 ```
 
 - Bar: Krippendorff's ordinal alpha of at least 0.667 per dimension (pre-registered).
-- Every cell where raters differ goes to adjudication. Record each decision in
-  `data/scores/adjudication-log.md` with the blind id, dimension, both scores, the final
-  score and one line of reason. Adjudicate while still blind.
+- With three raters, the analysis unit is the **median** of the three scores for each
+  answer and dimension: `modegrid consensus human.csv llm-a.csv llm-b.csv`. This replaces
+  hand adjudication, because the only person who could adjudicate (the author) is not
+  blind. Report agreement across all three raters and between the human and each LLM.

@@ -60,12 +60,16 @@ Anything else is "inconclusive".
 ## 4. Measurement
 
 - Rubric: `vendor/llm-architects/docs/rubric.md`, v2 hard anchors for D1, D7, D8, D9.
-- At least two independent raters, blind to family and mode (see [scoring.md](scoring.md)).
+- Three independent raters, blind to family and mode: one human who is not an author and
+  two LLMs from different vendors, each named with model id and run date before scoring,
+  with live web search (see [scoring.md](scoring.md)). The author does not score.
+- LLM raters' scores for their own vendor's family are also reported separately.
 - D3 and D4 require web verification of every named tool and model, as of the capture date.
 - D1 requires running `memory_budget.py` on the answer's co-resident model set.
 - Reliability: Krippendorff's ordinal alpha per dimension. Bar: 0.667.
-- Disagreements are adjudicated with a written reason. The adjudicated score is the
-  analysis unit.
+- The analysis unit is the median of the three raters' scores for each answer and
+  dimension (`modegrid consensus`). No hand adjudication: the only possible adjudicator,
+  the author, is not blind.
 
 ## 5. Primary analysis
 

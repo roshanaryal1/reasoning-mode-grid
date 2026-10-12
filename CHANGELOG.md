@@ -7,6 +7,10 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions follo
 
 ### Changed
 
+- Single author (2026-10-12). The author never scores; three blind raters (one human
+  who is not an author, two LLMs from different vendors) score, and the median replaces
+  hand adjudication. AUTHORS.md, collaboration.md, scoring.md, the pre-registration,
+  runbook and threats to validity updated.
 - Decided settings from the chat apps as seen on 2026-10-06: Claude moves to
   `claude-sonnet-5-5` (Effort Low vs High; Sonnet 5 is no longer in claude.ai),
   Gemini to `gemini-3.6-flash` (Extended thinking off vs on; API `minimal` vs
@@ -26,6 +30,8 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions follo
 
 ### Added
 
+- `modegrid consensus`: median of an odd number of blind rater sheets, the analysis unit
+  when the author cannot adjudicate blind.
 - Per-family `max_tokens` for the API check (GPT 6,000 to fit a 10,000 tokens-per-minute
   account limit); the grid default rises to 64,000. Captures record the limit used.
 - `modegrid agreement --out` writes `dimension,alpha` CSV, the input LA-P5's

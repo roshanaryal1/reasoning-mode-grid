@@ -98,7 +98,7 @@ configs/grid.yaml --plan--> runs.csv --new-capture (60 chat) / run (12 API)--> d
 - [Analysis](docs/analysis.md): the statistics in plain language
 - [Power](docs/power.md): why 5 replicates
 - [Threats to validity](docs/threats-to-validity.md)
-- [Collaboration](docs/collaboration.md): who does what, and how blinding survives a co-author
+- [Scorers and outside help](docs/collaboration.md): how scoring stays blind with a single author
 - [Venues and timeline](docs/venues.md): where to submit and how long each route takes
 - [Related work](docs/related-work.md): closest prior work and how this study differs
 - [Paper plan](docs/paper-plan.md) and [outline](paper/outline.md)

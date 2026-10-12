@@ -22,7 +22,8 @@ Each threat has a mitigation and the place in the paper where it is reported.
 | Raters know which mode wrote an answer. Reasoning answers can look different. | Blinded packets, identity redaction, rater guesses recorded and reported as a blinding-failure rate. |
 | Vendors change models during data collection. | Randomised run order. All runs for a family inside a short window. Dated captures. |
 | Personalisation in chat apps. | Fresh chat, memory off, no custom instructions, recorded in each capture. |
-| A co-author or rater sees the captures before scoring. | Raters get only the blinded packet. Repo access for raters only after unblinding (see collaboration.md). |
+| A rater sees the captures before scoring. | The author, who collected the captures, never scores. Raters get only the blinded packet and never get repo access (see collaboration.md). |
+| LLM raters favour their own vendor or reasoning-style answers. | Two LLMs from different vendors plus one human; median of three; own-vendor scores reported separately; human-vs-LLM agreement reported. |
 | Raters with old training data flag real new tools as fake (the LA-P2 effect). | Mandatory web verification for D3 and D4. UNRESOLVED scores as 1. |
 | Analysis choices made after seeing data. | Pre-registration tagged before the first capture. Deviations logged. |
 
@@ -47,4 +48,6 @@ Each threat has a mitigation and the place in the paper where it is reported.
 
 The author proposed the claim. The pilot does not clearly support it. The pre-registration
 says so in advance, so a negative or mixed result is reported with the same weight as a
-positive one.
+positive one. The study has a single author, so no second author checks the analysis;
+the data and code are released so anyone can re-run it, and the author does no
+scoring.

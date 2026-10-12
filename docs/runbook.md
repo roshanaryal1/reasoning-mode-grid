@@ -119,19 +119,20 @@ Check: 60 main captures plus 12 API checks in `data/captures/`, and
 1. Build the packets. Keep the key away from raters.
 
    ```bash
-   modegrid blind --raters rater1 rater2 rater3
+   modegrid blind --raters human llm-a llm-b
    ```
 
-   Send each rater the `packets/answers/` folder, their own score sheet, the rubric
+   Send the human rater the `packets/answers/` folder, their own score sheet, the rubric
    (`vendor/llm-architects/docs/rubric.md`, v2 anchors) and [scoring.md](scoring.md).
-2. Raters score independently. At least two. D3 and D4 require web verification of every
-   tool and model name. This rule exists because the LA-P1 anchor rater wrongly flagged
-   14 real post-cutoff tools as fabricated.
-3. Collect sheets into `data/scores/rater1.csv`, `data/scores/rater2.csv` and check
-   agreement:
+   Give each LLM rater the same packet and instructions, with web search on.
+2. Raters score independently. The author does not score. D3 and D4 require web
+   verification of every tool and model name. This rule exists because the LA-P1 anchor
+   rater wrongly flagged 14 real post-cutoff tools as fabricated.
+3. Collect sheets into `data/scores/human.csv`, `data/scores/llm-a.csv`,
+   `data/scores/llm-b.csv` and check agreement:
 
    ```bash
-   modegrid agreement data/scores/rater1.csv data/scores/rater2.csv --out results/agreement.csv
+   modegrid agreement data/scores/human.csv data/scores/llm-a.csv data/scores/llm-b.csv --out results/agreement.csv
    ```
 
    `results/agreement.csv` is also LA-P5's input: `specbench gate --alpha` reads it.
@@ -139,9 +140,13 @@ Check: 60 main captures plus 12 API checks in `data/captures/`, and
    Pre-registered bar: Krippendorff's ordinal alpha of at least 0.667 per dimension.
    A dimension below the bar is still reported, but its hypothesis test is labelled
    unreliable. Do not drop it and do not re-score until it passes.
-4. Adjudicate every disagreement listed in the queue. Write the decision and the reason
-   in `data/scores/adjudication-log.md`. Save the final sheet as
-   `data/scores/adjudicated-blind.csv`.
+4. Take the median of the three raters (no hand adjudication; the author is not blind):
+
+   ```bash
+   modegrid consensus data/scores/human.csv data/scores/llm-a.csv data/scores/llm-b.csv
+   ```
+
+   This writes `data/scores/adjudicated-blind.csv`.
 5. Unblind and commit the key now that scoring is locked:
 
    ```bash

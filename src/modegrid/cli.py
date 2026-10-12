@@ -20,7 +20,7 @@ from .capture import Capture, check_capture, manual_template, read_capture, word
 from .config import load_grid, unready_families
 from .plan import API_CHECK, MAIN, build_manifest, read_manifest, write_manifest
 from .providers import adapter_for, with_retries
-from .scores import disagreements, load_key, load_scores, unblind, write_scores
+from .scores import consensus, disagreements, load_key, load_scores, unblind, write_scores
 from .synthetic import Effect, power, synthetic_scores
 
 DEFAULT_CONFIG = "configs/grid.yaml"
@@ -195,6 +195,14 @@ def cmd_unblind(args: argparse.Namespace) -> int:
     scores = unblind(load_scores(args.scores), key)
     write_scores(scores, args.out)
     print(f"wrote {len(scores)} run-level rows to {args.out}")
+    return 0
+
+
+def cmd_consensus(args: argparse.Namespace) -> int:
+    sheets = [load_scores(p) for p in args.files]
+    merged = consensus(sheets)
+    write_scores(merged, args.out, id_col="blind_id")
+    print(f"median of {len(sheets)} raters for {len(merged)} answers -> {args.out}")
     return 0
 
 
@@ -402,6 +410,11 @@ def build_parser() -> argparse.ArgumentParser:
     a.add_argument("--show", type=int, default=30)
     a.add_argument("--out", default="", help="also write dimension,alpha CSV (input for specbench gate)")
     a.set_defaults(func=cmd_agreement)
+
+    cs = sub.add_parser("consensus", help="median of an odd number of blind rater sheets")
+    cs.add_argument("files", nargs="+")
+    cs.add_argument("--out", default="data/scores/adjudicated-blind.csv")
+    cs.set_defaults(func=cmd_consensus)
 
     bc = sub.add_parser("blinding-check", help="rater guess accuracy vs chance")
     bc.add_argument("files", nargs="+", help="rater score sheets with guess_family / guess_mode filled")
