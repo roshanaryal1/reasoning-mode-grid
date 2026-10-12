@@ -35,7 +35,8 @@ prompts:
     sha256: ba2acba8868b254a96897e0552dd62ccd00443bc6afd084df419ba37ba0370e0
     extract: between-markers
 
-# Masked in rater packets on top of each family's vendor/model/redact_terms.
+# Masked in rater packets, with each family's vendor/model/redact_terms, but only where an
+# answer refers to itself ("I'm ...", "As ...,"). Names used as content stay (see blind.py).
 global_redact_terms: [ChatGPT, OpenAI, Anthropic, Claude, Gemini, Google, Qwen, Alibaba, DeepSeek, Grok, xAI]
 
 families:

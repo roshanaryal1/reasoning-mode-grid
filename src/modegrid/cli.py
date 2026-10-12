@@ -121,6 +121,8 @@ def cmd_new_capture(args: argparse.Namespace) -> int:
         print(f"{r.run_id} is an API run. Use `modegrid run` for it.")
         return 2
     mode = fam.modes[r.mode]
+    # time needed for the 48 h rule; date_stamped is never edited, date_run may be corrected with a date_note
+    stamp = dt.datetime.now(dt.timezone.utc).isoformat(timespec="seconds")
     meta = {
         "run_id": r.run_id,
         "set": r.set,
@@ -134,7 +136,8 @@ def cmd_new_capture(args: argparse.Namespace) -> int:
         "prompt_id": prompt.id,
         "prompt_sha256": prompt.sha256,
         "replicate": r.replicate,
-        "date_run": dt.datetime.now(dt.timezone.utc).isoformat(timespec="seconds"),  # time needed for the 48 h rule
+        "date_stamped": stamp,
+        "date_run": stamp,
         "run_by": args.run_by,
         "interface": "web app, fresh chat, signed in, no custom instructions, memory off",
     }
@@ -371,11 +374,12 @@ def cmd_demo(args: argparse.Namespace) -> int:
 def cmd_power(args: argparse.Namespace) -> int:
     effect = Effect(args.family_sd, args.mode_shift, args.noise_sd)
     print(f"effect: family_sd={effect.family_sd} mode_shift={effect.mode_shift} noise_sd={effect.noise_sd}")
-    print(f"{'families':>9}{'replicates':>11}{'runs':>6}{'power':>8}")
+    print(f"{'families':>9}{'replicates':>11}{'runs':>6}{'delta only':>12}{'H4 rule':>9}")
     for a in args.families:
         for n in args.replicates:
             p = power(effect, a, n, sims=args.sims, seed=args.seed)
-            print(f"{a:>9}{n:>11}{a * 2 * n:>6}{p:>8.2f}")
+            p_dir = power(effect, a, n, sims=args.sims, seed=args.seed, direction=True)
+            print(f"{a:>9}{n:>11}{a * 2 * n:>6}{p:>12.2f}{p_dir:>9.2f}")
     return 0
 
 
