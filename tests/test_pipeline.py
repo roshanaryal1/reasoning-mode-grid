@@ -124,7 +124,7 @@ def test_redaction_keeps_names_used_as_content():
     # D2-D4 need the recommended models and tools visible to raters
     text = "\n" * 12 + (
         "Run Qwen3-Coder via Ollama, use Claude Code, and tools such as DeepSeek or Gemini CLI.\n"
-        "Gemma is a model family developed by Google."
+        "Gemma is a model family developed by Google. As Google explains, I think it fits."
     )
     out = redact(text, ["Claude", "DeepSeek", "Gemini", "Qwen", "Google"])
     assert out == text

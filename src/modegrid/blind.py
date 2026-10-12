@@ -34,15 +34,17 @@ HEADER_PATTERN = re.compile(
 MASK = "[REDACTED]"
 
 # Phrases where a name identifies the answering model rather than a recommendation.
-# "As" counts only at the start of a sentence, so "tools such as DeepSeek" is kept.
 # "developed by X" counts only after one of these cues ("I am an AI developed by X"),
 # so "a tool developed by Google" is kept.
 _SELF_CUES = (
     r"\bI\s+am\s+",
     r"\bI['’]m\s+",
     r"\bmy\s+name\s+is\s+",
-    r"(?:^|(?<=[.!?:]\s))As\s+",
 )
+# "As X, I ..." at the start of a sentence. Needs the comma and "I", so "tools such as
+# DeepSeek" and "As Google explains, ..." are kept.
+_AS_CUE = r"(?:^|(?<=[.!?:]\s))As\s+"
+_AS_TAIL = r"(?=[^\S\n]*,\s*I\b)"
 _FILLER = (
     r"(?:(?:an?|the|AI|model|assistant|language|large)\s+){0,4}"
     r"(?:(?:made|built|developed|trained|created)\s+by\s+)?"
@@ -63,8 +65,12 @@ def redact(text: str, terms: list[str] | tuple[str, ...], header_lines: int = 12
     if not names:
         return out
     cue = "|".join(_SELF_CUES)
-    pattern = re.compile(rf"(?P<cue>(?:{cue}){_FILLER})(?P<name>{names})(?![\w-])", re.IGNORECASE | re.MULTILINE)
-    return pattern.sub(lambda m: m.group("cue") + MASK, out)
+    flags = re.IGNORECASE | re.MULTILINE
+    first_person = re.compile(rf"(?P<cue>(?:{cue}){_FILLER})(?P<name>{names})(?![\w-])", flags)
+    as_self = re.compile(rf"(?P<cue>{_AS_CUE}{_FILLER})(?P<name>{names})(?![\w-]){_AS_TAIL}", flags)
+    for pattern in (first_person, as_self):
+        out = pattern.sub(lambda m: m.group("cue") + MASK, out)
+    return out
 
 
 def build_packets(
