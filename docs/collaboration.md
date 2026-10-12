@@ -43,4 +43,7 @@ Rules from [scoring.md](scoring.md), "LLM raters":
 
 ## Repository access
 
-Only the author has write access. Nobody who scores is ever added as a collaborator.
+The author does all the work in the repository. One observer also has access (added
+while a co-authorship was being planned) and takes no part in collecting, scoring or
+analysis. Because the observer can see the captures, the observer can never be a rater.
+Nobody who scores is ever added as a collaborator.
