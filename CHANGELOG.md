@@ -7,6 +7,18 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions follo
 
 ### Changed
 
+- Third review pass on the pre-registration. Blinding now masks a vendor or model name only
+  where an answer refers to itself; names used as content stay, because D2 to D4 need the
+  recommended models and tools. An outright refusal scores 0 on every dimension. Chosen
+  model per family listed, with a tie-break rule. Family blocks follow manifest order, which
+  keeps the seeded order and the 48-hour rule both true. Up to 2 replacements per cell for
+  errors or cut-offs; a replaced capture moves to `data/captures/superseded/` and the
+  replacement keeps the run id. `new-capture` writes an unedited `date_stamped`, and
+  `validate` rejects a changed `date_run` with no `date_note`. Low-variance dimensions make
+  their hypothesis inconclusive; a strong interaction labels support "average effect
+  only"; the bootstrap CI decides and permutation disagreements are reported. `modegrid
+  power` reports the full H4 rule beside delta alone; power.md no longer says the
+  equal-effects rate is near 5% (it is 0.15 at 60 runs).
 - Pre-registration tightened after two outside reviews: H4 is the single confirmatory test
   (H1-H3 secondary); H1, H2, H4 also need reasoning > fast; dimensions below alpha 0.667 are
   exploratory, with H4 gated on the total score's alpha; refusals are kept and scored;

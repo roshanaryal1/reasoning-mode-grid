@@ -17,7 +17,7 @@ from dataclasses import dataclass
 import numpy as np
 
 from . import DIMS, PRIMARY_MODES
-from .anova import bootstrap
+from .anova import decompose, resample
 
 CUTS = (-0.5, 0.5)
 
@@ -70,14 +70,27 @@ def synthetic_scores(
     return out
 
 
-def power(effect: Effect, a: int, n: int, sims: int = 300, n_boot: int = 400, seed: int = 0) -> float:
-    """Share of simulated studies where the 95% CI for delta omega2 is above zero."""
+def power(
+    effect: Effect, a: int, n: int, sims: int = 300, n_boot: int = 400, seed: int = 0, direction: bool = False
+) -> float:
+    """Share of simulated studies where the 95% CI for delta omega2 is above zero.
+
+    With `direction`, a study counts only if the reasoning-minus-fast CI from the
+    same resamples is also above zero: the pre-registered rule for H4.
+    """
     rng = np.random.default_rng(seed)
     data = simulate_cells(effect, a, n, rng, size=sims)
+    fast, reasoning = PRIMARY_MODES.index("fast"), PRIMARY_MODES.index("reasoning")
     hits = 0
     for s in range(sims):
-        boot = bootstrap(data[s], n_boot=n_boot, seed=seed + s).delta_omega2
+        samples = resample(data[s], n_boot=n_boot, seed=seed + s)
+        boot = decompose(samples).delta_omega2
         boot = boot[~np.isnan(boot)]
-        if boot.size and np.percentile(boot, 2.5) > 0:
-            hits += 1
+        if not (boot.size and np.percentile(boot, 2.5) > 0):
+            continue
+        if direction:
+            diff = samples[:, :, reasoning, :].mean(axis=(1, 2)) - samples[:, :, fast, :].mean(axis=(1, 2))
+            if not np.percentile(diff, 2.5) > 0:
+                continue
+        hits += 1
     return hits / sims

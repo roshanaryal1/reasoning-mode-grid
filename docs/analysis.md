@@ -62,7 +62,10 @@ shuffle produces a mode effect as large as the real one. No distribution assumpt
 
 The hypotheses table below it marks H4 confirmatory and H1-H3 secondary. "Supported" needs
 the predicted verdict, reasoning > fast where predicted, and rater alpha at or above 0.667
-(pass `--agreement results/agreement.csv`). `results/family_mode_effects.csv` lists each
+(pass `--agreement results/agreement.csv`). A low-variance or no-variance dimension makes
+its hypothesis "inconclusive". If the interaction's omega squared exceeds both main
+effects, a "yes" carries the label "average effect only". The bootstrap CI decides the
+verdict; where the permutation p-value disagrees, report both. `results/family_mode_effects.csv` lists each
 family's reasoning-minus-fast difference per dimension.
 
 A dimension with "no variance" means every answer got the same score. That is a finding

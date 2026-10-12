@@ -5,7 +5,12 @@ are handled here:
 
 1. Self-identification. The study prompt asks the model to state its name,
    cutoff and browsing status at the top. Those header lines are removed.
-2. Vendor and model names in the body. Terms from the config are masked.
+2. Self-reference in the body ("I'm Claude", "As ChatGPT, ...", "a model
+   developed by Google"). Config terms are masked only inside such phrases.
+
+Vendor and model names used as content stay. The prompt asks for a local model
+and tool stack, so answers name Qwen, DeepSeek or Gemma models and tools such as
+Claude Code; D2 to D4 cannot be scored if those names are masked.
 
 What cannot be removed: style, length, and formatting habits. A rater may still
 guess. Raters record a guess per answer (`guess_family`, `guess_mode`) so the
@@ -28,6 +33,17 @@ HEADER_PATTERN = re.compile(
 )
 MASK = "[REDACTED]"
 
+# Phrases where a name identifies the answering model rather than a recommendation.
+# "As" counts only at the start of a sentence, so "tools such as DeepSeek" is kept.
+_SELF_CUES = (
+    r"\bI\s+am\s+",
+    r"\bI['’]m\s+",
+    r"\bmy\s+name\s+is\s+",
+    r"(?:^|(?<=[.!?:]\s))As\s+",
+    r"\b(?:made|built|developed|trained|created)\s+by\s+",
+)
+_FILLER = r"(?:(?:an?|the|AI|model|assistant|language|large)\s+){0,4}"
+
 
 def redact(text: str, terms: list[str] | tuple[str, ...], header_lines: int = 12) -> str:
     lines = text.splitlines()
@@ -39,9 +55,12 @@ def redact(text: str, terms: list[str] | tuple[str, ...], header_lines: int = 12
         kept.append(line)
     out = "\n".join(kept)
     # Longest first so "Claude Sonnet" masks before "Claude".
-    for term in sorted({t for t in terms if t}, key=len, reverse=True):
-        out = re.sub(rf"(?<![\w-]){re.escape(term)}(?![\w-])", MASK, out, flags=re.IGNORECASE)
-    return out
+    names = "|".join(re.escape(t) for t in sorted({t for t in terms if t}, key=len, reverse=True))
+    if not names:
+        return out
+    cue = "|".join(_SELF_CUES)
+    pattern = re.compile(rf"(?P<cue>(?:{cue}){_FILLER})(?P<name>{names})(?![\w-])", re.IGNORECASE | re.MULTILINE)
+    return pattern.sub(lambda m: m.group("cue") + MASK, out)
 
 
 def build_packets(

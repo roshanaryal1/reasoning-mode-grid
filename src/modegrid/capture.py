@@ -106,6 +106,11 @@ def check_capture(capture: Capture) -> list[str]:
     if (not capture.final_answer or capture.final_answer.startswith("<!--")) and not truncated_check:
         # an API check that spent its whole limit on thinking is still evidence; never scored
         problems.append("final answer is empty")
+    # date_stamped is written by new-capture and never edited; a changed date_run needs a reason
+    stamped = capture.meta.get("date_stamped")
+    moved = stamped is not None and str(stamped) != str(capture.meta.get("date_run"))
+    if moved and not str(capture.meta.get("date_note") or "").strip():
+        problems.append("date_run differs from date_stamped but date_note gives no reason")
     for key, value in capture.meta.items():
         if isinstance(value, str) and "FILL IN" in value:
             problems.append(f"front-matter {key!r} still says FILL IN")

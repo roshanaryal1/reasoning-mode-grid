@@ -19,8 +19,9 @@ Each threat has a mitigation and the place in the paper where it is reported.
 
 | Threat | Mitigation |
 |---|---|
-| Raters know which mode wrote an answer. Reasoning answers can look different. | Blinded packets, identity redaction, rater guesses recorded and reported as a blinding-failure rate. |
-| Vendors change models during data collection. | Randomised run order. All runs for a family inside a short window. Dated captures. |
+| Raters know which mode wrote an answer. Reasoning answers can look different. | Blinded packets, self-identification removed, rater guesses recorded and reported as a blinding-failure rate. |
+| Answers recommend their own vendor's models, which hints at the family. Masking those names would make D2 to D4 unscorable. | Names used as content are kept; only self-reference is masked. The family-guess accuracy reports how much this leaks. |
+| Vendors change models during data collection. | Randomised run order inside each family block. All runs for a family inside 48 hours. Dated captures with an unedited `date_stamped`. Family blocks run on different days, so family is partly confounded with date; stated in the paper. |
 | Personalisation in chat apps. | Fresh chat, memory off, no custom instructions, recorded in each capture. |
 | A rater sees the captures before scoring. | The author, who collected the captures, never scores. Raters get only the blinded packet and never get repo access (see collaboration.md). |
 | LLM raters favour their own vendor or reasoning-style answers. | Two LLMs from different vendors plus one human; median of three; own-vendor scores reported separately; human-vs-LLM agreement reported. |

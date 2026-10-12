@@ -96,6 +96,17 @@ def test_capture_round_trip(tmp_path):
         write_capture(cap, tmp_path)
 
 
+def test_changed_run_time_needs_a_reason():
+    meta = {k: "x" for k in ("run_id", "family", "mode", "native_label", "channel", "model_requested")}
+    meta |= {"model_returned": "m", "prompt_id": "p", "prompt_sha256": "h", "replicate": 1, "run_by": "me"}
+    meta |= {"date_stamped": "2026-10-13T01:00:00+00:00", "date_run": "2026-10-13T01:00:00+00:00"}
+    assert check_capture(Capture(meta=dict(meta), final_answer="a")) == []
+    meta["date_run"] = "2026-10-13T05:00:00+00:00"
+    assert any("date_note" in p for p in check_capture(Capture(meta=dict(meta), final_answer="a")))
+    meta["date_note"] = "template made in the morning, prompt sent after lunch"
+    assert check_capture(Capture(meta=dict(meta), final_answer="a")) == []
+
+
 def test_parse_rejects_missing_section():
     with pytest.raises(CaptureError):
         parse_capture("---\nrun_id: a\n---\n\n## Final answer\n\nhi\n")
@@ -104,9 +115,27 @@ def test_parse_rejects_missing_section():
 def test_redaction_masks_identity():
     text = "Model name: Claude Sonnet 5, knowledge cutoff 2026\n\n# Plan\nUse Claude Code and the DeepSeek API."
     out = redact(text, ["Claude Sonnet 5", "Claude", "DeepSeek"])
-    assert "Sonnet" not in out and "DeepSeek" not in out
+    assert "Sonnet" not in out
     assert "self-identification line removed" in out
     assert "# Plan" in out
+
+
+def test_redaction_keeps_names_used_as_content():
+    # D2-D4 need the recommended models and tools visible to raters
+    text = "\n" * 12 + "Run Qwen3-Coder via Ollama, use Claude Code, and tools such as DeepSeek or Gemini CLI."
+    out = redact(text, ["Claude", "DeepSeek", "Gemini", "Qwen"])
+    assert out == text
+
+
+def test_redaction_masks_self_reference_in_body():
+    body = "\n" * 12 + (
+        "I'm Claude, so take this with care. As ChatGPT, I cannot browse.\n"
+        "I am an AI model developed by Google. My name is Grok."
+    )
+    out = redact(body, ["Claude", "ChatGPT", "Google", "Grok"])
+    for name in ("Claude", "ChatGPT", "Google", "Grok"):
+        assert name not in out
+    assert out.count("[REDACTED]") == 4
 
 
 def test_blind_unblind_round_trip(tmp_path):
@@ -465,6 +494,22 @@ def test_hypothesis_needs_reasoning_better_and_reliable_dimension():
     assert (
         hypothesis_status({"verdict": "model > mode", "mode_effect_ci_low": 0.0}, HYPOTHESES["H3"], reliable) == "yes"
     )
+
+
+def test_low_variance_and_interaction_labels():
+    from modegrid.analyze import HYPOTHESES, hypothesis_status
+
+    h1, reliable = HYPOTHESES["H1"], {"D1": 0.8}
+    flat = {"verdict": "uninformative (low variance)", "mode_effect_ci_low": 0.0}
+    assert hypothesis_status(flat, h1, reliable) == "inconclusive (uninformative (low variance))"
+    tangled = {
+        "verdict": "mode > model",
+        "mode_effect_ci_low": 0.3,
+        "omega2_mode": 0.2,
+        "omega2_family": 0.05,
+        "omega2_interaction": 0.3,
+    }
+    assert hypothesis_status(tangled, h1, reliable).startswith("yes (average effect only")
 
 
 def test_low_variance_dimension_is_uninformative():

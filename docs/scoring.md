@@ -2,8 +2,10 @@
 
 ## What raters receive
 
-- `packets/answers/B001.md` to `B060.md`: the final answers, with self-identification
-  lines and vendor or model names masked as `[REDACTED]`.
+- `packets/answers/B001.md` to `B060.md`: the final answers. Self-identification lines at
+  the top are removed, and a vendor or model name is masked as `[REDACTED]` only where the
+  answer refers to itself ("I'm ...", "As ...,"). Models and tools the answer recommends
+  are left in, because D2 to D4 need them.
 - Their own score sheet `scoresheet-<rater>.csv`, in a reading order unique to them.
 - The rubric: `vendor/llm-architects/docs/rubric.md`. Use the **v2 hard anchors** for D1,
   D7, D8 and D9.
@@ -16,7 +18,9 @@ one human who is not an author and two LLMs from different vendors (see
 
 ## How to score
 
-A refusal is scored like any other answer, against the rubric as written.
+**Refusals.** An outright refusal (the answer declines the task and recommends no models,
+tools or plan) scores 0 on all nine dimensions. An answer that does part of the task is
+scored normally against the rubric.
 
 1. Score each answer on its own. Do not compare answers and adjust.
 2. Fill D1 to D9 with 0, 1 or 2. No blanks, no halves.

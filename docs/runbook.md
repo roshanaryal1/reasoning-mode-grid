@@ -78,15 +78,20 @@ and the `prereg-v1` tag exists.
 
 ## Phase 2. Collect the 60 chat captures (3 to 5 days)
 
-All 60 scored runs happen in the vendors' chat apps. Work through
-`data/manifest/runs.csv` in order (rows with `set` = `main`). The order is random on
-purpose, so vendor-side changes during the week do not line up with one mode.
+All 60 scored runs happen in the vendors' chat apps. Capture one family at a time, taking
+families in the order each first appears in `data/manifest/runs.csv` (rows with `set` =
+`main`). Inside a family, follow the manifest order. That order is random on purpose, so
+fast and reasoning runs are mixed and a vendor-side change mid-block does not line up
+with one mode.
 
-For each run:
+For each run, make the template right before you send the prompt (it stamps the time):
 
 ```bash
 modegrid new-capture claude__fast__p1-v1__r1
 ```
+
+If you end up sending the prompt later, set `date_run` to the real UTC time and add a
+`date_note` saying why. Never edit `date_stamped`.
 
 Then:
 
@@ -102,10 +107,16 @@ Then:
 - Replace the `FILL IN` value in `model_returned` with the model name the app shows.
 - Take a screenshot of the model and mode selector. Keep screenshots outside the repo,
   named by run id.
+- **Refusal:** keep it. It is scored (0 on every dimension if it refuses outright).
+- **Error, cut-off answer, or wrong model shown:** move the capture to
+  `data/captures/superseded/`, add a line to that folder's README saying why, and run
+  `new-capture` again for the same run id. Up to 2 replacements per cell for errors or
+  cut-offs. A wrong model gets one replacement; if it happens again in that family, stop
+  and record the family as dropped (preregistration section 7).
 
 Tips that save time:
 
-- Do one family per sitting, in manifest order. A family's 10 runs take about an hour.
+- Do one family per sitting. A family's 10 runs take about an hour.
 - Finish each family inside 48 hours, so a silent vendor update cannot split it.
 - `modegrid validate` catches a missing section or a leftover `FILL IN`.
 

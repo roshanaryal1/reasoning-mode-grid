@@ -199,12 +199,20 @@ def hypothesis_status(row: dict[str, object], h: Hypothesis, alphas: dict[str, f
     checked = alpha is not None and math.isfinite(alpha)
     if checked and alpha < ALPHA_BAR:  # type: ignore[operator]
         return f"exploratory (alpha {alpha:.2f} below {ALPHA_BAR})"
+    if row["verdict"] in ("no variance", "uninformative (low variance)"):
+        return f"inconclusive ({row['verdict']})"
     if row["verdict"] != h.predicted:
         return "no"
     if h.direction == "reasoning > fast" and not float(row["mode_effect_ci_low"]) > 0:  # type: ignore[arg-type]
         return "no (mode matters, but reasoning is not better)"
     # support needs a passing reliability gate; without one the result is provisional
-    return "yes" if checked else "yes, pending alpha"
+    status = "yes" if checked else "yes, pending alpha"
+    # a strong interaction does not overturn support for the average effect, but the label says so
+    inter = float(row.get("omega2_interaction", math.nan))  # type: ignore[arg-type]
+    mains = max(float(row.get("omega2_mode", math.nan)), float(row.get("omega2_family", math.nan)))  # type: ignore[arg-type]
+    if inter > mains:
+        status += " (average effect only; interaction exceeds both main effects)"
+    return status
 
 
 def run_analysis(
