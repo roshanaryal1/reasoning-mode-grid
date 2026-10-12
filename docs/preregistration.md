@@ -46,7 +46,7 @@ prediction.
 
 **Competing prediction for H3.** Work on reasoning-trained models reports that they
 hallucinate more than comparable non-reasoning models (for example Li and Ng, arXiv
-2505.24630, who find that reasoning-oriented RL fine-tuning "significantly increases the
+2505.24630v2, who find that reasoning-oriented RL fine-tuning "significantly increases the
 prevalence of hallucinations"). That work compares differently trained models, not one
 model with inference-time reasoning switched on and off, so it is motivation, not direct
 evidence about this manipulation. If the pattern carries over, mode would matter for D3
@@ -80,7 +80,8 @@ is supported only if both hold; "mode > model" with reasoning not better is repo
   contrast as vendor-exposed chat settings, not a proven same-weights manipulation.
 - **Capture window and drift.** Each family's 10 runs inside 48 hours; all 60 inside 14
   days. Every capture records its date and time. Vendor release notes published during the
-  window are recorded in the mode registry.
+  window are recorded in the mode registry. `modegrid new-capture` stamps each capture with
+  a UTC date and time when it is created; adjust it if the run happens later.
 - **Replicates.** 5 independent runs per cell. 60 runs total. Rationale in [power.md](power.md).
 - **API mode check.** Separately, 1 API call per family and mode (12 calls) with the
   documented API equivalent of each chat mode. These show that each mode switch changes
@@ -216,8 +217,9 @@ direction condition makes support somewhat harder to reach and is stated as a li
 
 ## 8. Stopping rule
 
-Data collection stops at 60 valid runs (plus any permitted re-runs). No interim analysis of real scores. The demo and power
-commands use synthetic data only.
+Data collection stops at 10 valid runs per family for every family still in the study:
+60 if no family is dropped, 50 if one is (plus any permitted re-runs). No interim analysis
+of real scores. The demo and power commands use synthetic data only.
 
 ## 9. Pilot data
 

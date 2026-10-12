@@ -134,7 +134,7 @@ def cmd_new_capture(args: argparse.Namespace) -> int:
         "prompt_id": prompt.id,
         "prompt_sha256": prompt.sha256,
         "replicate": r.replicate,
-        "date_run": dt.date.today().isoformat(),
+        "date_run": dt.datetime.now(dt.timezone.utc).isoformat(timespec="seconds"),  # time needed for the 48 h rule
         "run_by": args.run_by,
         "interface": "web app, fresh chat, signed in, no custom instructions, memory off",
     }

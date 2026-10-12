@@ -453,11 +453,18 @@ def test_hypothesis_needs_reasoning_better_and_reliable_dimension():
     h1 = HYPOTHESES["H1"]
     better = {"verdict": "mode > model", "mode_effect_ci_low": 0.3}
     worse = {"verdict": "mode > model", "mode_effect_ci_low": -0.9}
-    assert hypothesis_status(better, h1) == "yes"
-    assert hypothesis_status(worse, h1).startswith("no")
+    reliable = {"D1": 0.8, "D3": 0.8}
+    assert hypothesis_status(better, h1, reliable) == "yes"
+    assert hypothesis_status(worse, h1, reliable).startswith("no")
     assert hypothesis_status(better, h1, {"D1": 0.41}).startswith("exploratory")
+    # never "yes" without a passing reliability gate (missing file, missing row, or NaN)
+    assert hypothesis_status(better, h1) == "yes, pending alpha"
+    assert hypothesis_status(better, h1, {"D3": 0.9}) == "yes, pending alpha"
+    assert hypothesis_status(better, h1, {"D1": float("nan")}) == "yes, pending alpha"
     assert HYPOTHESES["H4"].role == "confirmatory" and HYPOTHESES["H1"].role == "secondary"
-    assert hypothesis_status({"verdict": "model > mode", "mode_effect_ci_low": 0.0}, HYPOTHESES["H3"]) == "yes"
+    assert (
+        hypothesis_status({"verdict": "model > mode", "mode_effect_ci_low": 0.0}, HYPOTHESES["H3"], reliable) == "yes"
+    )
 
 
 def test_low_variance_dimension_is_uninformative():

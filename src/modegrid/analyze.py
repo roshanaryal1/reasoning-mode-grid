@@ -196,13 +196,15 @@ def analyse_dimension(
 def hypothesis_status(row: dict[str, object], h: Hypothesis, alphas: dict[str, float] | None = None) -> str:
     """Pre-registered decision for one hypothesis (preregistration sections 2 and 4)."""
     alpha = (alphas or {}).get(h.dim)
-    if alpha is not None and alpha < ALPHA_BAR:
+    checked = alpha is not None and math.isfinite(alpha)
+    if checked and alpha < ALPHA_BAR:  # type: ignore[operator]
         return f"exploratory (alpha {alpha:.2f} below {ALPHA_BAR})"
     if row["verdict"] != h.predicted:
         return "no"
     if h.direction == "reasoning > fast" and not float(row["mode_effect_ci_low"]) > 0:  # type: ignore[arg-type]
         return "no (mode matters, but reasoning is not better)"
-    return "yes"
+    # support needs a passing reliability gate; without one the result is provisional
+    return "yes" if checked else "yes, pending alpha"
 
 
 def run_analysis(
