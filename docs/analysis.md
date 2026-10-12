@@ -35,13 +35,16 @@ Scores are 0, 1 or 2. Classical F-tests assume smooth, normal data. A permutatio
 shuffles the mode labels within each family thousands of times and asks how often a
 shuffle produces a mode effect as large as the real one. No distribution assumption.
 
-## The three robustness checks
+## The robustness checks
 
 1. **Ranks.** Re-run on ranked scores. Guards against the 0/1/2 scale doing odd things.
 2. **Length.** Reasoning modes write more. Remove the linear effect of log answer length
-   in words and re-run. If the mode effect disappears, the honest finding is about length.
-3. **Per rater.** Re-run on each rater's raw scores. A result that exists only after
-   adjudication is fragile.
+   in words and re-run. Length is itself affected by mode, so if the mode effect shrinks,
+   the honest finding is that it is not separable from length, not that length caused it.
+3. **Per rater.** Re-run on each rater's raw scores. A result that exists only in the
+   median of three is fragile.
+4. **Split by fast-mode floor.** Re-run on the true-off families and on the
+   lowest-available families separately.
 
 ## Reading the output
 
@@ -50,10 +53,17 @@ shuffle produces a mode effect as large as the real one. No distribution assumpt
 | Column | Meaning |
 |---|---|
 | eta2 family, mode, FxM, resid | Plain shares of the spread. They sum to 1 |
+| omega2 FxM | Bias-corrected share of the family x mode interaction |
 | delta omega2 | The primary statistic. Positive means mode explains more |
 | 95% CI | Bootstrap interval for delta |
-| p mode, p family | Permutation p-values for each main effect |
-| Verdict | mode > model, model > mode, inconclusive, or no variance |
+| reasoning - fast, 95% CI | Signed mode effect: positive means reasoning scored higher |
+| p mode, p family | Permutation p-values (mode: shuffled within each family) |
+| Verdict | mode > model, model > mode, inconclusive, uninformative (low variance), or no variance |
+
+The hypotheses table below it marks H4 confirmatory and H1-H3 secondary. "Supported" needs
+the predicted verdict, reasoning > fast where predicted, and rater alpha at or above 0.667
+(pass `--agreement results/agreement.csv`). `results/family_mode_effects.csv` lists each
+family's reasoning-minus-fast difference per dimension.
 
 A dimension with "no variance" means every answer got the same score. That is a finding
 about the rubric, not about mode or model. Report it.

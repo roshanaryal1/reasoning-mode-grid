@@ -328,7 +328,7 @@ def test_agreement_writes_gate_csv(tmp_path, monkeypatch):
     out = tmp_path / "alpha.csv"
     assert main(["agreement", *sheets, "--out", str(out)]) == 0
     rows = list(csv.DictReader(out.open()))
-    assert [r["dimension"] for r in rows] == [f"D{i}" for i in range(1, 10)]
+    assert [r["dimension"] for r in rows] == [*(f"D{i}" for i in range(1, 10)), "total"]
     assert all(-1.0 <= float(r["alpha"]) <= 1.0 for r in rows)
 
 
@@ -420,3 +420,63 @@ def test_cli_consensus_writes_blind_sheet(tmp_path):
     out = tmp_path / "adjudicated-blind.csv"
     assert main(["consensus", *paths, "--out", str(out)]) == 0
     assert load_scores(out)["B001"]["D2"] == 2
+
+
+def _grid(fast, reasoning, a=6, n=5):
+    # y[family, mode, replicate]; mode 0 = fast, 1 = reasoning
+    import numpy as np
+
+    y = np.empty((a, 2, n))
+    y[:, 0, :] = fast
+    y[:, 1, :] = reasoning
+    return y
+
+
+def test_mode_effect_is_signed_with_a_ci():
+    import numpy as np
+
+    from modegrid.analyze import analyse_dimension
+
+    rng = np.random.default_rng(1)
+    y = _grid(0.0, 2.0) + rng.integers(0, 2, size=(6, 2, 5)) * 0.0
+    y[:, 0, 0] = 1  # some noise so variance is not degenerate
+    y[:, 1, 0] = 1
+    row = analyse_dimension(y, "D1", n_boot=200, n_perm=50, seed=1, families=list("abcdef"))
+    assert row["mode_effect"] > 0 and row["mode_effect_ci_low"] > 0
+    assert "omega2_interaction" in row
+    assert len(row["family_effects"]) == 6 and all(fe["diff"] > 0 for fe in row["family_effects"])
+
+
+def test_hypothesis_needs_reasoning_better_and_reliable_dimension():
+    from modegrid.analyze import HYPOTHESES, hypothesis_status
+
+    h1 = HYPOTHESES["H1"]
+    better = {"verdict": "mode > model", "mode_effect_ci_low": 0.3}
+    worse = {"verdict": "mode > model", "mode_effect_ci_low": -0.9}
+    assert hypothesis_status(better, h1) == "yes"
+    assert hypothesis_status(worse, h1).startswith("no")
+    assert hypothesis_status(better, h1, {"D1": 0.41}).startswith("exploratory")
+    assert HYPOTHESES["H4"].role == "confirmatory" and HYPOTHESES["H1"].role == "secondary"
+    assert hypothesis_status({"verdict": "model > mode", "mode_effect_ci_low": 0.0}, HYPOTHESES["H3"]) == "yes"
+
+
+def test_low_variance_dimension_is_uninformative():
+    from modegrid.analyze import analyse_dimension
+
+    y = _grid(2.0, 2.0)
+    y[0, 0, 0] = 1  # 1 of 60 differs: 98% identical
+    row = analyse_dimension(y, "D5", n_boot=50, n_perm=20, seed=1, families=list("abcdef"))
+    assert row["verdict"].startswith("uninformative")
+
+
+def test_agreement_reports_total_alpha(tmp_path, capsys):
+    rows_a = {f"B{i:03d}": {f"D{j}": (i + j) % 3 for j in range(1, 10)} for i in range(1, 9)}
+    paths = []
+    for name in ("human", "llm-a", "llm-b"):
+        p = tmp_path / f"{name}.csv"
+        write_scores(rows_a, p, id_col="blind_id")
+        paths.append(str(p))
+    out = tmp_path / "agreement.csv"
+    assert main(["agreement", *paths, "--out", str(out)]) == 0
+    dims = [line.split(",")[0] for line in out.read_text().splitlines()[1:]]
+    assert dims[-1] == "total"

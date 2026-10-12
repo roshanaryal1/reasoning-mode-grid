@@ -6,20 +6,40 @@ import csv
 import math
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Any, cast
 
 import numpy as np
 
 from . import DIM_NAMES, DIMS, PRIMARY_MODES
-from .anova import bootstrap, cell_spreads, decompose, permutation_p, rank_transform, residualise
+from .anova import cell_spreads, decompose, permutation_p, rank_transform, resample, residualise
 from .plan import MAIN, Run
 from .scores import Scores
 
-# Pre-registered directional hypotheses (docs/preregistration.md).
+ALPHA_BAR = 0.667  # pre-registered; Krippendorff's lowest bar for tentative conclusions
+LOW_VARIANCE_SHARE = 0.9  # pre-registered: >= 90% identical scores -> uninformative
+
+
+@dataclass(frozen=True)
+class Hypothesis:
+    dim: str
+    predicted: str  # "mode > model" or "model > mode" on delta omega2
+    label: str
+    role: str  # "confirmatory" (H4 only) or "secondary"
+    direction: str | None  # "reasoning > fast" when the rationale predicts reasoning helps
+
+
+# Pre-registered hypotheses (docs/preregistration.md, section 2).
 HYPOTHESES = {
-    "H1": ("D1", "mode > model", "Constraint reasoning is mode-sensitive"),
-    "H2": ("D9", "mode > model", "Internal consistency is mode-sensitive"),
-    "H3": ("D3", "model > mode", "Tool factuality is mode-stable"),
-    "H4": ("total", "mode > model", "Headline: mode explains more of the total score than model"),
+    "H1": Hypothesis("D1", "mode > model", "Constraint reasoning is mode-sensitive", "secondary", "reasoning > fast"),
+    "H2": Hypothesis("D9", "mode > model", "Internal consistency is mode-sensitive", "secondary", "reasoning > fast"),
+    "H3": Hypothesis("D3", "model > mode", "Tool factuality is mode-stable", "secondary", None),
+    "H4": Hypothesis(
+        "total",
+        "mode > model",
+        "Headline: mode explains more of the total than model",
+        "confirmatory",
+        "reasoning > fast",
+    ),
 }
 
 ROW_FIELDS = [
@@ -31,9 +51,13 @@ ROW_FIELDS = [
     "eta2_residual",
     "omega2_family",
     "omega2_mode",
+    "omega2_interaction",
     "delta_omega2",
     "ci_low",
     "ci_high",
+    "mode_effect",
+    "mode_effect_ci_low",
+    "mode_effect_ci_high",
     "p_mode",
     "p_family",
     "within_model_mode",
@@ -94,9 +118,11 @@ def _ci(samples: np.ndarray, level: float = 0.95) -> tuple[float, float]:
     return float(lo), float(hi)
 
 
-def verdict(ci_low: float, ci_high: float, ss_total: float) -> str:
+def verdict(ci_low: float, ci_high: float, ss_total: float, low_variance: bool = False) -> str:
     if ss_total == 0 or math.isnan(ci_low):
         return "no variance"
+    if low_variance:
+        return "uninformative (low variance)"
     if ci_low > 0:
         return "mode > model"
     if ci_high < 0:
@@ -111,10 +137,29 @@ def analyse_dimension(
     n_perm: int,
     seed: int,
     lengths: np.ndarray | None = None,
+    families: list[str] | None = None,
 ) -> dict[str, object]:
+    y = np.asarray(y, dtype=float)
     d = decompose(y)
-    boot = bootstrap(y, n_boot=n_boot, seed=seed)
+    resamples = resample(y, n_boot=n_boot, seed=seed)
+    boot = decompose(resamples)
     lo, hi = _ci(boot.delta_omega2)
+    fast, reasoning = PRIMARY_MODES.index("fast"), PRIMARY_MODES.index("reasoning")
+    # signed mode effect: reasoning mean minus fast mean, same resamples as delta
+    mode_effect = float(y[:, reasoning, :].mean() - y[:, fast, :].mean())
+    me_lo, me_hi = _ci(resamples[:, :, reasoning, :].mean(axis=(1, 2)) - resamples[:, :, fast, :].mean(axis=(1, 2)))
+    _, counts = np.unique(y, return_counts=True)
+    low_variance = counts.max() / y.size >= LOW_VARIANCE_SHARE
+    names = families or [str(i) for i in range(y.shape[0])]
+    family_effects = [
+        {
+            "family": names[i],
+            "fast_mean": float(y[i, fast].mean()),
+            "reasoning_mean": float(y[i, reasoning].mean()),
+            "diff": float(y[i, reasoning].mean() - y[i, fast].mean()),
+        }
+        for i in range(y.shape[0])
+    ]
     spreads = cell_spreads(y)
     rank_d = decompose(rank_transform(y)).delta_omega2
     length_adj: float | str = ""
@@ -130,17 +175,34 @@ def analyse_dimension(
         "eta2_residual": float(d.eta2["residual"]),
         "omega2_family": float(d.omega2["family"]),
         "omega2_mode": float(d.omega2["mode"]),
+        "omega2_interaction": float(d.omega2["interaction"]),
         "delta_omega2": float(d.delta_omega2),
         "ci_low": lo,
         "ci_high": hi,
+        "mode_effect": mode_effect,
+        "mode_effect_ci_low": me_lo,
+        "mode_effect_ci_high": me_hi,
         "p_mode": math.nan if no_var else permutation_p(y, "mode", n_perm=n_perm, seed=seed),
         "p_family": math.nan if no_var else permutation_p(y, "family", n_perm=n_perm, seed=seed + 1),
         "within_model_mode": spreads["within_model_mode"],
         "between_model": spreads["between_model"],
         "rank_delta_omega2": float(rank_d),
         "length_adj_delta_omega2": length_adj,
-        "verdict": verdict(lo, hi, float(d.ss_total)),
+        "verdict": verdict(lo, hi, float(d.ss_total), bool(low_variance)),
+        "family_effects": family_effects,
     }
+
+
+def hypothesis_status(row: dict[str, object], h: Hypothesis, alphas: dict[str, float] | None = None) -> str:
+    """Pre-registered decision for one hypothesis (preregistration sections 2 and 4)."""
+    alpha = (alphas or {}).get(h.dim)
+    if alpha is not None and alpha < ALPHA_BAR:
+        return f"exploratory (alpha {alpha:.2f} below {ALPHA_BAR})"
+    if row["verdict"] != h.predicted:
+        return "no"
+    if h.direction == "reasoning > fast" and not float(row["mode_effect_ci_low"]) > 0:  # type: ignore[arg-type]
+        return "no (mode matters, but reasoning is not better)"
+    return "yes"
 
 
 def run_analysis(
@@ -171,7 +233,7 @@ def run_analysis(
     if lengths is not None and all(rid in lengths for rid in design.run_ids.ravel()):
         length_arr = np.vectorize(lambda r: float(lengths[r]), otypes=[float])(design.run_ids)
     rows = [
-        analyse_dimension(score_array(design, scores, dim), dim, n_boot, n_perm, seed, length_arr)
+        analyse_dimension(score_array(design, scores, dim), dim, n_boot, n_perm, seed, length_arr, design.families)
         for dim in (*DIMS, "total")
     ]
     return design, rows
@@ -183,14 +245,29 @@ def _fmt(v: object) -> str:
     return str(v)
 
 
-def write_outputs(design: Design, rows: list[dict[str, object]], out_dir: str | Path, note: str = "") -> None:
+def write_outputs(
+    design: Design,
+    rows: list[dict[str, object]],
+    out_dir: str | Path,
+    note: str = "",
+    alphas: dict[str, float] | None = None,
+) -> None:
     out = Path(out_dir)
     out.mkdir(parents=True, exist_ok=True)
     with (out / "variance_table.csv").open("w", newline="", encoding="utf-8") as fh:
-        w = csv.DictWriter(fh, fieldnames=ROW_FIELDS, lineterminator="\n")
+        w = csv.DictWriter(fh, fieldnames=ROW_FIELDS, lineterminator="\n", extrasaction="ignore")
         w.writeheader()
         for row in rows:
-            w.writerow({k: _fmt(v) for k, v in row.items()})
+            w.writerow({k: _fmt(v) for k, v in row.items() if k in ROW_FIELDS})
+    with (out / "family_mode_effects.csv").open("w", newline="", encoding="utf-8") as fh:
+        fw = csv.writer(fh, lineterminator="\n")
+        fw.writerow(["dimension", "family", "fast_mean", "reasoning_mean", "reasoning_minus_fast"])
+        for row in rows:
+            effects = cast(list[dict[str, Any]], row.get("family_effects", []))
+            for fe in effects:
+                fw.writerow(
+                    [row["dimension"], fe["family"], *(_fmt(fe[k]) for k in ("fast_mean", "reasoning_mean", "diff"))]
+                )
 
     by_dim = {r["dimension"]: r for r in rows}
     lines = [
@@ -205,27 +282,32 @@ def write_outputs(design: Design, rows: list[dict[str, object]], out_dir: str | 
         "Primary statistic: delta = omega2(mode) - omega2(family), 95% bootstrap CI over replicates.",
         "",
         "| Dim | Name | eta2 family | eta2 mode | eta2 FxM | eta2 resid "
-        "| delta omega2 | 95% CI | p mode | p family | Verdict |",
-        "|---|---|---|---|---|---|---|---|---|---|---|",
+        "| omega2 FxM | delta omega2 | 95% CI | reasoning - fast | 95% CI | p mode | p family | Verdict |",
+        "|---|---|---|---|---|---|---|---|---|---|---|---|---|---|",
     ]
     for r in rows:
         lines.append(
             f"| {r['dimension']} | {r['name']} | {_fmt(r['eta2_family'])} | {_fmt(r['eta2_mode'])} | "
-            f"{_fmt(r['eta2_interaction'])} | {_fmt(r['eta2_residual'])} | {_fmt(r['delta_omega2'])} | "
-            f"[{_fmt(r['ci_low'])}, {_fmt(r['ci_high'])}] | {_fmt(r['p_mode'])} | {_fmt(r['p_family'])} | "
-            f"{r['verdict']} |"
+            f"{_fmt(r['eta2_interaction'])} | {_fmt(r['eta2_residual'])} | {_fmt(r['omega2_interaction'])} | "
+            f"{_fmt(r['delta_omega2'])} | [{_fmt(r['ci_low'])}, {_fmt(r['ci_high'])}] | {_fmt(r['mode_effect'])} | "
+            f"[{_fmt(r['mode_effect_ci_low'])}, {_fmt(r['mode_effect_ci_high'])}] | "
+            f"{_fmt(r['p_mode'])} | {_fmt(r['p_family'])} | {r['verdict']} |"
         )
     lines += [
         "",
         "## Pre-registered hypotheses",
         "",
-        "| ID | Dimension | Predicted | Observed | Supported |",
-        "|---|---|---|---|---|",
+        "H4 is the single confirmatory test; H1-H3 are pre-specified secondary tests.",
+        "",
+        "| ID | Role | Dimension | Predicted | Observed | Reasoning - fast (95% CI) | Supported |",
+        "|---|---|---|---|---|---|---|",
     ]
-    for hid, (dim, predicted, label) in HYPOTHESES.items():
-        observed = str(by_dim[dim]["verdict"])
+    for hid, h in HYPOTHESES.items():
+        r = by_dim[h.dim]
         lines.append(
-            f"| {hid} | {dim} ({label}) | {predicted} | {observed} | {'yes' if observed == predicted else 'no'} |"
+            f"| {hid} | {h.role} | {h.dim} ({h.label}) | {h.predicted}"
+            f"{'; ' + h.direction if h.direction else ''} | {r['verdict']} | {_fmt(r['mode_effect'])} "
+            f"[{_fmt(r['mode_effect_ci_low'])}, {_fmt(r['mode_effect_ci_high'])}] | {hypothesis_status(r, h, alphas)} |"
         )
     lines += [
         "",

@@ -26,7 +26,7 @@ pre-registered analysis.
 
 | Paper | What it found | Relevance |
 |---|---|---|
-| Reasoning Models Hallucinate More: Factuality-Aware Reinforcement Learning for Large Reasoning Models. arXiv 2505.24630 | DeepSeek-R1 and QwQ-32B hallucinate on average 10 and 13 points more than their non-reasoning counterparts | **Direct tension with H3.** H3 predicts tool factuality is mode-stable. This work suggests reasoning can lower factuality. Discuss either outcome |
+| Reasoning Models Hallucinate More: Factuality-Aware Reinforcement Learning for Large Reasoning Models. arXiv 2505.24630 | Reasoning-oriented RL fine-tuning "significantly increases the prevalence of hallucinations" (abstract). Compares differently trained models, not reasoning switched on and off within one model. No "10 to 13 points" figure appears in the paper's text (checked 2026-10-12) | **Direct tension with H3.** H3 predicts tool factuality is mode-stable. This work suggests reasoning can lower factuality. Discuss either outcome |
 | Mitigating Factual Hallucination in Large Reasoning Models via Mixed-Mode Advantage Regularization. arXiv 2607.05861 | Names "thinking-induced hallucination": thinking turns a correct direct answer into a wrong one | Same tension, mechanism-level |
 | Learning to Reason for Factuality. arXiv 2508.05618 | Methods to reduce hallucination in reasoning models | Background |
 | Reasoning LLM Errors Arise from Hallucinating Critical Problem Features. arXiv 2505.12151 | Errors come from hallucinated problem features | Background for D1 (misreading the hardware spec) |

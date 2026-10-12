@@ -16,6 +16,8 @@ one human who is not an author and two LLMs from different vendors (see
 
 ## How to score
 
+A refusal is scored like any other answer, against the rubric as written.
+
 1. Score each answer on its own. Do not compare answers and adjust.
 2. Fill D1 to D9 with 0, 1 or 2. No blanks, no halves.
 3. **D3 and D4: web-verify before scoring.** Search for every tool, framework and model
