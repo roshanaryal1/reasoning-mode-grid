@@ -133,12 +133,12 @@ def test_redaction_keeps_names_used_as_content():
 def test_redaction_masks_self_reference_in_body():
     body = "\n" * 12 + (
         "I'm Claude, so take this with care. As ChatGPT, I cannot browse.\n"
-        "I am an AI model developed by Google. My name is Grok."
+        "I am an AI model developed by Google. My name is Grok. I was trained by Anthropic."
     )
-    out = redact(body, ["Claude", "ChatGPT", "Google", "Grok"])
-    for name in ("Claude", "ChatGPT", "Google", "Grok"):
+    out = redact(body, ["Claude", "ChatGPT", "Google", "Grok", "Anthropic"])
+    for name in ("Claude", "ChatGPT", "Google", "Grok", "Anthropic"):
         assert name not in out
-    assert out.count("[REDACTED]") == 4
+    assert out.count("[REDACTED]") == 5
 
 
 def test_blind_unblind_round_trip(tmp_path):

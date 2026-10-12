@@ -38,6 +38,7 @@ MASK = "[REDACTED]"
 # so "a tool developed by Google" is kept.
 _SELF_CUES = (
     r"\bI\s+am\s+",
+    r"\bI\s+was\s+",
     r"\bI['’]m\s+",
     r"\bmy\s+name\s+is\s+",
 )
