@@ -66,3 +66,23 @@ def disagreements(a: Scores, b: Scores) -> list[tuple[str, str, int, int]]:
             if d in a[uid] and d in b[uid] and a[uid][d] != b[uid][d]:
                 out.append((uid, d, a[uid][d], b[uid][d]))
     return out
+
+
+def consensus(sheets: list[Scores]) -> Scores:
+    """Median score per answer and dimension across an odd number of raters.
+
+    Replaces author adjudication when the author is not blind: the median of three
+    blind raters is mechanical and needs no one to see which model wrote what.
+    """
+    if len(sheets) < 3 or len(sheets) % 2 == 0:
+        raise ScoreError(f"consensus needs an odd number of raters (3 or more), got {len(sheets)}")
+    ids = set(sheets[0])
+    if any(set(s) != ids for s in sheets[1:]):
+        raise ScoreError("all raters must score the same answers")
+    out: Scores = {}
+    for uid in sorted(ids):
+        out[uid] = {}
+        for d in DIMS:
+            values = sorted(s[uid][d] for s in sheets)
+            out[uid][d] = values[len(values) // 2]
+    return out

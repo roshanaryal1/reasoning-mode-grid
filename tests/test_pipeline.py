@@ -359,3 +359,30 @@ def test_run_retries_flag_limits_attempts(tmp_path, monkeypatch, grid_path):
     with pytest.raises(TimeoutError):
         main([*common, "run", "--family", "claude", "--limit", "1", "--retries", "1"])
     assert calls["n"] == 1
+
+
+def test_consensus_is_the_median_of_three_raters(tmp_path):
+    from modegrid.scores import consensus
+
+    row = {f"D{i}": 1 for i in range(1, 10)}
+    human = {"B001": {**row, "D1": 2}, "B002": row}
+    llm_a = {"B001": {**row, "D1": 0}, "B002": {**row, "D3": 2}}
+    llm_b = {"B001": {**row, "D1": 2}, "B002": {**row, "D3": 0}}
+    out = consensus([human, llm_a, llm_b])
+    assert out["B001"]["D1"] == 2 and out["B002"]["D3"] == 1
+    with pytest.raises(ScoreError, match="odd"):
+        consensus([human, llm_a])
+    with pytest.raises(ScoreError, match="same answers"):
+        consensus([human, llm_a, {"B001": row}])
+
+
+def test_cli_consensus_writes_blind_sheet(tmp_path):
+    rows = {"B001": {f"D{i}": i % 3 for i in range(1, 10)}}
+    paths = []
+    for name in ("human", "llm-a", "llm-b"):
+        p = tmp_path / f"{name}.csv"
+        write_scores(rows, p, id_col="blind_id")
+        paths.append(str(p))
+    out = tmp_path / "adjudicated-blind.csv"
+    assert main(["consensus", *paths, "--out", str(out)]) == 0
+    assert load_scores(out)["B001"]["D2"] == 2

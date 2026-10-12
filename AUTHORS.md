@@ -1,31 +1,29 @@
 # Authors and contributions
 
-Draft. Both authors confirm this file in a pull request before the first capture.
-See [docs/collaboration.md](docs/collaboration.md) for the reasoning behind the split.
+Single author. Decided 2026-10-12, after the planned co-author withdrew before any data
+was collected. See [docs/collaboration.md](docs/collaboration.md) for how scoring stays
+blind without a co-author.
 
-| Order | Name | Affiliation | Corresponding | Main responsibilities |
-|---|---|---|---|---|
-| 1 | Roshan Aryal | Independent Researcher, Auckland, New Zealand | Yes | Design, chat captures, API checks, analysis, method and results |
-| 2 | TBD | TBD | No | Pre-registration review, blind scoring (rater 1), adjudication, independent re-analysis, related work and discussion |
+| Name | Affiliation | Corresponding | Responsibilities |
+|---|---|---|---|
+| Roshan Aryal | Independent Researcher, Auckland, New Zealand | Yes | Everything except scoring: design, chat captures, API checks, blinding, analysis, writing |
 
 ## CRediT
 
-| Role | Roshan Aryal | Co-author |
-|---|---|---|
-| Conceptualization | X | |
-| Methodology | X | X |
-| Software | X | |
-| Investigation | X | |
-| Validation | | X |
-| Formal analysis | X | |
-| Data curation | X | |
-| Writing, original draft | X | X |
-| Writing, review and editing | X | X |
-| Project administration | X | |
+All roles: Roshan Aryal (conceptualization, methodology, software, investigation,
+validation, formal analysis, data curation, writing original draft, writing review and
+editing, project administration).
+
+## Scorers
+
+The author does not score. The 60 answers are scored blind by:
+
+- one human scorer who is not an author, thanked by name in the Acknowledgements with
+  their permission;
+- two LLM scorers from different vendors, named in the paper with model id and run date.
 
 ## Agreements
 
-- Author order changes only if the split of work changes substantially, agreed in writing.
-- If an author leaves, the data stays in this repository under its licence, and the
-  remaining author may publish with an acknowledgement.
-- Any LLM used as a rater is named in the paper.
+- If a scorer becomes a substantial contributor (for example, writes a section), authorship
+  is revisited and agreed in writing.
+- Any LLM used as a scorer is named in the paper.
