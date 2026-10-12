@@ -23,7 +23,7 @@ about 7 months, and a peer-reviewed journal paper in about 5 to 7 months.
 |---|---|---|
 | Settings filled, API checks, pre-registration tagged | mid October 2026 | LA-P2 has a hard date on 15 Oct and competes for the same weeks |
 | 60 chat captures | early November 2026 | 3 to 5 days of collection |
-| Blind scoring, adjudication | early December 2026 | 1 to 2 weeks per rater, plus finding rater 2 |
+| Blind scoring (median of three raters) | early December 2026 | 1 to 2 weeks for the human rater, plus finding them; the two LLM raters take a day |
 | Analysis and draft | late December 2026 to mid January 2027 | |
 
 So the first realistic submission window is **January to February 2027**. Every venue
