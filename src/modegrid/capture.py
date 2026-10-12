@@ -108,6 +108,8 @@ def check_capture(capture: Capture) -> list[str]:
         problems.append("final answer is empty")
     # date_stamped is written by new-capture and never edited; a changed date_run needs a reason
     stamped = capture.meta.get("date_stamped")
+    if capture.meta.get("channel") == "web" and not str(stamped or "").strip():
+        problems.append("web capture has no date_stamped (make it with `modegrid new-capture`)")
     moved = stamped is not None and str(stamped) != str(capture.meta.get("date_run"))
     if moved and not str(capture.meta.get("date_note") or "").strip():
         problems.append("date_run differs from date_stamped but date_note gives no reason")

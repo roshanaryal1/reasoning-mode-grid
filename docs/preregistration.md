@@ -248,8 +248,8 @@ where reasoning helps; the simulation models one 0 to 2 dimension, not the nine-
 - A run is **replaced** only if: the app or API returned an error, the answer was visibly
   cut off in transmission, or the app silently used a different model or mode than the one
   selected (visible in the screenshot). The replacement keeps the same run id; the failed
-  capture moves to `data/captures/superseded/` with a line in its README saying why. It is
-  never deleted.
+  capture moves to `data/captures/superseded/` as `<run_id>.attemptN.md`, with a line in
+  that folder's README saying why. It is never deleted.
 - Up to **2 replacements per cell** for errors or cut-offs, so one bad day for an app does
   not cost the family. A different model showing up is handled separately: one
   replacement, and if it happens again in that family, the family is dropped.

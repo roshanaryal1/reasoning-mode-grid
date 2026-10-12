@@ -109,8 +109,10 @@ Then:
   named by run id.
 - **Refusal:** keep it. It is scored (0 on every dimension if it refuses outright).
 - **Error, cut-off answer, or wrong model shown:** move the capture to
-  `data/captures/superseded/`, add a line to that folder's README saying why, and run
-  `new-capture` again for the same run id. Up to 2 replacements per cell for errors or
+  `data/captures/superseded/` as `<run_id>.attempt1.md` (then `.attempt2.md`), so two
+  failures of the same run never overwrite each other. Leave the `run_id` inside the file
+  as it is. Add a line to that folder's README saying why, and run `new-capture` again for
+  the same run id. Up to 2 replacements per cell for errors or
   cut-offs. A wrong model gets one replacement; if it happens again in that family, stop
   and record the family as dropped (preregistration section 7).
 

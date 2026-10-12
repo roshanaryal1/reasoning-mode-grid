@@ -35,14 +35,18 @@ MASK = "[REDACTED]"
 
 # Phrases where a name identifies the answering model rather than a recommendation.
 # "As" counts only at the start of a sentence, so "tools such as DeepSeek" is kept.
+# "developed by X" counts only after one of these cues ("I am an AI developed by X"),
+# so "a tool developed by Google" is kept.
 _SELF_CUES = (
     r"\bI\s+am\s+",
     r"\bI['’]m\s+",
     r"\bmy\s+name\s+is\s+",
     r"(?:^|(?<=[.!?:]\s))As\s+",
-    r"\b(?:made|built|developed|trained|created)\s+by\s+",
 )
-_FILLER = r"(?:(?:an?|the|AI|model|assistant|language|large)\s+){0,4}"
+_FILLER = (
+    r"(?:(?:an?|the|AI|model|assistant|language|large)\s+){0,4}"
+    r"(?:(?:made|built|developed|trained|created)\s+by\s+)?"
+)
 
 
 def redact(text: str, terms: list[str] | tuple[str, ...], header_lines: int = 12) -> str:
