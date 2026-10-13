@@ -1,7 +1,7 @@
 # Pre-registration: LA-P4
 
-Status: **DRAFT.** Frozen when the `prereg-v1` git tag exists. After that, every change
-goes in the Deviations section at the bottom with a date and a reason.
+Status: **FROZEN** on 2026-10-13 (git tag `prereg-v1`). Every change after that goes in
+the Deviations section at the bottom with a date and a reason.
 
 Author: Roshan Aryal, Independent Researcher, Auckland, New Zealand.
 
