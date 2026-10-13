@@ -100,8 +100,8 @@ is supported only if both hold; "mode > model" with reasoning not better is repo
   contrast as vendor-exposed chat settings, not a proven same-weights manipulation.
 - **Capture window and drift.** Each family's 10 runs inside 48 hours; all 60 inside 14
   days. Vendor release notes published during the window are recorded in the mode
-  registry. A family block that overruns 48 hours (for example, an outage) is still
-  completed, and the overrun is reported.
+  registry. A family block that overruns 48 hours, or a collection that overruns 14 days
+  (for example, an outage), is still completed, and the overrun is reported.
 - **Timestamps.** `modegrid new-capture` writes `date_stamped` and `date_run`, both the UTC
   time the template was made. Make the template immediately before sending the prompt.
   `date_stamped` is never edited. If the prompt was sent later, `date_run` is corrected and
