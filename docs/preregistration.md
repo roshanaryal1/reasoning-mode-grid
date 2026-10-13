@@ -165,9 +165,10 @@ is supported only if both hold; "mode > model" with reasoning not better is repo
     did not beat chance reach the same conclusions.
   - All three raters beat chance: a supported H4 is described as tentative, whatever its
     alpha, and labelled "mode blinding failed".
-  - Family guesses above chance (against 1/6, or 1/5 if a family is dropped) are reported
-    the same way. They do not change any hypothesis's status, because family leaking
-    through recommended model names is expected (see the blinding procedure above).
+  - Family guesses above chance (against 1/k, where k is the number of families retained)
+    are reported the same way. They do not change any hypothesis's status, because family
+    leaking through recommended model names is expected (see the blinding procedure
+    above).
 - **Refusals.** An outright refusal (the answer declines the task and recommends no
   models, tools or plan) scores 0 on all nine dimensions. The rubric assumes an answer
   exists; without this rule a refusal would earn 2s on D3, D5 and D9 for naming nothing.
@@ -273,9 +274,9 @@ where reasoning helps; the simulation models one 0 to 2 dimension, not the nine-
   selected (visible in the screenshot). The replacement is captured immediately after the
   failed attempt, as the next capture inside the same family block, before the block moves
   on to the next run in manifest order. If the app is down, the block waits until it works
-  again (the 48-hour overrun rule in section 3 applies). The replacement keeps the same
-  run id; the failed
-  capture moves to `data/captures/superseded/` as `<run_id>.attemptN.md`, with a line in
+  again. The block may then run past 48 hours, and the whole study past 14 days; both
+  overruns are reported (section 3) and do not by themselves drop the family. The
+  replacement keeps the same run id; the failed capture moves to `data/captures/superseded/` as `<run_id>.attemptN.md`, with a line in
   that folder's README saying why. It is never deleted.
 - Up to **2 replacements per cell** for errors or cut-offs, so one bad day for an app does
   not cost the family. A different model showing up is handled separately: one
