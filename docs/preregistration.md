@@ -27,14 +27,19 @@ vendor's own app, available to the author's individual account, that offers both
 a reasoning setting. Where an app offers more than one such model, the tie-break is the one
 recorded in `configs/grid.yaml` before the first scored capture. The choice is fixed here:
 
-| Family | Model | App |
-|---|---|---|
-| Claude | Claude Sonnet 5.5 | claude.ai |
-| GPT | GPT-5.6 Sol | chatgpt.com |
-| Gemini | Gemini 3.6 Flash | gemini.google.com |
-| Qwen | Qwen3.8-Max | chat.qwen.ai |
-| DeepSeek | DeepSeek-V4-Pro | chat.deepseek.com |
-| Grok | Grok 4.6 | grok.com |
+| Family | Model | App | API id (returned by the API check) |
+|---|---|---|---|
+| Claude | Claude Sonnet 5.5 | claude.ai | `claude-sonnet-5-5`, 2026-10-06 |
+| GPT | GPT-5.6 Sol | chatgpt.com | `gpt-5.6-sol`, 2026-10-06 |
+| Gemini | Gemini 3.6 Flash | gemini.google.com | `gemini-3.6-flash`, 2026-10-12 |
+| Qwen | Qwen3.8-Max | chat.qwen.ai | `qwen3.8-max`, 2026-10-06 |
+| DeepSeek | DeepSeek-V4-Pro | chat.deepseek.com | `deepseek-v4-pro-0813` (Alibaba-hosted), 2026-10-06 |
+| Grok | Grok 4.6 | grok.com | `grok-4.6`, 2026-10-06 |
+
+Each API id is the model name the vendor's API returned in the API check
+(`data/captures/*apicheck1.md`). The author checks each app's model picker before the
+first scored capture and records the date and what it showed in section 10. Every capture
+records the model name the app shows (`model_returned`).
 
 These are not all each vendor's top model (Claude Opus 5.5 and Gemini 3.1 Pro exist), and
 they are not matched on size or price. The paper says so. The mode settings for each are
@@ -151,6 +156,18 @@ is supported only if both hold; "mode > model" with reasoning not better is repo
   of the answer. Each rater gets an independent reading order. Raters guess family and mode
   for every answer; the guess accuracy against chance is reported as the blinding-failure
   rate (`modegrid blinding-check`). The original captures are never edited.
+- **If raters guess mode above chance.** A rater beats chance on mode when the one-sided
+  binomial p-value against 1/2 is below 0.05 (`modegrid blinding-check`). Reasoning answers
+  may simply read differently, so this cannot be fully prevented and does not void the
+  study, but it is handled as follows:
+  - Any rater beats chance: the paper names the rater(s), and H1 to H4 are re-run on each
+    rater's own scores as a sensitivity check. The paper reports whether the raters who
+    did not beat chance reach the same conclusions.
+  - All three raters beat chance: a supported H4 is described as tentative, whatever its
+    alpha, and labelled "mode blinding failed".
+  - Family guesses above chance (against 1/6, or 1/5 if a family is dropped) are reported
+    the same way. They do not change any hypothesis's status, because family leaking
+    through recommended model names is expected (see the blinding procedure above).
 - **Refusals.** An outright refusal (the answer declines the task and recommends no
   models, tools or plan) scores 0 on all nine dimensions. The rubric assumes an answer
   exists; without this rule a refusal would earn 2s on D3, D5 and D9 for naming nothing.
@@ -162,9 +179,14 @@ is supported only if both hold; "mode > model" with reasoning not better is repo
 
 ## 5. Primary analysis
 
+The H4 total for an answer is the sum of its nine consensus (median) dimension scores,
+D1 to D9, so it runs from 0 to 18. It is not the median of the three raters' totals. (The
+reliability check in section 4 uses each rater's own total, the sum of that rater's nine
+scores.)
+
 For each dimension, and for the total, fit a balanced two-way fixed-effects decomposition
-(family, mode, family x mode, residual) on the 60 consensus scores (median of the three
-raters).
+(family, mode, family x mode, residual) on all consensus scores (60, or 50 if a family is
+dropped), each the median of the three raters.
 
 Primary statistic:
 
@@ -182,7 +204,7 @@ Negative estimates are kept, not truncated at zero. Omega squared is used rather
 squared because family has 5 degrees of freedom and mode has 1, and eta squared rewards
 extra degrees of freedom even when they carry only noise.
 
-Direction: `mode_effect = mean(reasoning) - mean(fast)` over all 60 consensus scores, with a
+Direction: `mode_effect = mean(reasoning) - mean(fast)` over all consensus scores (60, or 50 if a family is dropped), with a
 95% percentile bootstrap CI from the same resamples as delta.
 
 Interaction: omega squared for family x mode, and each family's reasoning-minus-fast
@@ -192,9 +214,10 @@ comparison does not summarise the data well and interprets the per-family differ
 This does not change H4's status, because H4's estimand is the average effect (section 1);
 the result is labelled "average effect only; interaction exceeds both main effects".
 
-Low variance: if 90% or more of a dimension's 60 scores share one value, the dimension is
-reported as uninformative and any hypothesis on it as inconclusive; omega squared and its
-bootstrap are unstable near zero variance. If all 60 scores are identical, omega squared is
+Low variance: if 90% or more of a dimension's consensus scores share one value, the
+dimension is reported as uninformative and any hypothesis on it as inconclusive; omega
+squared and its bootstrap are unstable near zero variance. If all its scores are identical,
+omega squared is
 undefined and the dimension is reported as "no variance", also inconclusive. Bootstrap
 resamples in which omega squared is undefined are dropped before the CI is computed.
 
@@ -247,7 +270,11 @@ where reasoning helps; the simulation models one 0 to 2 dimension, not the nine-
 
 - A run is **replaced** only if: the app or API returned an error, the answer was visibly
   cut off in transmission, or the app silently used a different model or mode than the one
-  selected (visible in the screenshot). The replacement keeps the same run id; the failed
+  selected (visible in the screenshot). The replacement is captured immediately after the
+  failed attempt, as the next capture inside the same family block, before the block moves
+  on to the next run in manifest order. If the app is down, the block waits until it works
+  again (the 48-hour overrun rule in section 3 applies). The replacement keeps the same
+  run id; the failed
   capture moves to `data/captures/superseded/` as `<run_id>.attemptN.md`, with a line in
   that folder's README saying why. It is never deleted.
 - Up to **2 replacements per cell** for errors or cut-offs, so one bad day for an app does

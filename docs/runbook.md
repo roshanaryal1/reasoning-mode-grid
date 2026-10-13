@@ -46,7 +46,12 @@ This is the phase that decides whether the paper survives review. Take it slowly
    thinking" option, and an October update adds low, medium and high levels. Write the
    exact control names you see into `web_label`. If the control differs from the config,
    revise the mapping before the freeze. Turn off web search in every app; DeepSeek's
-   Search toggle was on by default on 2026-10-06.
+   Search toggle was on by default on 2026-10-06. DeepSeek: third-party guides (not
+   DeepSeek itself) say chat.deepseek.com now offers "Instant" (V4-Flash) and "Expert"
+   (V4-Pro) modes. If the app picks a different model per mode, that is a model switch,
+   not a mode switch: both captures must use V4-Pro with thinking off and on. Record what
+   the app shows. Write the date and result of every app check into the Deviations table
+   of the pre-registration (section 10).
 3. **Run the 12 API mode checks.** One API call per family and mode. This costs a few
    dollars in total and is the evidence that each switch does what you claim.
 
@@ -112,7 +117,8 @@ Then:
   `data/captures/superseded/` as `<run_id>.attempt1.md` (then `.attempt2.md`), so two
   failures of the same run never overwrite each other. Leave the `run_id` inside the file
   as it is. Add a line to that folder's README saying why, and run `new-capture` again for
-  the same run id. Up to 2 replacements per cell for errors or
+  the same run id straight away, as the next capture in the same family block, before
+  moving on in the manifest. Up to 2 replacements per cell for errors or
   cut-offs. A wrong model gets one replacement; if it happens again in that family, stop
   and record the family as dropped (preregistration section 7).
 
