@@ -13,9 +13,9 @@ documented API equivalent, run once per mode as evidence (`modegrid check-modes`
 |---|---|---|---|---|---|---|---|
 | Claude | claude.ai, Sonnet 5.5, Effort Low | claude.ai, Sonnet 5.5, Effort High | `claude-sonnet-5-5` | `thinking: {type: adaptive}`, effort low (lowest available) | `thinking: {type: adaptive}`, effort high | Anthropic API reference (bundled, cached 2026-09-25), 2026-10-06 | switch confirmed (0 vs 14,864) |
 | GPT | chatgpt.com (paid), GPT-5.6 Sol, Thinking effort Instant | chatgpt.com (paid), GPT-5.6 Sol, Thinking effort High | `gpt-5.6-sol` | `reasoning_effort: none` | `reasoning_effort: high` | <https://developers.openai.com/api/docs/models/gpt-5.6-sol>, 2026-10-06 | switch confirmed (0 vs 6,000) |
-| Gemini | gemini.google.com, 3.6 Flash, Extended thinking off | gemini.google.com, 3.6 Flash, Extended thinking on | `gemini-3.6-flash` | `reasoning_effort: minimal` (lowest available) | `reasoning_effort: high` | <https://ai.google.dev/gemini-api/docs/generate-content/thinking>, 2026-10-06 | switch confirmed (0 vs 2,601) |
+| Gemini | aistudio.google.com, Gemini 3.8 Flash, Thinking level Low, Search grounding off | aistudio.google.com, Gemini 3.8 Flash, Thinking level High, Search grounding off | `gemini-3.8-flash` | `reasoning_effort: low` (lowest available) | `reasoning_effort: high` | <https://ai.google.dev/gemini-api/docs/thinking>, 2026-10-13 | switch confirmed (0 vs 4,911; docs say low cannot disable thinking, so treated as lowest available) |
 | Qwen | chat.qwen.ai, Qwen3.8-Max, Fast | chat.qwen.ai, Qwen3.8-Max, Thinking | `qwen3.8-max` | `enable_thinking: false` | `enable_thinking: true` | <https://www.alibabacloud.com/help/en/model-studio/deep-thinking>, 2026-10-06 | switch confirmed (0 vs 23,805) |
-| DeepSeek | chat.deepseek.com, DeepThink off, Search off | chat.deepseek.com, DeepThink on, Search off | `deepseek-v4-pro-0813` via Alibaba Model Studio | `enable_thinking: false` | `enable_thinking: true` | <https://www.alibabacloud.com/help/en/model-studio/deepseek-api>, 2026-10-07 | switch confirmed (0 vs 10,546) |
+| DeepSeek | chat.deepseek.com, Deep thinking off, Smart Search off | chat.deepseek.com, Deep thinking on, Smart Search off | `deepseek-v4.1-flash` via Alibaba Model Studio | `enable_thinking: false` | `enable_thinking: true` | <https://www.alibabacloud.com/help/en/model-studio/deepseek-api>, 2026-10-13 | switch confirmed (0 vs 1,367) |
 | Grok | grok.com, Fast | grok.com, Expert | `grok-4.6` | `reasoning_effort: low` (lowest available) | `reasoning_effort: xhigh` | <https://docs.x.ai/developers/model-capabilities/text/reasoning>, 2026-10-05 | lowest available (131 vs 4,627) |
 
 ## Rules
@@ -150,7 +150,7 @@ Sources:
 - ChatGPT thinking effort levels (secondary): <https://www.ai-toolbox.co/chatgpt-models/chatgpt-reasoning-modes-instant-thinking-pro-2026>
 - GPT-5.6 in ChatGPT (OpenAI help, 403 when fetched): <https://help.openai.com/en/articles/20001354-gpt-56-in-chatgpt>
 
-## DeepSeek API check host, 2026-10-07
+## DeepSeek API check host, 2026-10-07 (superseded 2026-10-13)
 
 The DeepSeek API check runs on Alibaba Model Studio's hosted `deepseek-v4-pro-0813`, on
 the author's free quota, instead of DeepSeek's own API. The 10 scored DeepSeek runs still
@@ -166,7 +166,39 @@ reasoning count when the model does not think, so `_unreported_is_zero` records 
 
 Source: <https://www.alibabacloud.com/help/en/model-studio/deepseek-api>
 
-## API check results, 2026-10-12
+## App check and decisions, 2026-10-13
+
+The author opened each app again before the freeze and screenshotted the menus. This
+section supersedes the 2026-10-06 Gemini and 2026-10-07 DeepSeek decisions.
+
+| Family | Seen in the app | Decision |
+|---|---|---|
+| GPT | Thinking effort slider: Instant at the left, High at the right | Unchanged |
+| Qwen | Qwen3.8-Max, mode menu Auto, Thinking, Fast | Unchanged: Fast vs Thinking, never Auto |
+| DeepSeek | No model picker. Author saw it serving DeepSeek-V4.1-Flash. Toggles "Deep thinking" and "Smart Search"; Smart Search was on | DeepSeek-V4.1-Flash, Deep thinking off vs on, Smart Search off. API check re-run on Alibaba-hosted `deepseek-v4.1-flash` |
+| Gemini | Free Gemini app: only "Auto (Gemini 3 models)" plus thinking levels Low, Medium, High. No manual model choice | Moved to Google AI Studio. AI Studio marks Gemini 3.6 Flash as Paid, so Gemini 3.8 Flash (current Flash): Thinking level Low vs High, Grounding with Google Search off (it was on by default). API check re-run on `gemini-3.8-flash`, `reasoning_effort` `low` vs `high` |
+| Claude, Grok | Not re-checked on 2026-10-13 | Check before the first capture of that family block |
+
+Why Gemini moved: press reports say the free app's Auto mode sends most prompts to
+Flash-Lite and may escalate to Flash or Pro, so in that app a thinking-level change could
+also change the model. In AI Studio the model is picked by hand.
+
+DeepSeek V4.1-Flash: released 2026-09-10 per DeepSeek's API changelog; DeepSeek's own API
+name is `deepseek-flash`. The chat app shows no model name, so "V4.1-Flash" is the author's
+observation on 2026-10-13, not a vendor statement about the app.
+
+Google's thinking docs list low, medium (default) and high for `gemini-3.8-flash`, with
+no minimal level and no off, so Gemini fast is "lowest available" (low).
+
+Sources:
+
+- Gemini app Auto and thinking levels: <https://9to5google.com/2026/10/09/gemini-auto-free-users/>
+- Gemini app models (Google help): <https://support.google.com/gemini/answer/18648722>
+- Gemini thinking levels: <https://ai.google.dev/gemini-api/docs/thinking>
+- DeepSeek V4.1-Flash release: <https://api-docs.deepseek.com/news/news260910/>
+- DeepSeek changelog: <https://api-docs.deepseek.com/updates/>
+
+## API check results, 2026-10-12 (Gemini and DeepSeek re-run 2026-10-13)
 
 One API call per family and mode (`modegrid check-modes`, `results/mode_check.md`).
 Reasoning tokens are as reported by each API, or derived where the API omits them (see
@@ -179,8 +211,8 @@ at the 32,000-token limit in force when it ran. Neither affects the switch evide
 | Family | Words fast | Words reasoning | Reasoning tokens fast | Reasoning tokens reasoning | Model returned | Verdict |
 |---|---|---|---|---|---|---|
 | claude | 2108 | 6051 | 0 | 14864 | claude-sonnet-5-5 | switch confirmed |
-| deepseek | 4203 | 5188 | 0 | 10546 | deepseek-v4-pro-0813 | switch confirmed |
-| gemini | 3783 | 4411 | 0 | 2601 | gemini-3.6-flash | switch confirmed |
+| deepseek | 6916 | 10043 | 0 | 1367 | deepseek-v4.1-flash | switch confirmed |
+| gemini | 4592 | 6482 | 0 | 4911 | gemini-3.8-flash | switch confirmed |
 | gpt | 4014 | 0 | 0 | 6000 | gpt-5.6-sol | switch confirmed |
 | grok | 1990 | 7393 | 131 | 4627 | grok-4.6 | lowest available: fast reasons less, not zero; record both counts |
 | qwen | 3315 | 7587 | 0 | 23805 | qwen3.8-max | switch confirmed |

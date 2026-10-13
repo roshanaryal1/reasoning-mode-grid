@@ -42,16 +42,14 @@ This is the phase that decides whether the paper survives review. Take it slowly
    will select into `web_label` (for example "claude.ai, Sonnet 5.5, Effort High").
    Avoid "auto" model pickers, they can route to a different model.
    Open each app on the plan you will use and confirm the switch exists as labelled.
-   Gemini matters most: on 2026-10-06 the app showed 3.6 Flash with an "Extended
-   thinking" option, and an October update adds low, medium and high levels. Write the
-   exact control names you see into `web_label`. If the control differs from the config,
-   revise the mapping before the freeze. Turn off web search in every app; DeepSeek's
-   Search toggle was on by default on 2026-10-06. DeepSeek: third-party guides (not
-   DeepSeek itself) say chat.deepseek.com now offers "Instant" (V4-Flash) and "Expert"
-   (V4-Pro) modes. If the app picks a different model per mode, that is a model switch,
-   not a mode switch: both captures must use V4-Pro with thinking off and on. Record what
-   the app shows. Write the date and result of every app check into the Deviations table
-   of the pre-registration (section 10).
+   Write the exact control names you see into `web_label`. If the control differs from
+   the config, revise the mapping before the freeze. Turn off web search in every app:
+   DeepSeek's "Smart Search" and AI Studio's "Grounding with Google Search" were both on
+   by default. Gemini runs in Google AI Studio (aistudio.google.com), not the Gemini app:
+   pick Gemini 3.8 Flash, set Thinking level to Low (fast) or High (reasoning), turn
+   every tool off, leave temperature, output length and safety at their defaults, and
+   use no system instructions. The app checks of 2026-10-13 are recorded in the mode
+   registry.
 3. **Run the 12 API mode checks.** One API call per family and mode. This costs a few
    dollars in total and is the evidence that each switch does what you claim.
 

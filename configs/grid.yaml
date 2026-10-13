@@ -96,25 +96,27 @@ families:
     adapter: openai_compatible
     base_url: https://generativelanguage.googleapis.com/v1beta/openai/
     api_key_env: GEMINI_API_KEY
-    model: gemini-3.6-flash   # decided 2026-10-06; the Flash the app shows. Never Pro
+    model: gemini-3.8-flash   # decided 2026-10-13; current Flash, run in Google AI Studio
     notes: >-
-      Decided 2026-10-06: Gemini 3.6 Flash, the model the Gemini app picker showed on
-      2026-10-06 (3.5 Flash-Lite, 3.6 Flash, 3.1 Pro, plus an Extended thinking
-      option). App modes: 3.6 Flash with Extended thinking off vs on. API: 3.6 Flash
-      accepts minimal, low, medium (default), high and cannot disable thinking;
-      Google says minimal "does not guarantee that thinking is off". So fast is
-      "lowest available" (minimal) and reasoning is high. The API check can use the
-      free Gemini API tier (free-tier data may be used by Google; the prompt is
-      public). If the app picker changes before capture (an October update adds
-      effort levels), update web_label and run all 10 Gemini captures in one 48-hour
-      window. From 9 Oct 2026 Flash needs Google AI Plus or higher in the app.
+      Decided 2026-10-13. Since about 9 Oct 2026 the free Gemini app offers only "Auto"
+      (routes between Flash-Lite, Flash and Pro) plus Low, Medium and High thinking
+      levels, so a mode change there could also change the model. Scored Gemini runs
+      therefore use Google AI Studio (aistudio.google.com), Google's own web app, where
+      the model and thinking level are picked by hand. AI Studio marks Gemini 3.6 Flash
+      as Paid; Gemini 3.8 Flash, the current Flash (released 3 Sep 2026), is used
+      instead. Google's thinking docs list low, medium (default) and high for 3.8 Flash,
+      no minimal and no off, so fast is "lowest available" (low) and reasoning is high.
+      AI Studio settings for every capture: Grounding with Google Search OFF (it was on
+      by default), all other tools off, temperature, output length and safety at their
+      defaults, no system instructions. The API check uses the free Gemini API tier
+      (free-tier data may be used by Google; the prompt is public).
     modes:
       fast:
-        web_label: "gemini.google.com, 3.6 Flash, Extended thinking OFF"
-        native_label: "thinking level minimal (lowest available, cannot be disabled)"
-        params: {reasoning_effort: minimal, _reasoning_in_total: true}
+        web_label: "aistudio.google.com, Gemini 3.8 Flash, Thinking level Low, Google Search grounding OFF"
+        native_label: "thinking level low (lowest available, cannot be disabled)"
+        params: {reasoning_effort: low, _reasoning_in_total: true}
       reasoning:
-        web_label: "gemini.google.com, 3.6 Flash, Extended thinking ON"
+        web_label: "aistudio.google.com, Gemini 3.8 Flash, Thinking level High, Google Search grounding OFF"
         native_label: "thinking level high"
         params: {reasoning_effort: high, _reasoning_in_total: true}
 
@@ -151,24 +153,25 @@ families:
     adapter: openai_compatible
     base_url: https://dashscope-intl.aliyuncs.com/compatible-mode/v1
     api_key_env: DASHSCOPE_API_KEY
-    model: deepseek-v4-pro-0813  # decided 2026-10-07; Alibaba-hosted, free quota
+    model: deepseek-v4.1-flash  # decided 2026-10-13; what chat.deepseek.com serves
     notes: >-
-      The pilot used chat.deepseek.com with DeepSeek-V4-Pro, so the 10 scored runs
-      stay there. Decided 2026-10-07: the API check runs on Alibaba Model Studio's
-      hosted deepseek-v4-pro-0813 (author's free quota) instead of DeepSeek's own
-      API, to avoid a paid top-up. This is a third-party host and a dated snapshot,
-      so it shows the thinking switch works on DeepSeek V4 Pro weights, not that it
-      matches chat.deepseek.com exactly. Alibaba documents enable_thinking for
-      DeepSeek V4 hybrid models; a free test on 2026-10-07 gave 0 vs 59 reasoning
-      tokens on a short prompt. DashScope omits the reasoning count when the model
-      does not think, so _unreported_is_zero records that as 0. Both modes stream.
+      Decided 2026-10-13. chat.deepseek.com has no model picker; on 2026-10-13 the
+      author saw it serving DeepSeek-V4.1-Flash (released 2026-09-10 per DeepSeek's API
+      changelog), with two toggles, "Deep thinking" and "Smart Search" (Search was on
+      by default). The 10 scored runs come from chat.deepseek.com with Smart Search OFF.
+      The API check runs on Alibaba Model Studio's hosted deepseek-v4.1-flash (author's
+      free quota, "free quota only" on, so it cannot charge) instead of DeepSeek's own
+      API. Third-party host, so it shows the thinking switch works on V4.1-Flash
+      weights, not that the chat app is identical. The 2026-10-07 check on
+      deepseek-v4-pro-0813 is superseded. DashScope omits the reasoning count when the
+      model does not think, so _unreported_is_zero records that as 0. Both modes stream.
     modes:
       fast:
-        web_label: "chat.deepseek.com, DeepThink OFF, Search OFF"
+        web_label: "chat.deepseek.com, Deep thinking OFF, Smart Search OFF"
         native_label: "thinking off (enable_thinking=false)"
         params: {_stream: true, enable_thinking: false, _unreported_is_zero: true}
       reasoning:
-        web_label: "chat.deepseek.com, DeepThink ON, Search OFF"
+        web_label: "chat.deepseek.com, Deep thinking ON, Smart Search OFF"
         native_label: "thinking on (enable_thinking=true)"
         params: {_stream: true, enable_thinking: true, _unreported_is_zero: true}
 

@@ -31,15 +31,20 @@ recorded in `configs/grid.yaml` before the first scored capture. The choice is f
 |---|---|---|---|
 | Claude | Claude Sonnet 5.5 | claude.ai | `claude-sonnet-5-5`, 2026-10-06 |
 | GPT | GPT-5.6 Sol | chatgpt.com | `gpt-5.6-sol`, 2026-10-06 |
-| Gemini | Gemini 3.6 Flash | gemini.google.com | `gemini-3.6-flash`, 2026-10-12 |
+| Gemini | Gemini 3.8 Flash | aistudio.google.com | `gemini-3.8-flash`, 2026-10-13 |
 | Qwen | Qwen3.8-Max | chat.qwen.ai | `qwen3.8-max`, 2026-10-06 |
-| DeepSeek | DeepSeek-V4-Pro | chat.deepseek.com | `deepseek-v4-pro-0813` (Alibaba-hosted), 2026-10-06 |
+| DeepSeek | DeepSeek-V4.1-Flash | chat.deepseek.com | `deepseek-v4.1-flash` (Alibaba-hosted), 2026-10-13 |
 | Grok | Grok 4.6 | grok.com | `grok-4.6`, 2026-10-06 |
 
 Each API id is the model name the vendor's API returned in the API check
-(`data/captures/*apicheck1.md`). The author checks each app's model picker before the
-first scored capture and records the date and what it showed in section 10. Every capture
-records the model name the app shows (`model_returned`).
+(`data/captures/*apicheck1.md`). The author checked each app's model picker on
+2026-10-13; what each app showed is recorded in [mode-registry.md](mode-registry.md).
+Every capture records the model name the app shows (`model_returned`). Two families do not
+use the consumer app. Gemini runs in Google AI Studio, Google's own web app, because the
+free Gemini app now offers only "Auto", which picks between Flash-Lite, Flash and Pro by
+itself, so a mode change there could also change the model. chat.deepseek.com shows no
+model picker; the author saw it serving V4.1-Flash, which the paper reports as the
+author's observation.
 
 These are not all each vendor's top model (Claude Opus 5.5 and Gemini 3.1 Pro exist), and
 they are not matched on size or price. The paper says so. The mode settings for each are
@@ -87,8 +92,9 @@ is supported only if both hold; "mode > model" with reasoning not better is repo
   with mode (2 levels: fast, reasoning). Within a family the weights are fixed. The
   vendor-specific settings for each level are in `configs/grid.yaml` and
   [mode-registry.md](mode-registry.md).
-- **Channel.** All 60 scored runs are captured in each vendor's own chat app, the way
-  people use these models and the way LA-P1 was captured. Fresh chat each time, signed
+- **Channel.** All 60 scored runs are captured in each vendor's own web app, the way
+  people use these models and the way LA-P1 was captured: the consumer chat app for five
+  families, Google AI Studio for Gemini (section 1). Fresh chat each time, signed
   in, memory off, no custom instructions, no files. A screenshot of the mode selector is
   kept for every run.
 - **Same model in both modes.** Each capture records the model name the app shows and a
@@ -257,7 +263,7 @@ where reasoning helps; the simulation models one 0 to 2 dimension, not the nine-
 3. Rater-level analysis: run the decomposition on each rater's raw scores separately.
 4. Split by fast-mode floor. Three families can switch reasoning fully off in fast mode
    (GPT, Qwen, DeepSeek). Three can only lower it to a minimum (Claude Sonnet 5.5,
-   Gemini 3.6 Flash, Grok 4.6; see [mode-registry.md](mode-registry.md)). Run the
+   Gemini 3.8 Flash, Grok 4.6; see [mode-registry.md](mode-registry.md)). Run the
    primary analysis on each group of three separately
    (`modegrid analyze --families gpt,qwen,deepseek` and
    `--families claude,gemini,grok`). Each group has 30 runs, so these are descriptive
