@@ -6,3 +6,5 @@ Kept for the record, never analysed. Loaders only read the top level of `data/ca
 |---|---|---|
 | `gemini__fast__p1-v1__apicheck1.md`, `gemini__reasoning__p1-v1__apicheck1.md` | 2026-10-06 | Recorded before the adapter derived Gemini reasoning tokens from `total_tokens` (PR #7), so `reasoning_tokens` is null and the mode switch could not be confirmed. Re-run the same day with the fix. |
 | `gemini__fast__p1-v1__apicheck1.second-run.md` | 2026-10-07 | Second run. Thinking gap was 0, but the adapter recorded it as null before `_reasoning_in_total` existed (PR fixing Gemini's measured zero). Re-run with the fix. |
+| `gemini__fast__p1-v1__apicheck1.attempt4.md`, `gemini__reasoning__p1-v1__apicheck1.attempt3.md` | 2026-10-12 | Valid check on `gemini-3.6-flash`. Superseded 2026-10-13 when Gemini moved to Gemini 3.8 Flash in AI Studio (mode registry, 2026-10-13). |
+| `deepseek__fast__p1-v1__apicheck1.attempt1.md`, `deepseek__reasoning__p1-v1__apicheck1.attempt1.md` | 2026-10-06 | Valid check on `deepseek-v4-pro-0813`. Superseded 2026-10-13 when the app was seen serving V4.1-Flash (mode registry, 2026-10-13). |

@@ -7,6 +7,12 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions follo
 
 ### Changed
 
+- App checks on 2026-10-13. Gemini moves to Google AI Studio with Gemini 3.8 Flash
+  (Thinking level Low vs High, Search grounding off), because the free Gemini app now
+  offers only "Auto", which can switch models by itself, and AI Studio marks 3.6 Flash as
+  Paid. DeepSeek moves to DeepSeek-V4.1-Flash, the model chat.deepseek.com was seen
+  serving. Both API checks re-run (Gemini 0 vs 4,911, DeepSeek 0 vs 1,367 reasoning
+  tokens); the old checks are in `data/captures/superseded/`.
 - Final fixes before freeze. The H4 total is defined as the sum of the nine consensus
   (median) scores. Analysis counts say "60, or 50 if a family is dropped". A replacement is
   captured straight after the failed attempt, inside the same family block. A rule for
