@@ -315,4 +315,4 @@ stated here so the result cannot be framed as a confirmation of the pilot.
 
 | Date | Change | Reason |
 |---|---|---|
-| | | |
+| 2026-10-13 | Registered on OSF: <https://osf.io/nj2zp/> (public, registered 2026-10-13 08:31 UTC, file SHA-256 matches the frozen plan). Record only; the protocol is unchanged. | Independent timestamp for the frozen plan |

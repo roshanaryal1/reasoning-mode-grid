@@ -7,6 +7,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions follo
 
 ### Changed
 
+- Pre-registration registered on OSF: <https://osf.io/nj2zp/>.
 - Pre-registration frozen on 2026-10-13 (tag `prereg-v1`).
 - App checks on 2026-10-13. Gemini moves to Google AI Studio with Gemini 3.8 Flash
   (Thinking level Low vs High, Search grounding off), because the free Gemini app now
