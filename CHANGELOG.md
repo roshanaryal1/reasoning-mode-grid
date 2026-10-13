@@ -7,6 +7,11 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions follo
 
 ### Changed
 
+- Final fixes before freeze. The H4 total is defined as the sum of the nine consensus
+  (median) scores. Analysis counts say "60, or 50 if a family is dropped". A replacement is
+  captured straight after the failed attempt, inside the same family block. A rule for
+  raters who guess mode above chance. The model table lists the API id each vendor
+  returned, and app names are checked in each app before the first scored capture.
 - Third review pass on the pre-registration. Blinding now masks a vendor or model name only
   where an answer refers to itself; names used as content stay, because D2 to D4 need the
   recommended models and tools. An outright refusal scores 0 on every dimension. Chosen
