@@ -9,3 +9,4 @@ Kept for the record, never analysed. Loaders only read the top level of `data/ca
 | `gemini__fast__p1-v1__apicheck1.attempt4.md`, `gemini__reasoning__p1-v1__apicheck1.attempt3.md` | 2026-10-12 | Valid check on `gemini-3.6-flash`. Superseded 2026-10-13 when Gemini moved to Gemini 3.8 Flash in AI Studio (mode registry, 2026-10-13). |
 | `deepseek__fast__p1-v1__apicheck1.attempt1.md`, `deepseek__reasoning__p1-v1__apicheck1.attempt1.md` | 2026-10-06 | Valid check on `deepseek-v4-pro-0813`. Superseded 2026-10-13 when the app was seen serving V4.1-Flash (mode registry, 2026-10-13). |
 | `qwen__fast__p1-v1__extra1.md` | 2026-10-13 | Unplanned extra Qwen Fast answer, sent without a template between runs 2 and 3. Not assigned to any run, never scored. |
+| `qwen__reasoning__p1-v1__r5.attempt1.md` | 2026-10-14 | Wrong mode by the operator: the chat ran in Fast, but this run is a Thinking run. Not scored; the run is redone in Thinking with the same run id. |
