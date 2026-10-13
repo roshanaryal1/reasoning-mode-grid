@@ -338,5 +338,5 @@ NONE
 chat.qwen.ai, new chat, model picker Qwen3.8-Max, mode menu Fast (not Auto). Template
 made 2026-10-13 23:45:41 NZDT; prompt sent within a few minutes of it. Fast mode showed no
 thinking panel. The answer's header says "Web Browsing/Tools: Enabled"; that is the
-model's own claim. Answer copied by the author from the app and written to this file
+model's own claim; the author turned on no search or tool option in the app. Answer copied by the author from the app and written to this file
 verbatim.
