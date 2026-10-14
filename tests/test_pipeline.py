@@ -5,7 +5,7 @@ from pathlib import Path
 import pytest
 
 from modegrid.analyze import AnalysisError, build_design, run_analysis, write_outputs
-from modegrid.blind import build_packets, redact, strip_app_artifacts
+from modegrid.blind import build_packets, redact, strip_app_artifacts, strip_self_disclosure
 from modegrid.capture import Capture, CaptureError, check_capture, parse_capture, read_capture, write_capture
 from modegrid.cli import main
 from modegrid.config import ConfigError, load_grid, unready_families
@@ -644,3 +644,33 @@ def test_validate_reads_every_score_sheet_shape(tmp_path, monkeypatch, grid_path
     write_scores(dict(list(by_run.items())[:-1]), scores_dir / "adjudicated.csv")
     assert main([*base, "validate"]) == 1
     assert "missing" in capsys.readouterr().out
+
+
+@pytest.mark.parametrize(
+    ("text", "expected"),
+    [
+        (
+            "Disclosure: I am a [REDACTED] model, so discount my view on Claude Code accordingly. The ranking stands.",
+            "The ranking stands.",
+        ),
+        ("A\n\n**Conflict of interest:** I'm built by [REDACTED], so I chose open tools.\n\nB", "A\n\nB"),
+        ("A\n\n- **Conflict of interest:** I am built by X.\n- Next item", "A\n\n- Next item"),
+        ("| Claude Code | Optional. Conflict of interest noted. |", "| Claude Code | Optional. |"),
+        ("Pick Opus 5.5 (disclosure above) or GPT-5.6.", "Pick Opus 5.5 or GPT-5.6."),
+        ("  Disclosure: I work for Y. Then text.", "  Then text."),
+    ],
+)
+def test_self_disclosure_is_removed(text, expected):
+    assert strip_self_disclosure(text) == expected
+
+
+@pytest.mark.parametrize(
+    "text",
+    [
+        "Keep memory separate to reduce accidental disclosure between projects.",
+        "Disclosure: none of these tools pay for placement.",
+        "Use Claude Code with a local model.",
+    ],
+)
+def test_content_mentions_of_disclosure_stay(text):
+    assert strip_self_disclosure(text) == text

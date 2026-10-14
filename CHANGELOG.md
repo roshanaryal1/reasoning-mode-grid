@@ -7,6 +7,9 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions follo
 
 ### Changed
 
+- Rater packets drop conflict-of-interest disclosures in which an answer names its own maker
+  ("Disclosure: I am a [REDACTED] model, so discount my view on ..."). 4 packets change. Rebuild
+  packets before scoring.
 - Rater packets drop removed self-identification lines with no marker, and the empty header shell
   they leave, because the markers' count and position differed by family. Rebuild packets before scoring.
 

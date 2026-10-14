@@ -191,9 +191,10 @@ timestamps and capture metadata were removed. Self-identification lines near the
 answer (the model's own name, which the prompt asks for) were removed without a trace, and a vendor or
 model name was masked only where the answer refers to itself. Names used as content were
 kept, because the prompt asks for a model and tool stack and D2 to D4 cannot be scored with
-the recommendations hidden. We also removed clutter that the chat apps add to copied text
-and that would name the family outright, such as ChatGPT's citation chips and Grok's
-citation tags. The original captures are never edited. Raters guessed the family and mode
+the recommendations hidden. A conflict-of-interest disclosure in which an answer names its
+own maker ("so discount my view on" that vendor's product) was removed as well. We also
+removed clutter that the chat apps add to copied text and that would name the family
+outright, such as ChatGPT's citation chips and Grok's citation tags. The original captures are never edited. Raters guessed the family and mode
 of every answer, and we report how often they beat chance as the blinding-failure rate
 (section 3.7).
 
@@ -283,11 +284,12 @@ The Deviations table (Appendix D) lists every change. Four bear on how to read t
 - **Unverifiable model identity.** DeepSeek and Grok show no model name in the app, so for
   them the mode contrast is the vendor's exposed setting, not a verified same-weights
   manipulation.
-- **Blinding fixes before scoring.** Three leaks were found and fixed before any real
+- **Blinding fixes before scoring.** Four leaks were found and fixed before any real
   scoring: app clutter copied with the answers, bare "Model:" label lines missed by the
-  self-identification rule, and the marker lines left where header lines were removed,
-  whose count and position differed by family. All three fixes apply to every packet in
-  the same way, and the blinding key did not change.
+  self-identification rule, the marker lines left where header lines were removed, whose
+  count and position differed by family, and conflict-of-interest disclosures that named
+  the answer's maker through its own product even with the name masked. All four fixes
+  apply to every packet in the same way, and the blinding key did not change.
 
 ## 3.9 Materials and code
 

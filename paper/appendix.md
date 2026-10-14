@@ -81,7 +81,7 @@ summary:
 | App behaviour | Claude, GPT and Grok searched the web by themselves, with no switch to stop it. Two DeepSeek fast answers were finished with the app's own "Continue" button | Family differences may include live search. Stated as a limitation |
 | Model self-reports | DeepSeek and Gemini answers named Claude models, GPT answers named "GPT-6", Grok answers named "Grok 4.7". The app's model picker is taken as the evidence | DeepSeek and Grok contrasts described as vendor chat settings |
 | Reasoning traces | Kept where the app showed them. One GPT trace not captured | None. Raters never see traces |
-| Blinding, before scoring | Three fixes: chat-app clutter removed, bare "Model:" label lines removed, and removed header lines leave no marker | Same rule for every packet. Key unchanged |
+| Blinding, before scoring | Four fixes: chat-app clutter removed, bare "Model:" label lines removed, removed header lines leave no marker, and self-disclosures naming the answer's maker removed | Same rule for every packet. Key unchanged |
 | Raters | Two LLM raters named after the freeze, as the plan requires. One answer per session from a fixed kit, instructions hashed before scoring | None |
 
 ## E. Data and code availability
