@@ -20,11 +20,11 @@ portable across a grid.
 
 | | |
 |---|---|
-| Stage | Harness built and tested. Pre-registration frozen 2026-10-13 (tag `prereg-v1`) and registered on OSF: <https://osf.io/nj2zp/>. **No grid data collected yet.** |
+| Stage | Harness built and tested. Pre-registration frozen 2026-10-13 (tag `prereg-v1`) and registered on OSF: <https://osf.io/nj2zp/>. **All 60 chat captures and the 12 API checks are collected** (2026-10-13 to 2026-10-15). No scores yet. |
 | Pilot | n = 1 family (DeepSeek, 3 modes, web app, v1 rubric). See [the pilot note](data/pilot/README.md): the adjudicated pilot scores do **not** yet support the claim. |
 | Design | 6 families x 2 modes x 5 replicates = 60 chat-app runs, 12 cells, plus 12 API calls that verify each mode switch |
 | Venue | arXiv, then an ICLR 2027 workshop (about Feb 2027) plus TMLR. See [venues](docs/venues.md) |
-| Next | The 60 chat captures, one family block at a time ([runbook](docs/runbook.md)). The 12 API checks are done: see [`results/mode_check.md`](results/mode_check.md) |
+| Next | Blind scoring by three raters ([runbook](docs/runbook.md) Phase 3). The LLM raters are named in [`data/scores/raters.md`](data/scores/raters.md). The human rater is still to be named. API check results: [`results/mode_check.md`](results/mode_check.md) |
 
 ## What you get
 
