@@ -22,8 +22,10 @@ Source files after Phase 4 of the runbook:
 
 ## 4.1 Data and reliability
 
-60 of 60 planned answers were scored by all three raters. [Refusals: number per family and
-mode, from the rater sheets. Expected 0.]
+60 of 60 planned answers were scored by all three raters. Refusals per family and mode: the
+`n_all_zero` column of `results/cell_means.csv` counts answers whose consensus is 0 on all
+nine dimensions, which the refusal rule gives an outright refusal. Check any non-zero count
+against the raters' notes before calling it a refusal. [Expected 0.]
 
 Inter-rater reliability (Table 2, from `results/agreement.csv`): ordinal alpha per dimension
 and interval alpha on the total. Name every dimension below 0.667, which makes its test
@@ -56,6 +58,9 @@ For H1 (D1), H2 (D9) and H3 (D3): verdict, delta with CI, direction with CI, sta
 the multiplicity caveat. For H3, say which of the two pre-stated outcomes occurred: model >
 mode (supports H3), mode > model with reasoning lower (supports the hallucination account),
 or neither.
+
+The random-effects variance components (`vc_*` columns, and the exploratory section of
+`variance_table.md`) go in the appendix, labelled exploratory, as pre-registered.
 
 For D2, D4 to D8: the verdict only, as descriptive. Name any "no variance" or
 "uninformative" dimension, which is a finding about the rubric.

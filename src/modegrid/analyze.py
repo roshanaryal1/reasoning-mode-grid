@@ -62,6 +62,10 @@ ROW_FIELDS = [
     "p_family",
     "within_model_mode",
     "between_model",
+    "vc_family",
+    "vc_mode",
+    "vc_interaction",
+    "vc_residual",
     "rank_delta_omega2",
     "length_adj_delta_omega2",
     "verdict",
@@ -186,6 +190,10 @@ def analyse_dimension(
         "p_family": math.nan if no_var else permutation_p(y, "family", n_perm=n_perm, seed=seed + 1),
         "within_model_mode": spreads["within_model_mode"],
         "between_model": spreads["between_model"],
+        # Random-effects variance components (method of moments, truncated at zero).
+        # Pre-registered as exploratory: they read families as a sample, the primary
+        # analysis treats them as fixed.
+        **{f"vc_{k}": float(v) for k, v in d.var_components.items()},
         "rank_delta_omega2": float(rank_d),
         "length_adj_delta_omega2": length_adj,
         "verdict": verdict(lo, hi, float(d.ss_total), bool(low_variance)),
@@ -331,5 +339,20 @@ def write_outputs(
         lines.append(
             f"| {r['dimension']} | {_fmt(r['delta_omega2'])} | {_fmt(r['rank_delta_omega2'])} | "
             f"{_fmt(r['length_adj_delta_omega2']) or 'not run'} |"
+        )
+    lines += [
+        "",
+        "## Random-effects variance components (exploratory)",
+        "",
+        "Method of moments, truncated at zero. These read families as a sample from a wider",
+        "population; the primary analysis treats them as fixed, so these are exploratory.",
+        "",
+        "| Dim | family | mode | family x mode | residual |",
+        "|---|---|---|---|---|",
+    ]
+    for r in rows:
+        lines.append(
+            f"| {r['dimension']} | {_fmt(r['vc_family'])} | {_fmt(r['vc_mode'])} | "
+            f"{_fmt(r['vc_interaction'])} | {_fmt(r['vc_residual'])} |"
         )
     (out / "variance_table.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
