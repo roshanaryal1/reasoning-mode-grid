@@ -63,6 +63,9 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions follo
 
 ### Added
 
+- `strip_app_artifacts`: rater packets drop chat-app clutter (ChatGPT citation chips, diagram style
+  blocks, image embeds, `&#x20;`, Grok `[web:N]` tags) that would reveal the family. Captures are unchanged.
+- `data/scores/raters.md`: the two LLM raters (Claude Opus 5.5, GPT-5.6 Sol) named before scoring.
 - GPT block of the chat captures: 10 of 60 runs (chatgpt.com, GPT-5.6 Sol, Thinking effort Instant vs High),
   captured 2026-10-15 by hand. All 60 scored runs are now captured. Three Deviations rows record the send-time
   intervals and rejected duplicate copies, ChatGPT's built-in search and "GPT-6" self-reports, and the traces.
