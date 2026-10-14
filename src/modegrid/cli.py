@@ -14,9 +14,10 @@ from pathlib import Path
 
 from . import DIMS, PRIMARY_MODES, __version__
 from .agreement import exact_agreement, krippendorff_alpha
-from .analyze import ALPHA_BAR, run_analysis, write_outputs
+from .analyze import ALPHA_BAR, build_design, run_analysis, write_outputs
 from .blind import build_packets, guess_accuracy
 from .capture import Capture, check_capture, manual_template, read_capture, word_count, write_capture
+from .cells import plot_cell_means, rank_agreement, write_cell_means, write_rank_agreement
 from .config import load_grid, unready_families
 from .plan import API_CHECK, MAIN, build_manifest, read_manifest, write_manifest
 from .providers import adapter_for, with_retries
@@ -319,6 +320,35 @@ def cmd_analyze(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_cells(args: argparse.Namespace) -> int:
+    """Cell means (the table view of Figure 1), and Figure 1 itself with --figure."""
+    runs = read_manifest(args.manifest)
+    if args.families:
+        keep = {f.strip() for f in args.families.split(",") if f.strip()}
+        runs = [r for r in runs if r.family in keep]
+    design = build_design(runs, args.prompt)
+    scores = load_scores(args.scores, id_col="run_id")
+    out = write_cell_means(design, scores, Path(args.out) / "cell_means.csv")
+    print(f"wrote {out}")
+    if args.figure:
+        fig = plot_cell_means(design, scores, Path(args.out) / args.figure, note=args.note)
+        print(f"wrote {fig}")
+    return 0
+
+
+def cmd_rank_agreement(args: argparse.Namespace) -> int:
+    """Do raters rank the 12 cells the same way? Kendall's tau-b per pair and W across all."""
+    design = build_design(read_manifest(args.manifest), args.prompt)
+    sheets = {Path(p).stem.removesuffix("-unblinded"): load_scores(p, id_col="run_id") for p in args.files}
+    rows = rank_agreement(sheets, design)
+    print(f"{'measure':<8}{'comparison':<26}{'statistic':<15}{'value':>7}")
+    for r in rows:
+        print(f"{r['measure']!s:<8}{r['comparison']!s:<26}{r['statistic']!s:<15}{float(r['value']):>7.3f}")
+    if args.out:
+        print(f"\nwrote {write_rank_agreement(rows, args.out)}")
+    return 0
+
+
 def cmd_check_modes(args: argparse.Namespace) -> int:
     """Summarise the API-check runs: did each mode switch do what the registry claims?"""
     runs = [r for r in read_manifest(args.manifest) if r.set == API_CHECK]
@@ -499,6 +529,21 @@ def build_parser() -> argparse.ArgumentParser:
     z.add_argument("--families", default="", help="comma-separated subset, e.g. gpt,qwen,deepseek")
     z.add_argument("--agreement", default="", help="agreement CSV; dimensions below the alpha bar become exploratory")
     z.set_defaults(func=cmd_analyze)
+
+    ce = sub.add_parser("cells", help="cell means per family x mode, and Figure 1")
+    ce.add_argument("--scores", default="data/scores/adjudicated.csv")
+    ce.add_argument("--prompt", default="p1-v1")
+    ce.add_argument("--out", default="results")
+    ce.add_argument("--figure", default="", help="file name under --out, e.g. figure1.pdf (needs the paper extra)")
+    ce.add_argument("--families", default="", help="comma-separated subset, e.g. gpt,qwen,deepseek")
+    ce.add_argument("--note", default="", help="caption line printed on the figure")
+    ce.set_defaults(func=cmd_cells)
+
+    ra = sub.add_parser("rank-agreement", help="do raters rank the cells the same way (Kendall tau-b, W)")
+    ra.add_argument("files", nargs="+", help="unblinded run-level sheets, one per rater")
+    ra.add_argument("--prompt", default="p1-v1")
+    ra.add_argument("--out", default="results/cell_rank_agreement.csv")
+    ra.set_defaults(func=cmd_rank_agreement)
 
     d = sub.add_parser("demo", help="synthetic end-to-end dry run")
     d.add_argument("--out", default="")

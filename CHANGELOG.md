@@ -66,6 +66,10 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions follo
 
 ### Added
 
+- `modegrid cells`: cell means per family and mode (`results/cell_means.csv`), and with `--figure`
+  Figure 1 of the paper outline (needs the new `paper` extra, matplotlib). Reruns give the same file.
+- `modegrid rank-agreement`: Kendall's tau-b between each pair of raters and Kendall's W across all,
+  on how they rank the 12 cells, for the total and each dimension. The LA-P5 portability check.
 - `data/scores/RATER_SHA256SUMS`: hashes of the four files every rater kit is built from, recorded
   before scoring as pre-registration section 3 asks, and checked in CI.
 - `paper/methods.md`: draft of the Method section, written before scoring.

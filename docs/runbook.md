@@ -228,6 +228,24 @@ Then run the exploratory extras and label them as exploratory:
 
 - The DeepSeek third mode (instant plus DeepThink toggle) from the pilot.
 - Whether the rubric ranked cells the same way across raters (this is the LA-P5 gate).
+  Uses the per-rater unblinded sheets from robustness check 3:
+
+  ```bash
+  modegrid rank-agreement data/scores/human-unblinded.csv data/scores/llm-a-unblinded.csv \
+      data/scores/llm-b-unblinded.csv --out results/cell_rank_agreement.csv
+  ```
+
+  It prints Kendall's tau-b for each pair of raters and Kendall's W across all three, for the
+  total and each dimension, on the 12 cell means.
+
+Figure 1 and its table view (cell means, fast vs reasoning, one line per family):
+
+```bash
+pip install -e ".[paper]"   # matplotlib, once
+modegrid cells --figure figure1.pdf   # writes results/cell_means.csv and results/figure1.pdf
+```
+
+The PDF carries no creator, producer or date metadata, and the same scores give the same file.
 
 ## Phase 5. Write and submit (1 to 2 weeks)
 
