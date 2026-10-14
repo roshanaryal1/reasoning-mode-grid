@@ -3,6 +3,11 @@
 Collected 2026-10-02 by web search. Summaries come from abstracts and search
 snippets. **Read each paper before citing it**, and check the arXiv version you cite.
 
+Every entry was re-checked on 2026-10-14 by web search (arXiv itself is not reachable from
+the build container, so abstracts were read through search results and mirrors). All 13
+original papers exist with the ids given. Corrections and peer-reviewed versions are in
+"Verification, 2026-10-14" below, and five newer papers are added there.
+
 ## How LA-P4 differs, in one paragraph
 
 Prior work on reasoning modes measures accuracy on tasks with an answer key (math,
@@ -29,7 +34,7 @@ pre-registered analysis.
 | Li and Ng. Reasoning Models Hallucinate More: Factuality-Aware Reinforcement Learning for Large Reasoning Models. arXiv 2505.24630v2 (6 Nov 2025; v1 of 30 May 2025 was titled "The Hallucination Dilemma: Factuality-Aware Reinforcement Learning for Large Reasoning Models") | Reasoning-oriented RL fine-tuning "significantly increases the prevalence of hallucinations" (abstract). Compares differently trained models, not reasoning switched on and off within one model. No "10 to 13 points" figure appears in the paper's text (checked 2026-10-12) | **Direct tension with H3.** H3 predicts tool factuality is mode-stable. This work suggests reasoning can lower factuality. Discuss either outcome |
 | Mitigating Factual Hallucination in Large Reasoning Models via Mixed-Mode Advantage Regularization. arXiv 2607.05861 | Names "thinking-induced hallucination": thinking turns a correct direct answer into a wrong one | Same tension, mechanism-level |
 | Learning to Reason for Factuality. arXiv 2508.05618 | Methods to reduce hallucination in reasoning models | Background |
-| Reasoning LLM Errors Arise from Hallucinating Critical Problem Features. arXiv 2505.12151 | Errors come from hallucinated problem features | Background for D1 (misreading the hardware spec) |
+| Heyman and Zylberberg. Reasoning Large Language Model Errors Arise from Hallucinating Critical Problem Features. arXiv 2505.12151 | Errors come from hallucinated problem features | Background for D1 (misreading the hardware spec) |
 
 ## Test-time compute
 
@@ -49,8 +54,41 @@ pre-registered analysis.
 
 | Paper | Relevance |
 |---|---|
-| A Multi Model Study on the Inconsistency of LLM Judge. arXiv 2603.04417 | Why LLM raters need disclosure and a human rater |
+| Lau. Same Input, Different Scores: A Multi Model Study on the Inconsistency of LLM Judge. arXiv 2603.04417 | Why LLM raters need disclosure and a human rater |
 | LA-P2, The Rater Is Stale (in preparation) | Why D3 and D4 need web verification |
+
+## Verification, 2026-10-14
+
+### Corrections and versions to cite
+
+| Entry | Finding | Cite as |
+|---|---|---|
+| arXiv 2603.04417 | Full title is "Same Input, Different Scores: A Multi Model Study on the Inconsistency of LLM Judge", single author Fiona Lau, 4 Feb 2026. Five judge models (GPT-4o, GPT-4o-mini, Gemini-2.5-Flash, Claude Haiku 4.5, Claude Sonnet 4.5). Scores varied across models even at temperature 0 | arXiv preprint, full title |
+| arXiv 2505.12151 | Title says "Reasoning Large Language Model Errors", not "Reasoning LLM Errors". Heyman and Zylberberg, 17 May 2025. Graph colouring: reasoning models invent edges the prompt never gave | arXiv preprint, corrected title |
+| arXiv 2408.03314 | Snell, Lee, Xu, Kumar. Published at ICLR 2025 (oral) as "Scaling LLM Test-Time Compute Optimally Can be More Effective than Scaling Parameters for Reasoning" | ICLR 2025 title |
+| arXiv 2505.24630 | Li and Ng (NUS). Accepted at NeurIPS 2025. The abstract sentence "reasoning-oriented RL fine-tuning significantly increases the prevalence of hallucinations" is confirmed | NeurIPS 2025 |
+| arXiv 2506.09501 | Yuan, Li and others (Rice, Minnesota, Adobe). NeurIPS 2025 oral. Up to 9% accuracy and 9,000-token length variation for a reasoning model under bfloat16 greedy decoding, depending on GPU count, type and batch size | NeurIPS 2025 |
+| arXiv 2408.04667 | Atil and 12 co-authors (Penn State, Comcast). Also published at the 5th Eval4NLP workshop as "Non-Determinism of 'Deterministic' LLM System Settings in Hosted Environments" | Workshop version |
+| arXiv 2602.07150 | Bjarnason, Silva, Monperrus (KTH). ICLR 2026. 60,000 SWE-Bench-Verified trajectories: single-run pass@1 moved 2.2 to 6.0 points with the run chosen, SD above 1.5 at temperature 0 | ICLR 2026 |
+| arXiv 2508.05618 | Chen and seven co-authors (FAIR at Meta, UW). ICML 2026. Reports that reasoning LLMs hallucinate more than non-reasoning models on long-form factuality, which adds to the H3 competing prediction | ICML 2026 |
+| arXiv 2510.12680, 2604.27201 | Same first author (Shouren Wang). Path-Lock Expert: on Qwen3-4B, AIME24, no-think reflective tokens fall from 2.54 to 0.39 | arXiv preprints |
+| arXiv 2609.28682 | Liu and Honavar (Penn State). Leakage ratio 42% to 79% across nine aligned checkpoints | arXiv preprint |
+| arXiv 2607.05861 | Wang, Zheng, Cui, Chen, Xiong, Huang. MARGO, "thinking-induced hallucination" | arXiv preprint |
+| arXiv 2605.28398 | Ning, Liu, Ye, Zhang, Liu (HKUST Guangzhou, Tencent), 27 May 2026 | arXiv preprint |
+
+### Newer or missed work, found 2026-10-14
+
+| Paper | What it found | Relevance |
+|---|---|---|
+| Haase, Gonnermann-Müller, Hanel, Leins, Kosch, Mendling, Pokutta. Within-Model vs Between-Prompt Variability in Large Language Models for Creative Tasks. arXiv 2601.21339 (29 Jan 2026). A version titled "It's Not Just the Prompt: Model Choice Dominates LLM Creative Output" has DOI 10.1145/3772363.3799284. Confirm it is the same work before citing | 12 LLMs, 10 creativity prompts, 100 samples each. Variance split into model, prompt, within-model and interaction. For originality, model 41%, prompt 36%, within-model 11%. The authors note the balance may shift on constrained tasks | **Closest method.** Same variance-decomposition logic, but model vs prompt, not model vs mode, and on an unconstrained task. LA-P4 is the constrained-task, mode-axis counterpart |
+| How Does Thinking Mode Change LLM Moral Judgments? A Controlled Instant-vs-Thinking Comparison Across Five Frontier Models. arXiv 2605.04488 (May 2026). Authors not confirmed | Same checkpoint, instant vs thinking, five vendors, 3,000 API calls. Verdict agreement barely changes (alpha 0.781 vs 0.789). Notes that Gemini's minimal level is not a clean off | **Closest design.** Same crossed vendor x mode idea, but moral verdicts with an answer space, API not chat apps, LLM judges only. Its note on Gemini matches our "lowest available" group |
+| Zhang, Wang, Ge, Xu, Hamm, Reddy. Stop Comparing LLM Agents Without Disclosing the Harness. arXiv 2605.23950, ICML 2026 position paper | Harness-induced variance can exceed model-induced variance and reverse model rankings. Proposes a variance-decomposition protocol | Same argument shape: a setting around the model can matter more than the model. Supports the "report mode alongside model" discussion point |
+| Thinking Inertia: LLMs Keep Thinking When Told Not To. arXiv 2610.11765 (Oct 2026, about a week old when found). Authors not confirmed | Six LLMs keep reasoning under explicit no-thinking controls, more so as the answer space opens. On open-ended tasks accuracy drops about 15 points as controls tighten | Threat to validity: a "fast" setting may still reason on an open-ended task like ours. Supports reporting reasoning tokens per mode (API check) |
+| Sahu, Bothra, Arun, Godfrey, Narayan, Saeed. Assistants, Not Architects: The Role of LLMs in Networked Systems Design. arXiv 2604.25506 (Apr 2026) | LLMs cannot yet reliably do architectural reasoning for networked systems. How the LLM is involved in design changes outputs a lot | Task-domain context: LLMs as systems architects, the LA-P1 and LA-P4 task family |
+
+No study found that crosses reasoning mode with model identity and decomposes variance on an
+open-ended, constrained design task. That gap is the paper's contribution claim. Repeat this
+search before submission.
 
 ## Own prior work
 
@@ -71,3 +109,9 @@ pre-registered analysis.
 - <https://arxiv.org/html/2506.09501v2>
 - <https://arxiv.org/pdf/2602.07150>
 - <https://arxiv.org/pdf/2603.04417>
+- <https://arxiv.org/abs/2601.21339>
+- <https://doi.org/10.1145/3772363.3799284>
+- <https://arxiv.org/abs/2605.04488>
+- <https://arxiv.org/abs/2605.23950>
+- <https://arxiv.org/abs/2610.11765>
+- <https://arxiv.org/abs/2604.25506>

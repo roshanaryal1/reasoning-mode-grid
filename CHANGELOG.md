@@ -72,7 +72,10 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions follo
   on how they rank the 12 cells, for the total and each dimension. The LA-P5 portability check.
 - `data/scores/RATER_SHA256SUMS`: hashes of the four files every rater kit is built from, recorded
   before scoring as pre-registration section 3 asks, and checked in CI.
-- `paper/methods.md`: draft of the Method section, written before scoring.
+- Paper drafts written before scoring: `paper/introduction.md`, `paper/related-work.md`,
+  `paper/methods.md` and `paper/appendix.md`.
+- `docs/related-work.md`: every citation re-checked on 2026-10-14, with corrected titles,
+  peer-reviewed versions and five newer papers, two of them close to this design.
 - `modegrid rater-kit` and `modegrid rater-rows`: one self-contained file per answer per rater (fixed
   prompt in `docs/rater-prompt.md`, rubric, protocol, memory checker, one answer), and collection of the
   CSV rows raters return, with checks, into `data/scores/<rater>.csv` once all 60 are in.

@@ -132,9 +132,9 @@ stores the final answer verbatim, the model name the app showed, the interface s
 and, where the app shows one, the reasoning panel. Raters never see the reasoning panel.
 
 The Qwen, Gemini and GPT blocks were sent by the author by hand. The Grok, DeepSeek and
-Claude blocks were sent, at the author's request, by an AI assistant (Claude, through the
-Claude in Chrome browser extension) operating the author's signed-in browser, with the same
-settings and one new chat per run. Collection took place from 2026-10-13 10:45 UTC to
+Claude blocks were sent, at the author's request, by an AI assistant operating the author's
+signed-in browser through a browser extension, with the same settings and one new chat per
+run (Appendix D). Collection took place from 2026-10-13 10:45 UTC to
 2026-10-14 13:08 UTC, about 26 hours. Every block finished well inside 48 hours: Qwen took
 12.9 hours, Claude 4.6, Grok 1.8, GPT 1.1, Gemini 0.6 and DeepSeek 0.2.
 
@@ -188,7 +188,7 @@ random reading order. All three raters got the same instructions.
 
 **Blinding.** Raters saw only the final answer. Reasoning panels, interface labels,
 timestamps and capture metadata were removed. Self-identification lines near the top of an
-answer (the model's own name, which the prompt asks for) were removed, and a vendor or
+answer (the model's own name, which the prompt asks for) were removed without a trace, and a vendor or
 model name was masked only where the answer refers to itself. Names used as content were
 kept, because the prompt asks for a model and tool stack and D2 to D4 cannot be scored with
 the recommendations hidden. We also removed clutter that the chat apps add to copied text
@@ -283,10 +283,11 @@ The Deviations table (Appendix D) lists every change. Four bear on how to read t
 - **Unverifiable model identity.** DeepSeek and Grok show no model name in the app, so for
   them the mode contrast is the vendor's exposed setting, not a verified same-weights
   manipulation.
-- **Blinding fixes before scoring.** Two leaks were found and fixed before any real
-  scoring: app clutter copied with the answers, and bare "Model:" label lines missed by the
-  self-identification rule. Both fixes apply to every packet in the same way, and the
-  blinding key did not change.
+- **Blinding fixes before scoring.** Three leaks were found and fixed before any real
+  scoring: app clutter copied with the answers, bare "Model:" label lines missed by the
+  self-identification rule, and the marker lines left where header lines were removed,
+  whose count and position differed by family. All three fixes apply to every packet in
+  the same way, and the blinding key did not change.
 
 ## 3.9 Materials and code
 
