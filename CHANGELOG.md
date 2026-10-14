@@ -63,6 +63,10 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions follo
 
 ### Added
 
+- DeepSeek block of the chat captures: 10 of 60 runs (chat.deepseek.com, DeepThink off vs on,
+  Search off), captured 2026-10-14 with browser-clock send times. Two set-aside attempts are in
+  `data/captures/superseded/`; four Deviations rows record the operator, the app's paste and
+  toggle behaviour, the two continued Fast answers and the Claude self-reports.
 - Grok block of the chat captures: 10 of 60 runs (grok.com, Fast vs Expert), captured
   2026-10-14 with exact browser-clock send times. Three Deviations rows record the
   assistant-operated browser, Grok's built-in web search and the "Grok 4.7" self-report.
