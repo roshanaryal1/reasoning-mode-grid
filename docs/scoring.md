@@ -10,6 +10,10 @@
 - The rubric: `vendor/llm-architects/docs/rubric.md`. Use the **v2 hard anchors** for D1,
   D7, D8 and D9.
 - This file.
+- The fixed rater prompt, [rater-prompt.md](rater-prompt.md). `modegrid rater-kit` packs the prompt,
+  the rubric, this file, the memory checker and one answer into one file per answer, in the
+  rater's reading order (`packets/kit/<rater>/NN_B###.md`). One answer per session: a new chat
+  for an LLM rater, so no answer is scored next to another.
 
 Raters never receive the key file, the captures, the manifest, or the reasoning traces.
 The author collected the captures and therefore never scores. Three blind raters score:
