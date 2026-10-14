@@ -184,7 +184,8 @@ Check: 60 main captures plus 12 API checks in `data/captures/`, and
 
    ```bash
    modegrid unblind data/scores/adjudicated-blind.csv
-   git add data/blinding/key.csv data/scores/
+   git add -f data/blinding/key.csv   # gitignored until now, so it needs -f
+   git add data/scores/
    ```
 
 Check: `data/scores/adjudicated.csv` has 60 rows and `modegrid validate` prints `ok`.
