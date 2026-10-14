@@ -7,7 +7,7 @@ result, whichever way it goes.
 
 Drafts written before scoring (nothing in them depends on scores):
 [introduction](introduction.md), [related work](related-work.md), [method](methods.md),
-[appendix](appendix.md). Figure 1 comes from `modegrid cells --figure figure1.pdf`.
+[discussion, limitations only](discussion.md), [appendix](appendix.md). Figure 1 comes from `modegrid cells --figure figure1.pdf`.
 
 ## Abstract (write last, 150 words)
 
