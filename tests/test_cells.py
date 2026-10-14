@@ -68,6 +68,12 @@ def test_cell_means_and_csv(grid, tmp_path):
         rows = list(csv.DictReader(fh))
     assert len(rows) == len(design.families) * 2
     assert {r["n"] for r in rows} == {str(len(design.replicates))}
+    refused = next(iter(design.run_ids[0, 0]))
+    scores = {**scores, refused: dict.fromkeys(scores[refused], 0)}
+    with write_cell_means(design, scores, tmp_path / "cells.csv").open() as fh:
+        rows = list(csv.DictReader(fh))
+    first = next(r for r in rows if r["family"] == design.families[0] and r["mode"] == design.modes[0])
+    assert int(first["n_all_zero"]) >= 1
 
 
 def test_rank_agreement_identical_and_reversed(grid):

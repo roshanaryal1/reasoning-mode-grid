@@ -50,11 +50,14 @@ def write_cell_means(design: Design, scores: Scores, path: str | Path) -> Path:
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("w", newline="", encoding="utf-8") as fh:
         w = csv.writer(fh, lineterminator="\n")
-        w.writerow(["family", "mode", "n", *DIMS, "total"])
+        # n_all_zero: answers scored 0 on all nine dimensions, which the refusal rule gives an
+        # outright refusal. Pre-registration section 7 reports refusals per family and mode.
+        w.writerow(["family", "mode", "n", *DIMS, "total", "n_all_zero"])
         for i, fam in enumerate(design.families):
             for j, mode in enumerate(design.modes):
                 vals = [f"{means[m][i, j]:.3f}" for m in (*DIMS, "total")]
-                w.writerow([fam, mode, len(design.replicates), *vals])
+                zeros = sum(1 for rid in design.run_ids[i, j] if not any(scores[rid][d] for d in DIMS))
+                w.writerow([fam, mode, len(design.replicates), *vals, zeros])
     return path
 
 

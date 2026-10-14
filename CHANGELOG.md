@@ -69,6 +69,11 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions follo
 
 ### Added
 
+- `modegrid own-vendor`: each LLM rater's scores for its own vendor's family (`llm-a` on Claude,
+  `llm-b` on GPT), as pre-registration section 4 requires: the gap to the other raters, the same
+  gap on the other families, and their difference with a bootstrap CI.
+- `paper/results.md`: a Results skeleton, written before scoring, that names the file and column
+  behind every reported number.
 - `modegrid blinding-audit`: before scoring, counts family fingerprints left in the packets per
   cell, exits non-zero if a leak probe hits, and writes `results/blinding_audit.csv`. The final
   packets have no leak hits.
@@ -139,6 +144,11 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions follo
 
 ### Fixed
 
+- `modegrid analyze` computed the random-effects variance components but never wrote them. They are
+  now in `variance_table.csv` (`vc_*`) and in an exploratory section of `variance_table.md`, as
+  pre-registration section 5 lists them among the statistics reported for every dimension.
+- Refusal counts per family and mode (pre-registration section 7): `cell_means.csv` gains
+  `n_all_zero`, the answers whose consensus is 0 on all nine dimensions.
 - `modegrid validate` failed on `data/scores/adjudicated-blind.csv` (keyed by `blind_id`) and on the
   per-rater `*-unblinded.csv` sheets (keyed by `run_id`), so the Phase 3 check could never pass. It now
   reads the id column from each sheet's header, and checks that `adjudicated.csv` covers exactly the

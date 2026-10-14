@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pytest
 
-from modegrid.analyze import AnalysisError, build_design, run_analysis, write_outputs
+from modegrid.analyze import AnalysisError, build_design, run_analysis, score_array, write_outputs
 from modegrid.blind import build_packets, redact, strip_app_artifacts, strip_self_disclosure
 from modegrid.capture import Capture, CaptureError, check_capture, parse_capture, read_capture, write_capture
 from modegrid.cli import main
@@ -254,6 +254,31 @@ def test_analysis_recovers_synthetic_effects(grid_path, tmp_path):
     assert by["D3"]["verdict"] == "model > mode"
     write_outputs(design, rows, tmp_path)
     assert (tmp_path / "variance_table.md").read_text().count("| D") >= 9
+
+
+def test_variance_components_are_reported(grid_path, tmp_path):
+    # Pre-registration section 5 lists the random-effects components among the statistics
+    # reported for every dimension, labelled exploratory.
+    grid = load_grid(grid_path)
+    runs = build_manifest(grid)
+    fams = sorted({r.family for r in runs})
+    scores = synthetic_scores(fams, grid.replicates, "p1-v1", seed=7)
+    design, rows = run_analysis(runs, scores, "p1-v1", n_boot=50, n_perm=50)
+    by = {r["dimension"]: r for r in rows}
+    y = score_array(design, scores, "D1")
+    a, b, n = y.shape
+    cell, fam, grand = y.mean(axis=2), y.mean(axis=(1, 2)), y.mean()
+    mode = y.mean(axis=(0, 2))
+    ms_inter = n * ((cell - fam[:, None] - mode[None, :] + grand) ** 2).sum() / ((a - 1) * (b - 1))
+    ms_fam = b * n * ((fam - grand) ** 2).sum() / (a - 1)
+    assert by["D1"]["vc_family"] == pytest.approx(max(0.0, (ms_fam - ms_inter) / (b * n)))
+    assert all(by[d][f"vc_{k}"] >= 0 for d in by for k in ("family", "mode", "interaction", "residual"))
+    write_outputs(design, rows, tmp_path)
+    md = (tmp_path / "variance_table.md").read_text()
+    assert "Random-effects variance components (exploratory)" in md
+    with (tmp_path / "variance_table.csv").open() as fh:
+        header = next(csv.reader(fh))
+    assert {"vc_family", "vc_mode", "vc_interaction", "vc_residual"} <= set(header)
 
 
 def test_analysis_on_a_family_subset(grid_path):
