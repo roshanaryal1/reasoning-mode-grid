@@ -137,6 +137,16 @@ Check: 60 main captures plus 12 API checks in `data/captures/`, and
 
    ```bash
    modegrid blind --raters human llm-a llm-b
+   modegrid rater-kit --raters human llm-a llm-b   # one file per answer
+   ```
+
+   Each LLM session gets one kit file (`packets/kit/<rater>/NN_B###.md`) in a new chat with
+   memory and connectors off and web search on, and returns one CSV row. Save the replies to
+   text files and collect them; the sheet reaches `data/scores/<rater>.csv` only when all 60
+   rows are in:
+
+   ```bash
+   modegrid rater-rows llm-a replies/llm-a-*.txt
    ```
 
    Send the human rater the `packets/answers/` folder, their own score sheet, the rubric
