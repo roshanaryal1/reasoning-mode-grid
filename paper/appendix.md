@@ -34,8 +34,13 @@ Notes on the evidence:
   switch works.
 - **Model identity in the app.** Claude, GPT, Gemini and Qwen show the model name in the
   model picker. DeepSeek and Grok show none, so for them the model is the author's
-  observation (DeepSeek) or the one vendor documentation and secondary sources report for
-  every plan (Grok).
+  observation (DeepSeek) or the one given when the plan was frozen (Grok 4.6).
+- **Releases just before collection.** GPT-6 reached ChatGPT on 7 October 2026. OpenAI says
+  the rollout does not retire older models and that an explicit GPT-5.6 Sol choice stays on
+  GPT-5.6. [Confirm from the screenshots.] Grok 4.7 was released on 21 September for the
+  API, and sources disagree on whether it reached grok.com's hardest modes in early October.
+  No release note for any of the six models was found inside the collection window. Sources
+  are in the mode registry, "Vendor releases around the collection window".
 - **Superseded checks.** Earlier API checks for Gemini (on 3.6 Flash and before an adapter
   fix) and DeepSeek (on V4 Pro) are kept in `data/captures/superseded/` with the reason for
   each.
@@ -79,7 +84,7 @@ summary:
 | Operators and send times | Three blocks sent by an AI browser assistant at the author's request, three by the author. Send times recorded as exact times or as bounded intervals where chats ran side by side | None on scores. Disclosed for transparency |
 | Replacements | 6 failed attempts replaced: 3 Claude reasoning runs stopped by a usage limit (treated as the app being down), 1 DeepSeek cut-off, 1 DeepSeek app error, 1 Qwen run sent in the wrong mode (treated like a wrong model). One extra Qwen chat kept, unscored | 60 valid answers from 66 attempts. No family dropped |
 | App behaviour | Claude, GPT and Grok searched the web by themselves, with no switch to stop it. Two DeepSeek fast answers were finished with the app's own "Continue" button | Family differences may include live search. Stated as a limitation |
-| Model self-reports | DeepSeek and Gemini answers named Claude models, GPT answers named "GPT-6", Grok answers named "Grok 4.7". The app's model picker is taken as the evidence | DeepSeek and Grok contrasts described as vendor chat settings |
+| Model self-reports | DeepSeek and Gemini answers named Claude models, GPT answers named "GPT-6", Grok answers named "Grok 4.7". The app's model picker is taken as the evidence. GPT-6 and Grok 4.7 are real models released shortly before collection (Appendix A) | DeepSeek and Grok contrasts described as vendor chat settings. GPT model to confirm from the screenshots |
 | Reasoning traces | Kept where the app showed them. One GPT trace not captured | None. Raters never see traces |
 | Blinding, before scoring | Four fixes: chat-app clutter removed, bare "Model:" label lines removed, removed header lines leave no marker, and self-disclosures naming the answer's maker removed | Same rule for every packet. Key unchanged |
 | Raters | Two LLM raters named after the freeze, as the plan requires. One answer per session from a fixed kit, instructions hashed before scoring | None |

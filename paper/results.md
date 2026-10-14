@@ -22,12 +22,12 @@ Source files after Phase 4 of the runbook:
 
 ## 4.1 Data and reliability
 
-60 of 60 planned answers were scored by all three raters. Refusals per family and mode: the
+[60 of 60 planned answers were scored by all three raters.] Refusals per family and mode: the
 `n_all_zero` column of `results/cell_means.csv` counts answers whose consensus is 0 on all
 nine dimensions, which the refusal rule gives an outright refusal. Check any non-zero count
 against the raters' notes before calling it a refusal. [Expected 0.]
 
-Inter-rater reliability (Table 2, from `results/agreement.csv`): ordinal alpha per dimension
+Inter-rater reliability (Table 3, from `results/agreement.csv`): ordinal alpha per dimension
 and interval alpha on the total. Name every dimension below 0.667, which makes its test
 exploratory. State whether the total clears 0.667 (H4 stays confirmatory) and whether it
 clears 0.800 (firm, otherwise "tentative").
@@ -52,7 +52,7 @@ Then the power caveat: under equal effects 15% of simulated studies show "mode >
 
 ## 4.3 Secondary tests (H1 to H3) and the other dimensions
 
-Table 3: the full `variance_table.md` decomposition, all nine dimensions plus the total.
+Table 4: the full `variance_table.md` decomposition, all nine dimensions plus the total.
 
 For H1 (D1), H2 (D9) and H3 (D3): verdict, delta with CI, direction with CI, status, and
 the multiplicity caveat. For H3, say which of the two pre-stated outcomes occurred: model >
