@@ -160,8 +160,7 @@ def test_strip_app_artifacts_removes_chatgpt_citation_chips():
 
 def test_strip_app_artifacts_keeps_diagram_labels_and_drops_css():
     line = (
-        "\\#chatgpt-mermaid-\\_r_j6\\_{font-family:x;}"
-        "#chatgpt-mermaid-\\_r_j6\\_ p{margin:0;}Phone / LaptopSupervisor"
+        "\\#chatgpt-mermaid-\\_r_j6\\_{font-family:x;}#chatgpt-mermaid-\\_r_j6\\_ p{margin:0;}Phone / LaptopSupervisor"
     )
     out = strip_app_artifacts(f"## B. Diagram\n\n{line}\n\nAfter.")
     assert "chatgpt" not in out and "font-family" not in out
