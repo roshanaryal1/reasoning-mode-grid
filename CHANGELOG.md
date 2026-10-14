@@ -63,6 +63,9 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions follo
 
 ### Added
 
+- `modegrid rater-kit` and `modegrid rater-rows`: one self-contained file per answer per rater (fixed
+  prompt in `docs/rater-prompt.md`, rubric, protocol, memory checker, one answer), and collection of the
+  CSV rows raters return, with checks, into `data/scores/<rater>.csv` once all 60 are in.
 - `strip_app_artifacts`: rater packets drop chat-app clutter (ChatGPT citation chips, diagram style
   blocks, image embeds, `&#x20;`, Grok `[web:N]` tags) that would reveal the family. Captures are unchanged.
 - `data/scores/raters.md`: the two LLM raters (Claude Opus 5.5, GPT-5.6 Sol) named before scoring.
