@@ -69,6 +69,9 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions follo
 
 ### Added
 
+- Mode registry: vendor releases around the collection window, as pre-registration section 3
+  requires. None inside the window. GPT-6 (7 October) and Grok 4.7 bear on which model ran, and
+  the GPT and Grok screenshots need checking.
 - `modegrid own-vendor`: each LLM rater's scores for its own vendor's family (`llm-a` on Claude,
   `llm-b` on GPT), as pre-registration section 4 requires: the gap to the other raters, the same
   gap on the other families, and their difference with a bootstrap CI.

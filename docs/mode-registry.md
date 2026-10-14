@@ -216,3 +216,45 @@ at the 32,000-token limit in force when it ran. Neither affects the switch evide
 | gpt | 4014 | 0 | 0 | 6000 | gpt-5.6-sol | switch confirmed |
 | grok | 1990 | 7393 | 131 | 4627 | grok-4.6 | lowest available: fast reasons less, not zero; record both counts |
 | qwen | 3315 | 7587 | 0 | 23805 | qwen3.8-max | switch confirmed |
+
+## Vendor releases around the collection window (researched 2026-10-15)
+
+Pre-registration section 3: "Vendor release notes published during the window are recorded
+in the mode registry." The window ran from 2026-10-13 10:45 UTC (first Qwen run) to
+2026-10-14 13:08 UTC (last GPT run). Searched after collection, before any scoring. arXiv
+and the OpenAI help centre were not reachable from the build container, so most sources
+below are search results and third-party trackers. Treat dates from trackers as
+approximate.
+
+**Inside the window.** No vendor release note for any of the six models was found dated
+13 or 14 October 2026. The only item found on those dates is a Google Cloud note (13
+October) that CodeMender and AlphaEvolve can use Gemini 4 Argon, with Gemini 3.8 Flash
+staying the default. That concerns Google Cloud products, not AI Studio.
+
+**Before the window, bearing on which model ran.** Two releases in the week before
+collection bear on the model table in pre-registration section 1. Neither can be settled
+from search results. The author's screenshots of each app's model menu are the evidence.
+
+| Family | What was found | Bearing on this study | To check |
+|---|---|---|---|
+| GPT | GPT-6 launched in ChatGPT on 7 October 2026 for Plus, Pro, Business and Enterprise, taking the "Latest" slot. OpenAI's help article "GPT-6 and other models in ChatGPT" says the rollout does not retire older selectable models and that an explicit GPT-5.6 Sol selection stays on GPT-5.6. A third-party guide says GPT-6 Sol replaced GPT-5.6 Sol in standard chat, and a user report (10 October) says GPT-5.6 Sol was missing from one Plus account's iOS picker | Every GPT answer names itself "GPT-6". Under OpenAI's own statement, an explicit GPT-5.6 Sol choice ran GPT-5.6 Sol and the self-report is wrong. If the menu showed only GPT-6 or "Latest", the GPT family is GPT-6 and section 1's table needs a Deviations row | The GPT screenshots: was "GPT-5.6 Sol" chosen by name, and did the Thinking effort control sit under it? |
+| Grok | Grok 4.7 was released on 21 September 2026 for the API, Cursor and Grok Build. Sources disagree on the app: one says it has been rolling into grok.com since 1 to 7 October and names the app's hardest modes, another says it is not yet on grok.com and the app runs Grok 4.6. xAI's news page lists an "Introducing Grok 4.7" item dated 12 October | Every Grok answer, Fast and Expert alike, names itself "Grok 4.7". If Expert moved to 4.7 while Fast stayed on 4.6, the Grok mode contrast is also a model contrast. The pre-registration already describes Grok as vendor chat settings, not a verified same-weights manipulation, because the app shows no model name | The Grok screenshots: does any mode entry name a model version? |
+| Claude | Claude Haiku 5.5 released 7 October 2026. Sonnet 5.5 unchanged since 28 September | None. Sonnet 5.5 was picked by name | Nothing |
+| Gemini | AI Studio changelog, 8 October: Gemini 3.7 Flash deprecated and routed to 3.8 Flash | None. 3.8 Flash was picked by name | Nothing |
+| Qwen | No update found after the Qwen3.8-Max launch | None | Nothing |
+| DeepSeek | Last API change found: V4.1-Flash on 10 September 2026. No October changelog entry | None found. The app shows no model name, as already recorded | Nothing |
+
+Sources:
+
+- OpenAI help, GPT-6 and other models in ChatGPT: <https://help.openai.com/en/articles/20001354-gpt-6-and-other-models-in-chatgpt>
+- ChatGPT release notes: <https://help.openai.com/en/articles/6825453-chatgpt-release-notes>
+- GPT-5.6 Sol missing from picker (user report): <https://github.com/openai/codex/issues/52992>
+- ChatGPT versions guide (third party): <https://www.gradually.ai/en/chatgpt-versions/>
+- Introducing Grok 4.7: <https://x.ai/news/grok-4-7>
+- Grok 4.7 availability (third party): <https://www.lindy.ai/blog/grok-4-7>
+- Grok models guide (third party): <https://www.ai-toolbox.co/grok-models/grok-models-explained-2026>
+- Anthropic release tracker (third party): <https://releasebot.io/updates/anthropic/claude>
+- Gemini API changelog: <https://ai.google.dev/gemini-api/docs/changelog>
+- Gemini Enterprise release notes: <https://docs.cloud.google.com/gemini/enterprise/docs/release-notes>
+- Qwen3.8-Max blog: <https://qwen.ai/blog?id=qwen3.8>
+- DeepSeek V4.1-Flash release: <https://api-docs.deepseek.com/news/news260910/>
