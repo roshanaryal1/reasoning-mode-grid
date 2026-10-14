@@ -133,6 +133,11 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions follo
 
 ### Fixed
 
+- `modegrid validate` failed on `data/scores/adjudicated-blind.csv` (keyed by `blind_id`) and on the
+  per-rater `*-unblinded.csv` sheets (keyed by `run_id`), so the Phase 3 check could never pass. It now
+  reads the id column from each sheet's header, and checks that `adjudicated.csv` covers exactly the
+  manifest's 60 main runs. Found by a full rehearsal of Phases 3 and 4 on the real captures with
+  made-up rater rows.
 - The CI guard against committing the blinding key early looked for `data/scores/rater*.csv`, which
   never exists, so it would have failed the correct commit after scoring. It now needs all three sheets.
 - The runbook adds the gitignored blinding key with `git add -f`.

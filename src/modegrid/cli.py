@@ -171,10 +171,19 @@ def cmd_validate(args: argparse.Namespace) -> int:
             problems.append(f"{path}: file name does not match run_id")
     for path in sorted(Path("data/scores").glob("*.csv")):
         try:
-            col = "run_id" if path.name.startswith("adjudicated") else "blind_id"
-            load_scores(path, id_col=col)
+            # Rater and consensus sheets are keyed by blind_id; unblinded ones by run_id.
+            with path.open(newline="", encoding="utf-8") as fh:
+                header = next(csv.reader(fh), [])
+            col = "run_id" if "run_id" in header else "blind_id"
+            scores = load_scores(path, id_col=col)
         except Exception as exc:
-            problems.append(str(exc))
+            problems.append(f"{path}: {exc}")
+            continue
+        if path.name == "adjudicated.csv" and runs:
+            main_ids = {rid for rid, r in runs.items() if r.set == MAIN}
+            if set(scores) != main_ids:
+                missing, extra = sorted(main_ids - set(scores)), sorted(set(scores) - main_ids)
+                problems.append(f"{path}: {len(scores)} runs, missing {missing[:3]}, not in manifest {extra[:3]}")
     for msg in problems:
         print(f"ERROR {msg}")
     print("ok" if not problems else f"{len(problems)} problem(s)")

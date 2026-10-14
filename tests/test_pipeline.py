@@ -619,3 +619,28 @@ def test_agreement_reports_total_alpha(tmp_path, capsys):
     assert main(["agreement", *paths, "--out", str(out)]) == 0
     dims = [line.split(",")[0] for line in out.read_text().splitlines()[1:]]
     assert dims[-1] == "total"
+
+
+def test_validate_reads_every_score_sheet_shape(tmp_path, monkeypatch, grid_path, capsys):
+    # Rater and consensus sheets use blind_id, unblinded ones run_id. A run-level
+    # adjudicated.csv must cover exactly the manifest's main runs.
+    g = load_grid(grid_path)
+    runs = build_manifest(g)
+    manifest = tmp_path / "runs.csv"
+    write_manifest(runs, manifest)
+    (tmp_path / "captures").mkdir()
+    scores_dir = tmp_path / "data" / "scores"
+    families = sorted({r.family for r in runs})
+    by_run = synthetic_scores(families, g.replicates, g.prompts[0].id, seed=1)
+    by_blind = {f"B{i:03d}": s for i, s in enumerate(by_run.values(), start=1)}
+    write_scores(by_blind, scores_dir / "human.csv", id_col="blind_id")
+    write_scores(by_blind, scores_dir / "adjudicated-blind.csv", id_col="blind_id")
+    write_scores(by_run, scores_dir / "human-unblinded.csv")
+    write_scores(by_run, scores_dir / "adjudicated.csv")
+    monkeypatch.chdir(tmp_path)
+    base = ["--config", str(grid_path), "--manifest", str(manifest), "--captures", str(tmp_path / "captures")]
+    assert main([*base, "validate"]) == 0
+    assert capsys.readouterr().out.strip().endswith("ok")
+    write_scores(dict(list(by_run.items())[:-1]), scores_dir / "adjudicated.csv")
+    assert main([*base, "validate"]) == 1
+    assert "missing" in capsys.readouterr().out
