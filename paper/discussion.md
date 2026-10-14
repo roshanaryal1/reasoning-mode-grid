@@ -47,7 +47,12 @@ ran with search off. Differences between families may partly reflect live search
 
 **Model identity.** Two apps show no model name, and four families' answers named a
 different model than the app showed. We take the app's model picker as the evidence where
-there is one, and describe the DeepSeek and Grok contrasts as vendor chat settings.
+there is one, and describe the DeepSeek and Grok contrasts as vendor chat settings. Two
+releases landed in the week before collection: GPT-6 in ChatGPT, which OpenAI says does
+not replace an explicit GPT-5.6 Sol choice, and Grok 4.7, which some sources place in
+grok.com's hardest modes. If Grok's Expert mode ran a newer model than its Fast mode, the
+Grok contrast mixes mode with model. [Settle the GPT case from the screenshots. Report
+whether any result depends on Grok.]
 
 **Family is confounded with date and operator.** Families were captured one block at a
 time, so family is partly confounded with time of day, and three blocks were sent by an AI
