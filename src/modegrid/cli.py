@@ -20,6 +20,7 @@ from .blind import build_packets, guess_accuracy
 from .capture import Capture, check_capture, manual_template, read_capture, word_count, write_capture
 from .cells import plot_cell_means, rank_agreement, write_cell_means, write_rank_agreement
 from .config import load_grid, unready_families
+from .ownvendor import own_vendor, write_own_vendor
 from .plan import API_CHECK, MAIN, build_manifest, read_manifest, write_manifest
 from .providers import adapter_for, with_retries
 from .raterkit import build_kit, collect_rows
@@ -380,6 +381,26 @@ def cmd_rank_agreement(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_own_vendor(args: argparse.Namespace) -> int:
+    """LLM raters on their own vendor's family, against the other raters (preregistration section 4)."""
+    sheets = {Path(p).stem.removesuffix("-unblinded"): load_scores(p, id_col="run_id") for p in args.files}
+    rows = []
+    for pair in args.pair or ["llm-a=claude", "llm-b=gpt"]:
+        rater, _, family = pair.partition("=")
+        rows += own_vendor(sheets, rater.strip(), family.strip(), n_boot=args.boot, seed=args.seed)
+    print("gap = this rater minus the mean of the other raters; self-preference = own-family gap - baseline gap\n")
+    print(f"{'rater':<8}{'family':<9}{'measure':<8}{'own gap':>9}{'baseline':>10}{'self-pref':>11}  95% CI")
+    for r in rows:
+        print(
+            f"{r['rater']!s:<8}{r['family']!s:<9}{r['measure']!s:<8}{float(r['own_gap']):>9.2f}"
+            f"{float(r['baseline_gap']):>10.2f}{float(r['self_preference']):>11.2f}  "
+            f"[{float(r['self_preference_ci_low']):.2f}, {float(r['self_preference_ci_high']):.2f}]"
+        )
+    if args.out:
+        print(f"\nwrote {write_own_vendor(rows, args.out)}")
+    return 0
+
+
 def cmd_check_modes(args: argparse.Namespace) -> int:
     """Summarise the API-check runs: did each mode switch do what the registry claims?"""
     runs = [r for r in read_manifest(args.manifest) if r.set == API_CHECK]
@@ -581,6 +602,14 @@ def build_parser() -> argparse.ArgumentParser:
     ra.add_argument("--prompt", default="p1-v1")
     ra.add_argument("--out", default="results/cell_rank_agreement.csv")
     ra.set_defaults(func=cmd_rank_agreement)
+
+    ov = sub.add_parser("own-vendor", help="LLM raters' scores for their own vendor's family, reported separately")
+    ov.add_argument("files", nargs="+", help="unblinded run-level sheets, one per rater (name-unblinded.csv)")
+    ov.add_argument("--pair", action="append", default=None, help="rater=family, default llm-a=claude and llm-b=gpt")
+    ov.add_argument("--out", default="results/own_vendor.csv")
+    ov.add_argument("--boot", type=int, default=5000)
+    ov.add_argument("--seed", type=int, default=20261001)
+    ov.set_defaults(func=cmd_own_vendor)
 
     d = sub.add_parser("demo", help="synthetic end-to-end dry run")
     d.add_argument("--out", default="")

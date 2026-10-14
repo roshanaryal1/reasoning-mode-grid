@@ -216,6 +216,11 @@ for r in human llm-a llm-b; do
   modegrid analyze --scores data/scores/$r-unblinded.csv --out results/$r
 done
 
+# Own-vendor scores (preregistration section 4): llm-a on claude, llm-b on gpt,
+# against the other raters, relative to how each rates the other families
+modegrid own-vendor data/scores/human-unblinded.csv data/scores/llm-a-unblinded.csv \
+    data/scores/llm-b-unblinded.csv --out results/own_vendor.csv
+
 # Blinding-failure rate: did raters guess family or mode better than chance?
 modegrid blinding-check data/scores/human.csv data/scores/llm-a.csv data/scores/llm-b.csv
 

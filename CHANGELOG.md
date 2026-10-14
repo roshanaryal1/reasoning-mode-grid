@@ -69,6 +69,11 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions follo
 
 ### Added
 
+- `modegrid own-vendor`: each LLM rater's scores for its own vendor's family (`llm-a` on Claude,
+  `llm-b` on GPT), as pre-registration section 4 requires: the gap to the other raters, the same
+  gap on the other families, and their difference with a bootstrap CI.
+- `paper/results.md`: a Results skeleton, written before scoring, that names the file and column
+  behind every reported number.
 - `modegrid blinding-audit`: before scoring, counts family fingerprints left in the packets per
   cell, exits non-zero if a leak probe hits, and writes `results/blinding_audit.csv`. The final
   packets have no leak hits.
