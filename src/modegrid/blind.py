@@ -35,7 +35,9 @@ from . import DIMS
 from .capture import Capture
 
 HEADER_PATTERN = re.compile(
-    r"(model\s*(name|version)|knowledge\s*cut-?off|browsing|web\s*access|tools?\s*enabled|i\s+am\s+\w+)",
+    r"(model\s*(name|version)|knowledge\s*cut-?off|browsing|web\s*access|tools?\s*enabled|i\s+am\s+\w+"
+    # A "Model:" label line, plain or in markdown ("**Model:** X", "- **Model**: X").
+    r"|^[\s>*_#-]*model\b[^:|\n]{0,30}:)",
     re.IGNORECASE,
 )
 MASK = "[REDACTED]"
