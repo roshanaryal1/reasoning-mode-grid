@@ -4,7 +4,9 @@ Raters must not know which family or which mode produced an answer. Two leaks
 are handled here:
 
 1. Self-identification. The study prompt asks the model to state its name,
-   cutoff and browsing status at the top. Those header lines are removed.
+   cutoff and browsing status at the top. Those header lines are removed with no
+   marker, together with the empty shell they leave (a "Response Header" label,
+   a rule, blank lines), because the shell's shape differed by family.
 2. Self-reference in the body ("I'm Claude", "As ChatGPT, ...", "a model
    developed by Google"). Config terms are masked only inside such phrases.
 
@@ -104,14 +106,42 @@ def strip_app_artifacts(text: str) -> str:
     return "\n".join(kept)
 
 
+# What a removed header leaves behind at the top: blank lines, a rule, or a label whose
+# content was the header ("# Response Header", "**System Metadata:**").
+_TOP_RULE = re.compile(r"^\s*(?:-{3,}|\*{3,}|_{3,})\s*$")
+_TOP_LABEL = re.compile(
+    r"^[\s#>*_]*(?:\d+\.\s*)?(?:response\s+header|header(?:\s+line)?|metadata|"
+    r"system\s+(?:metadata|environment)|model\s+info(?:rmation)?)[\s*_:]*$",
+    re.IGNORECASE,
+)
+
+
+def _tidy_top(lines: list[str], region: int) -> list[str]:
+    """Drop the shell a removed header leaves at the top, and the blank runs it opens."""
+    i = 0
+    while i < len(lines) and (not lines[i].strip() or _TOP_RULE.match(lines[i]) or _TOP_LABEL.match(lines[i])):
+        i += 1
+    out: list[str] = []
+    for n, line in enumerate(lines[i:]):
+        if n < region and not line.strip() and out and not out[-1].strip():
+            continue
+        out.append(line)
+    return out
+
+
 def redact(text: str, terms: list[str] | tuple[str, ...], header_lines: int = 12) -> str:
     lines = text.splitlines()
     kept = []
+    dropped = 0
     for i, line in enumerate(lines):
+        # Dropped without a marker (decided 2026-10-15, see the Deviations table): how
+        # many marker lines an answer had, and where, differed by family.
         if i < header_lines and HEADER_PATTERN.search(line):
-            kept.append(f"{MASK} (self-identification line removed)")
+            dropped += 1
             continue
         kept.append(line)
+    if dropped:
+        kept = _tidy_top(kept, header_lines)
     out = "\n".join(kept)
     # Longest first so "Claude Sonnet" masks before "Claude".
     names = "|".join(re.escape(t) for t in sorted({t for t in terms if t}, key=len, reverse=True))

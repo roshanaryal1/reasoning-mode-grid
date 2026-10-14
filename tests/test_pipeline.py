@@ -116,8 +116,8 @@ def test_redaction_masks_identity():
     text = "Model name: Claude Sonnet 5, knowledge cutoff 2026\n\n# Plan\nUse Claude Code and the DeepSeek API."
     out = redact(text, ["Claude Sonnet 5", "Claude", "DeepSeek"])
     assert "Sonnet" not in out
-    assert "self-identification line removed" in out
-    assert "# Plan" in out
+    assert "REDACTED" not in out and "removed" not in out
+    assert out.startswith("# Plan")
 
 
 @pytest.mark.parametrize(
@@ -131,9 +131,22 @@ def test_redaction_masks_identity():
 )
 def test_redaction_removes_model_label_lines(line):
     out = redact(f"# Plan\n\n{line}\n\nBody.", [])
-    assert "self-identification line removed" in out
+    assert out == "# Plan\n\nBody."
     assert "Sonnet" not in out and "Qwen3.8" not in out
     assert "Body." in out
+
+
+def test_redaction_leaves_no_header_shell():
+    # What a removed header leaves at the top would itself hint at the family.
+    text = "# Response Header\n\n**Model:** X 1\nKnowledge cutoff: 2025\n\n---\n\n## Decisions\n\nBody."
+    assert redact(text, []) == "## Decisions\n\nBody."
+    text = "**System Metadata:**\n- Model name: X\n\n---\n\n### Plan\n\n\n\nBody."
+    assert redact(text, []) == "### Plan\n\nBody."
+
+
+def test_redaction_without_header_keeps_top_as_written():
+    text = "---\n\n# Response Header\n\nBody."
+    assert redact(text, []) == text
 
 
 def test_redaction_keeps_model_table_rows_in_header():

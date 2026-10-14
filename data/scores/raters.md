@@ -12,8 +12,11 @@ Raters never receive the key, the captures, the manifest or the reasoning traces
 Both LLM raters come from vendors whose families are scored. Their scores for their own
 vendor's family (`llm-a` on `claude`, `llm-b` on `gpt`) are also reported separately.
 
-Packets were built on 2026-10-15 with `modegrid blind --raters human llm-a llm-b`, after
+Packets were first built on 2026-10-15 with `modegrid blind --raters human llm-a llm-b`, after
 the chat-app clutter rule was added to `strip_app_artifacts` (see the Deviations table).
+They must be rebuilt (`modegrid blind`, then `modegrid rater-kit`) before scoring, because on
+2026-10-15 removed header lines stopped leaving a marker (Deviations table). The blinding key
+does not change.
 
 ## Rater instructions, hashed before scoring
 

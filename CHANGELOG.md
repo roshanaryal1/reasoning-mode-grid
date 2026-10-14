@@ -7,6 +7,9 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions follo
 
 ### Changed
 
+- Rater packets drop removed self-identification lines with no marker, and the empty header shell
+  they leave, because the markers' count and position differed by family. Rebuild packets before scoring.
+
 - Pre-registration registered on OSF: <https://osf.io/nj2zp/>.
 - Pre-registration frozen on 2026-10-13 (tag `prereg-v1`).
 - App checks on 2026-10-13. Gemini moves to Google AI Studio with Gemini 3.8 Flash
@@ -63,6 +66,9 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions follo
 
 ### Added
 
+- `data/scores/RATER_SHA256SUMS`: hashes of the four files every rater kit is built from, recorded
+  before scoring as pre-registration section 3 asks, and checked in CI.
+- `paper/methods.md`: draft of the Method section, written before scoring.
 - `modegrid rater-kit` and `modegrid rater-rows`: one self-contained file per answer per rater (fixed
   prompt in `docs/rater-prompt.md`, rubric, protocol, memory checker, one answer), and collection of the
   CSV rows raters return, with checks, into `data/scores/<rater>.csv` once all 60 are in.
@@ -117,6 +123,12 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions follo
 - `docs/venues.md`: venue research with dates and sources, and the submission timeline.
 - `docs/collaboration.md` and `AUTHORS.md`: co-author split, access rules that keep
   scoring blind, CRediT roles.
+
+### Fixed
+
+- The CI guard against committing the blinding key early looked for `data/scores/rater*.csv`, which
+  never exists, so it would have failed the correct commit after scoring. It now needs all three sheets.
+- The runbook adds the gitignored blinding key with `git add -f`.
 
 ## [0.1.0] - 2026-10-01
 
