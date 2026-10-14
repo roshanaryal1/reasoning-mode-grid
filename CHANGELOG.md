@@ -63,6 +63,9 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions follo
 
 ### Added
 
+- Grok block of the chat captures: 10 of 60 runs (grok.com, Fast vs Expert), captured
+  2026-10-14 with exact browser-clock send times. Three Deviations rows record the
+  assistant-operated browser, Grok's built-in web search and the "Grok 4.7" self-report.
 - Qwen block of the chat captures: 10 of 60 runs (Qwen3.8-Max, Fast vs Thinking), captured
   2026-10-13 to 2026-10-14. Two set-aside answers are in `data/captures/superseded/`; three
   Deviations rows record the extra chat, the wrong-mode attempt and the send-time intervals.
