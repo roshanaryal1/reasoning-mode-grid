@@ -120,6 +120,27 @@ def test_redaction_masks_identity():
     assert "# Plan" in out
 
 
+@pytest.mark.parametrize(
+    "line",
+    [
+        "**Model:** Claude 3.7 Sonnet (Architecture Review Engine)",
+        "**Model**: Claude 3.5 Sonnet (Simulated Instance)  ",
+        "- **Model Name & Version:** Claude 3.5 Sonnet",
+        "Model: Qwen3.8",
+    ],
+)
+def test_redaction_removes_model_label_lines(line):
+    out = redact(f"# Plan\n\n{line}\n\nBody.", [])
+    assert "self-identification line removed" in out
+    assert "Sonnet" not in out and "Qwen3.8" not in out
+    assert "Body." in out
+
+
+def test_redaction_keeps_model_table_rows_in_header():
+    text = "| Layer | Choice |\n| --- | --- |\n| Primary model | Qwen3.6-35B-A3B |\n| Model router | rules: first |"
+    assert redact(text, []) == text
+
+
 def test_redaction_keeps_names_used_as_content():
     # D2-D4 need the recommended models and tools visible to raters
     text = "\n" * 12 + (
