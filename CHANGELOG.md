@@ -63,6 +63,9 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions follo
 
 ### Added
 
+- Claude block of the chat captures: 10 of 60 runs (claude.ai incognito, Sonnet 5.5, Effort Low vs
+  High), captured 2026-10-14. Three usage-limit stops are in `data/captures/superseded/`; three
+  Deviations rows record the operator and settings, the usage-limit handling and the fetch prompts.
 - DeepSeek block of the chat captures: 10 of 60 runs (chat.deepseek.com, DeepThink off vs on,
   Search off), captured 2026-10-14 with browser-clock send times. Two set-aside attempts are in
   `data/captures/superseded/`; four Deviations rows record the operator, the app's paste and
