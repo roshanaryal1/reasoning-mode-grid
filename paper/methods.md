@@ -70,16 +70,22 @@ consumer Gemini app). Gemini was therefore run in Google AI Studio, Google's own
 where the model is picked by name. The consumer Gemini app offered only "Auto", which can
 route between Flash-Lite, Flash and Pro by itself. For Claude, GPT, Gemini and Qwen the app
 showed the same model name in both modes. chat.deepseek.com and grok.com show no model name.
-The DeepSeek model is the author's observation of what the app served on 2026-10-13, and the
-Grok model is the one xAI's documentation and secondary sources report for every grok.com
-plan. For these two families we describe the contrast as the vendor's exposed chat setting,
-not a verified same-weights manipulation, as the pre-registration requires.
+The DeepSeek model is the author's observation of what the app served on 2026-10-13. For
+Grok, xAI's API documentation and some secondary sources gave Grok 4.6 as the app model when
+the plan was frozen, but sources disagree on whether Grok 4.7 reached some grok.com modes in
+early October (Appendix A). For these two families we describe the contrast as the vendor's
+exposed chat setting, not a verified same-weights manipulation, as the pre-registration
+requires.
 
 **Model self-reports.** The prompt asks each model to name itself. Several answers named a
 different model than the app showed: every DeepSeek and Gemini answer named an Anthropic
 Claude model, every GPT answer named "GPT-6", and every Grok answer named "Grok 4.7". We
-record the app's model picker as the evidence of which model ran, and treat the
-self-reports as model errors. They are listed in each capture.
+record the app's model picker as the evidence of which model ran. The DeepSeek and Gemini
+self-reports are plainly errors. The GPT and Grok ones name real models released shortly
+before collection: GPT-6 reached ChatGPT a week earlier, and OpenAI states that an explicit
+GPT-5.6 Sol choice stays on GPT-5.6, while Grok 4.7 may have reached some grok.com modes
+(Appendix A). [Confirm the GPT model from the screenshots of the model menu.] Every
+self-report is kept in its capture.
 
 ## 3.4 Checking each mode switch through the API
 
@@ -126,8 +132,9 @@ Three apps offer no way to turn search off in the chosen mode, and their models 
 web by themselves: Claude, GPT and Grok. We record this as app behaviour (section 3.8). A
 capture file was created immediately before each send with `modegrid new-capture`, which
 stamps the UTC time in a field that is never edited. Where a send time was not recorded
-exactly (the Qwen, Gemini and GPT blocks, where chats were run side by side), the capture
-gives the send time as an interval bounded by known events instead of a guess. Each capture
+exactly (Qwen runs 3 to 10, sent before their capture files were made, and the Gemini and
+GPT blocks, whose chats ran side by side), the capture gives the send time as an interval
+bounded by known events instead of a guess. Each capture
 stores the final answer verbatim, the model name the app showed, the interface settings,
 and, where the app shows one, the reasoning panel. Raters never see the reasoning panel.
 
@@ -148,9 +155,9 @@ stopped by the account's five-hour usage limit. The pre-registration lists error
 and wrong models as reasons to replace. We treated an operator choosing the wrong mode the
 same way as a wrong model, and we treated the usage limit as the app being unavailable, so
 those three redos did not count toward the two-replacement limit per cell. One extra Qwen
-fast chat was sent by mistake and is kept but assigned to no run. No family was dropped and
-there were no refusals. [Confirm "no refusals" once raters have scored.] Every departure from
-the frozen plan is listed with its date and reason in Appendix D.
+fast chat was sent by mistake and is kept but assigned to no run. No family was dropped.
+[No answer was an outright refusal: confirm from `n_all_zero` and the raters' notes.] Every
+departure from the frozen plan is listed with its date and reason in Appendix D.
 
 ## 3.6 Scoring
 
@@ -188,13 +195,14 @@ random reading order. All three raters got the same instructions.
 
 **Blinding.** Raters saw only the final answer. Reasoning panels, interface labels,
 timestamps and capture metadata were removed. Self-identification lines near the top of an
-answer (the model's own name, which the prompt asks for) were removed without a trace, and a vendor or
-model name was masked only where the answer refers to itself. Names used as content were
+answer (the model's own name, which the prompt asks for) were removed without a trace,
+and a vendor or model name was masked only where the answer refers to itself. Names used as content were
 kept, because the prompt asks for a model and tool stack and D2 to D4 cannot be scored with
 the recommendations hidden. A conflict-of-interest disclosure in which an answer names its
 own maker ("so discount my view on" that vendor's product) was removed as well. We also
 removed clutter that the chat apps add to copied text and that would name the family
-outright, such as ChatGPT's citation chips and Grok's citation tags. The original captures are never edited. Before scoring, an automated audit
+outright, such as ChatGPT's citation chips and Grok's citation tags. The original captures
+are never edited. Before scoring, an automated audit
 (`modegrid blinding-audit`) checked every packet for app clutter, self-disclosure and
 masked self-references, and found none. It also counted the model's own style habits that
 survive blinding: four habits each appear in only one family (tool-progress text and notes
@@ -288,7 +296,9 @@ The Deviations table (Appendix D) lists every change. Four bear on how to read t
   author's browser. Settings and procedure were the same.
 - **Unverifiable model identity.** DeepSeek and Grok show no model name in the app, so for
   them the mode contrast is the vendor's exposed setting, not a verified same-weights
-  manipulation.
+  manipulation. Releases in the week before collection (GPT-6, Grok 4.7) mean the GPT
+  model rests on the screenshots, and a Grok Fast and Expert split across model versions
+  cannot be ruled out.
 - **Blinding fixes before scoring.** Four leaks were found and fixed before any real
   scoring: app clutter copied with the answers, bare "Model:" label lines missed by the
   self-identification rule, the marker lines left where header lines were removed, whose
