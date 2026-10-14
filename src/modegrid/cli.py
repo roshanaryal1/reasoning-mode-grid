@@ -20,6 +20,7 @@ from .capture import Capture, check_capture, manual_template, read_capture, word
 from .config import load_grid, unready_families
 from .plan import API_CHECK, MAIN, build_manifest, read_manifest, write_manifest
 from .providers import adapter_for, with_retries
+from .raterkit import build_kit, collect_rows
 from .scores import consensus, disagreements, load_key, load_scores, unblind, write_scores
 from .synthetic import Effect, power, synthetic_scores
 
@@ -248,6 +249,31 @@ def cmd_agreement(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_rater_kit(args: argparse.Namespace) -> int:
+    """One file per answer per rater: fixed prompt, rubric, protocol, checker, one answer."""
+    for rater in args.raters:
+        files = build_kit(args.packets, rater, args.prompt, args.rubric, args.protocol, args.checker, args.out)
+        print(f"{rater}: {len(files)} files in {Path(args.out) / rater}")
+    return 0
+
+
+def cmd_rater_rows(args: argparse.Namespace) -> int:
+    """Collect returned CSV rows. The sheet goes to data/scores only once all answers are in."""
+    sheet = Path(args.packets) / f"scoresheet-{args.rater}.csv"
+    work = Path(args.packets) / "collected" / f"{args.rater}.csv"
+    filled, missing = collect_rows(args.replies, sheet, work)
+    print(f"{args.rater}: {filled} of {filled + len(missing)} scored; working sheet {work}")
+    if missing:
+        print(f"still to score: {' '.join(missing)}")
+        return 0
+    final = Path(args.final_dir) / f"{args.rater}.csv"
+    final.parent.mkdir(parents=True, exist_ok=True)
+    final.write_text(work.read_text(encoding="utf-8"), encoding="utf-8")
+    load_scores(final)
+    print(f"complete: wrote {final}")
+    return 0
+
+
 def cmd_blinding_check(args: argparse.Namespace) -> int:
     """Did raters guess family or mode better than chance? Reported in the paper."""
     key = load_key(args.key)
@@ -439,6 +465,23 @@ def build_parser() -> argparse.ArgumentParser:
     cs.add_argument("files", nargs="+")
     cs.add_argument("--out", default="data/scores/adjudicated-blind.csv")
     cs.set_defaults(func=cmd_consensus)
+
+    rk = sub.add_parser("rater-kit", help="one self-contained file per answer for each rater")
+    rk.add_argument("--raters", nargs="+", required=True)
+    rk.add_argument("--packets", default="packets")
+    rk.add_argument("--prompt", default="docs/rater-prompt.md")
+    rk.add_argument("--rubric", default="vendor/llm-architects/docs/rubric.md")
+    rk.add_argument("--protocol", default="docs/scoring.md")
+    rk.add_argument("--checker", default="vendor/llm-architects/scripts/memory_budget.py")
+    rk.add_argument("--out", default="packets/kit")
+    rk.set_defaults(func=cmd_rater_kit)
+
+    rr = sub.add_parser("rater-rows", help="collect CSV rows returned by a rater into their sheet")
+    rr.add_argument("rater")
+    rr.add_argument("replies", nargs="+", help="text files holding pasted rater replies")
+    rr.add_argument("--packets", default="packets")
+    rr.add_argument("--final-dir", default="data/scores")
+    rr.set_defaults(func=cmd_rater_rows)
 
     bc = sub.add_parser("blinding-check", help="rater guess accuracy vs chance")
     bc.add_argument("files", nargs="+", help="rater score sheets with guess_family / guess_mode filled")
