@@ -51,3 +51,12 @@ plan: ## Regenerate the run manifest
 .PHONY: analyze
 analyze: ## Confirmatory analysis into results/
 	modegrid analyze
+
+PAPER_SECTIONS = paper/introduction.md paper/related-work.md paper/methods.md paper/results.md paper/discussion.md paper/appendix.md
+
+.PHONY: paper
+paper: ## Stitch the paper drafts into paper/build/manuscript.md and .html (needs pandoc for the HTML)
+	mkdir -p paper/build
+	cat $(PAPER_SECTIONS) > paper/build/manuscript.md
+	pandoc paper/build/manuscript.md --standalone --toc --metadata title="LA-P4 manuscript draft" -o paper/build/manuscript.html
+	@echo "wrote paper/build/manuscript.md and paper/build/manuscript.html"

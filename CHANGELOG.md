@@ -69,6 +69,9 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions follo
 
 ### Added
 
+- `.zenodo.json` for the Zenodo GitHub integration (title, creator, licence, links to the OSF
+  registration and the LA-P1 dataset), and the OSF registration in `CITATION.cff`.
+- `make paper`: stitches the paper drafts into one manuscript (Markdown and HTML).
 - Mode registry: vendor releases around the collection window, as pre-registration section 3
   requires. None inside the window. GPT-6 (7 October) and Grok 4.7 bear on which model ran, and
   the GPT and Grok screenshots need checking.
@@ -147,6 +150,8 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions follo
 
 ### Fixed
 
+- `CITATION.cff` used the reference type `dataset`, which the CFF 1.2.0 schema does not allow, so
+  GitHub could not offer "Cite this repository". It is now `data`, and the file validates.
 - `modegrid analyze` computed the random-effects variance components but never wrote them. They are
   now in `variance_table.csv` (`vc_*`) and in an exploratory section of `variance_table.md`, as
   pre-registration section 5 lists them among the statistics reported for every dimension.

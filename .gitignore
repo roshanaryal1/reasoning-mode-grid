@@ -29,5 +29,6 @@ data/blinding/key.csv
 .vscode/
 
 # Exports (double-blind hygiene: never commit a PDF with author metadata)
+paper/build/
 *.pdf
 *.docx

@@ -266,7 +266,12 @@ Before submitting:
 
 - Strip author metadata from the exported PDF and re-check after every re-export.
 - Cite LA-P1 (Cureus, or its preprint) and state the relationship.
-- Tag the data release: `git tag -a v1.0.0` and archive it on Zenodo for a DOI.
+- Tag the data release: `git tag -a v1.0.0` and archive it on Zenodo for a DOI. Turn on
+  the repository in Zenodo's GitHub integration first: it reads `.zenodo.json` (title,
+  creator, licence, links to the OSF registration and LA-P1) when the release is published.
+  Then put the DOI in `CITATION.cff`, the README and Appendix E.
+- `make paper` stitches the drafts in `paper/` into `paper/build/manuscript.md` and
+  `.html` for a full read-through. The build folder is not committed.
 - Update the LA-P4 entry in `research-pipeline`.
 
 ## Cost control
