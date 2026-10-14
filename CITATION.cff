@@ -14,6 +14,10 @@ authors:
     email: roshanaryaal@gmail.com
     affiliation: "Independent Researcher, Auckland, New Zealand"
 repository-code: "https://github.com/roshanaryal1/reasoning-mode-grid"
+identifiers:
+  - type: url
+    value: "https://osf.io/nj2zp/"
+    description: "Pre-registration (OSF, registered 2026-10-13)"
 license: MIT
 version: "0.1.0"
 date-released: "2026-10-01"
@@ -25,7 +29,7 @@ keywords:
   - variance decomposition
   - pre-registration
 references:
-  - type: dataset
+  - type: data
     title: "Large Language Models as Systems Architects (dataset and analysis code)"
     authors:
       - family-names: Aryal

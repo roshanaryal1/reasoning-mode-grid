@@ -1,0 +1,39 @@
+{
+  "title": "Reasoning Mode Beats Model Identity? A controlled model x mode grid (harness and dataset)",
+  "upload_type": "software",
+  "description": "<p>A pre-registered model x mode grid (LA-P4). Six LLM families are each run in a fast and a reasoning mode on one frozen, constrained systems-design prompt, five replicates per cell, 60 answers collected in each vendor's own web app. Answers are scored blind by three raters with a nine-dimension rubric, and the variance in each dimension is decomposed into model, mode, interaction and residual shares.</p><p>The release holds the <code>modegrid</code> harness (code, MIT), the configuration, the randomised manifest, all captures, the blinding rules, the rater sheets, the consensus scores and every analysis output (data, prompts and docs, CC-BY-4.0).</p>",
+  "creators": [
+    {
+      "name": "Aryal, Roshan",
+      "affiliation": "Independent Researcher, Auckland, New Zealand"
+    }
+  ],
+  "license": "mit",
+  "access_right": "open",
+  "keywords": [
+    "large language models",
+    "reasoning mode",
+    "test-time compute",
+    "LLM evaluation",
+    "variance decomposition",
+    "pre-registration"
+  ],
+  "related_identifiers": [
+    {
+      "identifier": "https://osf.io/nj2zp/",
+      "relation": "isDocumentedBy",
+      "resource_type": "publication-preprint"
+    },
+    {
+      "identifier": "10.5281/zenodo.22245991",
+      "relation": "isDerivedFrom",
+      "resource_type": "dataset"
+    },
+    {
+      "identifier": "https://github.com/roshanaryal1/reasoning-mode-grid",
+      "relation": "isSupplementTo",
+      "resource_type": "software"
+    }
+  ],
+  "notes": "Code is MIT (LICENSE). Data, prompts and documentation are CC-BY-4.0 (LICENSE-DATA). Captured model output stays attributable to the system that produced it."
+}
