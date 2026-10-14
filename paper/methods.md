@@ -194,9 +194,14 @@ kept, because the prompt asks for a model and tool stack and D2 to D4 cannot be 
 the recommendations hidden. A conflict-of-interest disclosure in which an answer names its
 own maker ("so discount my view on" that vendor's product) was removed as well. We also
 removed clutter that the chat apps add to copied text and that would name the family
-outright, such as ChatGPT's citation chips and Grok's citation tags. The original captures are never edited. Raters guessed the family and mode
-of every answer, and we report how often they beat chance as the blinding-failure rate
-(section 3.7).
+outright, such as ChatGPT's citation chips and Grok's citation tags. The original captures are never edited. Before scoring, an automated audit
+(`modegrid blinding-audit`) checked every packet for app clutter, self-disclosure and
+masked self-references, and found none. It also counted the model's own style habits that
+survive blinding: four habits each appear in only one family (tool-progress text and notes
+on the real date in Claude answers, "as of my cutoff" in DeepSeek answers, LaTeX arrows in
+Gemini answers), and each is split evenly between fast and reasoning runs, so it can hint
+at family but not at mode. Raters guessed the family and mode of every answer, and we
+report how often they beat chance as the blinding-failure rate (section 3.7).
 
 **Consensus.** The analysis unit is the median of the three raters' scores for each answer
 and dimension. There is no hand adjudication, because the only person who could adjudicate,

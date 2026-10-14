@@ -15,6 +15,7 @@ from pathlib import Path
 from . import DIMS, PRIMARY_MODES, __version__
 from .agreement import exact_agreement, krippendorff_alpha
 from .analyze import ALPHA_BAR, build_design, run_analysis, write_outputs
+from .audit import PROBES, audit, concentration, write_audit
 from .blind import build_packets, guess_accuracy
 from .capture import Capture, check_capture, manual_template, read_capture, word_count, write_capture
 from .cells import plot_cell_means, rank_agreement, write_cell_means, write_rank_agreement
@@ -301,6 +302,27 @@ def cmd_blinding_check(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_blinding_audit(args: argparse.Namespace) -> int:
+    """Before scoring: which family fingerprints survive in the packets? Exit 1 on a leak."""
+    key = load_key(args.key)
+    results = audit(Path(args.packets) / "answers", key)
+    cells = sorted({"/".join(run.split("__")[:2]) for run in key.values()})
+    leaks = 0
+    print(f"{len(key)} packets. leak = should be 0 after blinding; style = the model's own text, reported.\n")
+    print(f"{'probe':<18}{'kind':<7}{'packets':>8}  {'top family (share)':<22}cells")
+    for p in PROBES:
+        c = results[p.name]
+        fam, share = concentration(c)
+        top = f"{fam} ({share:.0%})" if fam else ""
+        print(f"{p.name:<18}{p.kind:<7}{sum(c.values()):>8}  {top:<22}{dict(sorted(c.items()))}")
+        if p.kind == "leak":
+            leaks += sum(c.values())
+    if args.out:
+        print(f"\nwrote {write_audit(results, cells, args.out)}")
+    print("\nno leak probes hit" if not leaks else f"\n{leaks} packet(s) hit a leak probe")
+    return 1 if leaks else 0
+
+
 def cmd_analyze(args: argparse.Namespace) -> int:
     runs = read_manifest(args.manifest)
     scores = load_scores(args.scores, id_col="run_id")
@@ -526,6 +548,12 @@ def build_parser() -> argparse.ArgumentParser:
     bc.add_argument("files", nargs="+", help="rater score sheets with guess_family / guess_mode filled")
     bc.add_argument("--key", default="data/blinding/key.csv")
     bc.set_defaults(func=cmd_blinding_check)
+
+    ba = sub.add_parser("blinding-audit", help="before scoring: family fingerprints left in the packets")
+    ba.add_argument("--packets", default="packets")
+    ba.add_argument("--key", default="data/blinding/key.csv")
+    ba.add_argument("--out", default="results/blinding_audit.csv")
+    ba.set_defaults(func=cmd_blinding_audit)
 
     z = sub.add_parser("analyze", help="variance decomposition table")
     z.add_argument("--scores", default="data/scores/adjudicated.csv")

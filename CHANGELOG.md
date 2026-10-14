@@ -69,6 +69,9 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions follo
 
 ### Added
 
+- `modegrid blinding-audit`: before scoring, counts family fingerprints left in the packets per
+  cell, exits non-zero if a leak probe hits, and writes `results/blinding_audit.csv`. The final
+  packets have no leak hits.
 - `modegrid cells`: cell means per family and mode (`results/cell_means.csv`), and with `--figure`
   Figure 1 of the paper outline (needs the new `paper` extra, matplotlib). Reruns give the same file.
 - `modegrid rank-agreement`: Kendall's tau-b between each pair of raters and Kendall's W across all,

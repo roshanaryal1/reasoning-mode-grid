@@ -84,6 +84,25 @@ summary:
 | Blinding, before scoring | Four fixes: chat-app clutter removed, bare "Model:" label lines removed, removed header lines leave no marker, and self-disclosures naming the answer's maker removed | Same rule for every packet. Key unchanged |
 | Raters | Two LLM raters named after the freeze, as the plan requires. One answer per session from a fixed kit, instructions hashed before scoring | None |
 
+## D2. Pre-scoring blinding audit
+
+`results/blinding_audit.csv`, from `modegrid blinding-audit` on the final packets, before any
+scoring. Each row counts the packets in each cell that contain a pattern.
+
+| Pattern | Kind | Packets | Where |
+|---|---|---|---|
+| Masked self-reference, self-disclosure, app tracking parameters, app citation markup, Grok citation tags, app images, tool file links | leak | 0 | none |
+| Tool-progress text ("I'll start by verifying ...") | style | 8 | Claude, 4 fast and 4 reasoning |
+| Note that the real date differs from the prompt's | style | 8 | Claude, 4 fast and 4 reasoning |
+| "As of my cutoff" | style | 8 | DeepSeek, 4 fast and 4 reasoning |
+| LaTeX arrows in prose | style | 7 | Gemini, 4 fast and 3 reasoning |
+| Mentions a downloadable archive | style | 1 | GPT, reasoning |
+
+Style habits are the model's own text and stay, as the pre-registration requires. Each one
+is confined to a single family but balanced across modes, so it can reveal family but not
+mode. Family guesses above chance are expected and do not change any hypothesis's status
+(pre-registration section 4).
+
 ## E. Data and code availability
 
 Code (MIT) and data (CC-BY-4.0) at [GitHub tag] and [Zenodo DOI]. The release holds the

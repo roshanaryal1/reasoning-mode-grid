@@ -1,0 +1,13 @@
+probe,kind,claude/fast,claude/reasoning,deepseek/fast,deepseek/reasoning,gemini/fast,gemini/reasoning,gpt/fast,gpt/reasoning,grok/fast,grok/reasoning,qwen/fast,qwen/reasoning,total,top_family,top_share,note
+redaction_mask,leak,0,0,0,0,0,0,0,0,0,0,0,0,0,,0.00,a masked self-reference; the sentence around it may still hint
+self_disclosure,leak,0,0,0,0,0,0,0,0,0,0,0,0,0,,0.00,conflict of interest
+tracking_param,leak,0,0,0,0,0,0,0,0,0,0,0,0,0,,0.00,chat apps tag links they cite
+citation_marker,leak,0,0,0,0,0,0,0,0,0,0,0,0,0,,0.00,app citation markup
+web_tag,leak,0,0,0,0,0,0,0,0,0,0,0,0,0,,0.00,Grok citation tag
+app_image,leak,0,0,0,0,0,0,0,0,0,0,0,0,0,,0.00,app image or favicon link
+sandbox_file,leak,0,0,0,0,0,0,0,0,0,0,0,0,0,,0.00,ChatGPT tool file link
+tool_narration,style,4,4,0,0,0,0,0,0,0,0,0,0,8,claude,1.00,tool progress text
+clock_note,style,4,4,0,0,0,0,0,0,0,0,0,0,8,claude,1.00,real date differs
+cutoff_note,style,0,0,4,4,0,0,0,0,0,0,0,0,8,deepseek,1.00,closed-book answer
+latex_arrow,style,0,0,0,0,4,3,0,0,0,0,0,0,7,gemini,1.00,LaTeX arrows in prose
+download_link,style,0,0,0,0,0,0,0,1,0,0,0,0,1,gpt,1.00,mentions a downloadable archive

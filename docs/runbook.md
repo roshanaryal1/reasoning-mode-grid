@@ -138,7 +138,14 @@ Check: 60 main captures plus 12 API checks in `data/captures/`, and
    ```bash
    modegrid blind --raters human llm-a llm-b
    modegrid rater-kit --raters human llm-a llm-b   # one file per answer
+   modegrid blinding-audit                          # must print "no leak probes hit"
    ```
+
+   The audit counts family fingerprints left in the packets, per cell, and writes
+   `results/blinding_audit.csv`. A leak probe (app clutter, self-disclosure, a masked
+   self-reference) must be zero before scoring starts. Style probes (the model's own
+   habits) are reported, not removed. Commit the CSV: it records that blinding was checked
+   before any scoring.
 
    Each LLM session gets one kit file (`packets/kit/<rater>/NN_B###.md`) in a new chat with
    memory and connectors off and web search on, and returns one CSV row. Save the replies to
