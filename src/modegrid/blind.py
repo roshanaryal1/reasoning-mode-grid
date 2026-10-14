@@ -12,6 +12,13 @@ Vendor and model names used as content stay. The prompt asks for a local model
 and tool stack, so answers name Qwen, DeepSeek or Gemma models and tools such as
 Claude Code; D2 to D4 cannot be scored if those names are masked.
 
+3. Chat-app clutter copied along with an answer (decided 2026-10-15, see the
+   Deviations table): ChatGPT's citation chips (favicon image link, source label,
+   "+N" count), its diagram style blocks and image embeds, the `&#x20;` entity,
+   and Grok's `[web:N]` citation tags. These come from the app, not the model's
+   text, and would name the family outright. Captures keep them; only packets
+   drop them.
+
 What cannot be removed: style, length, and formatting habits. A rater may still
 guess. Raters record a guess per answer (`guess_family`, `guess_mode`) so the
 paper can report how often blinding failed.
@@ -50,6 +57,49 @@ _FILLER = (
     r"(?:(?:an?|the|AI|model|assistant|language|large)\s+){0,4}"
     r"(?:(?:made|built|developed|trained|created)\s+by\s+)?"
 )
+
+
+_FAVICON_LINE = re.compile(r"^\s*\[image\]\(https://www\.google\.com/s2/favicons\?[^)]*\)\s*$")
+_PLUS_COUNT = re.compile(r"^\s*\+\d+\s*$")
+_APP_IMAGE_LINE = re.compile(r"^\s*\[[^\]]*\]\(https://images\.openai\.com/[^)]*\)\s*$")
+# ChatGPT renders a diagram as one line: a CSS block for #chatgpt-mermaid-<id>, then the
+# node labels. Keep the labels (answer content), drop the CSS.
+_MERMAID_CSS = re.compile(r"^\\?#chatgpt-mermaid-.*\}(?P<labels>[^}]*)$")
+_WEB_TAG = re.compile(r"[^\S\n]*\[web:\d+(?:,\s*web:\d+)*\]")
+
+
+def strip_app_artifacts(text: str) -> str:
+    """Remove chat-app clutter that names the family without being answer text."""
+    lines = text.replace("&#x20;", "").splitlines()
+    kept: list[str] = []
+    i = 0
+    while i < len(lines):
+        line = lines[i]
+        if _FAVICON_LINE.match(line):
+            # A citation chip: favicon link, blank lines, a source label, then maybe "+N".
+            j = i + 1
+            while j < len(lines) and not lines[j].strip():
+                j += 1
+            if j < len(lines):
+                j += 1
+            k = j
+            while k < len(lines) and not lines[k].strip():
+                k += 1
+            i = k + 1 if k < len(lines) and _PLUS_COUNT.match(lines[k]) else j
+            continue
+        if _APP_IMAGE_LINE.match(line):
+            i += 1
+            continue
+        m = _MERMAID_CSS.match(line)
+        if m:
+            labels = m.group("labels").strip()
+            if labels:
+                kept.append(labels)
+            i += 1
+            continue
+        kept.append(_WEB_TAG.sub("", line))
+        i += 1
+    return "\n".join(kept)
 
 
 def redact(text: str, terms: list[str] | tuple[str, ...], header_lines: int = 12) -> str:
@@ -96,7 +146,7 @@ def build_packets(
     answers_dir = out_dir / "answers"
     answers_dir.mkdir(parents=True, exist_ok=True)
     for (blind_id, _), cap in zip(key, order, strict=True):
-        body = redact(cap.final_answer, terms)
+        body = redact(strip_app_artifacts(cap.final_answer), terms)
         (answers_dir / f"{blind_id}.md").write_text(f"# {blind_id}\n\n{body}\n", encoding="utf-8")
 
     for rater in raters:

@@ -5,7 +5,7 @@ from pathlib import Path
 import pytest
 
 from modegrid.analyze import AnalysisError, build_design, run_analysis, write_outputs
-from modegrid.blind import build_packets, redact
+from modegrid.blind import build_packets, redact, strip_app_artifacts
 from modegrid.capture import Capture, CaptureError, check_capture, parse_capture, read_capture, write_capture
 from modegrid.cli import main
 from modegrid.config import ConfigError, load_grid, unready_families
@@ -139,6 +139,50 @@ def test_redaction_masks_self_reference_in_body():
     for name in ("Claude", "ChatGPT", "Google", "Grok", "Anthropic"):
         assert name not in out
     assert out.count("[REDACTED]") == 5
+
+
+def test_strip_app_artifacts_removes_chatgpt_citation_chips():
+    text = (
+        "Both deserve direct testing.&#x20;\n\n"
+        "[image](https://www.google.com/s2/favicons?domain=https://github.com\\&sz=32)\n\n"
+        "GitHub\n\n+1\n\n\n\n"
+        "Next paragraph stays.\n\n"
+        "[image](https://www.google.com/s2/favicons?domain=https://ollama.com\\&sz=32)\n\n"
+        "Ollama\n\n\n\n"
+        "Last paragraph stays."
+    )
+    out = strip_app_artifacts(text)
+    assert "favicons" not in out and "&#x20;" not in out
+    assert "GitHub" not in out and "+1" not in out and "\nOllama\n" not in out
+    assert "Both deserve direct testing." in out
+    assert "Next paragraph stays." in out and "Last paragraph stays." in out
+
+
+def test_strip_app_artifacts_keeps_diagram_labels_and_drops_css():
+    line = (
+        "\\#chatgpt-mermaid-\\_r_j6\\_{font-family:x;}"
+        "#chatgpt-mermaid-\\_r_j6\\_ p{margin:0;}Phone / LaptopSupervisor"
+    )
+    out = strip_app_artifacts(f"## B. Diagram\n\n{line}\n\nAfter.")
+    assert "chatgpt" not in out and "font-family" not in out
+    assert "Phone / LaptopSupervisor" in out and "After." in out
+
+
+def test_strip_app_artifacts_removes_app_images_and_grok_tags():
+    text = (
+        "[Tailscale for iPhone](https://images.openai.com/static-rsc-4/abc?purpose=inline)\n\n"
+        "- OpenHands docs, primary [web:40]\n- oMLX site, primary [web:64, web:67]\n"
+        "Keep [[evidence_id]] placeholders and [1] footnotes."
+    )
+    out = strip_app_artifacts(text)
+    assert "images.openai.com" not in out and "[web:" not in out
+    assert "- OpenHands docs, primary" in out and "- oMLX site, primary" in out
+    assert "[[evidence_id]]" in out and "[1]" in out
+
+
+def test_strip_app_artifacts_leaves_plain_answers_unchanged():
+    text = "# Plan\n\nUse llama.cpp and Ollama.\n\n| a | b |\n| - | - |\n| 1 | 2 |"
+    assert strip_app_artifacts(text) == text
 
 
 def test_blind_unblind_round_trip(tmp_path):
