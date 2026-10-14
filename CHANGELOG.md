@@ -63,6 +63,9 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions follo
 
 ### Added
 
+- Gemini block of the chat captures: 10 of 60 runs (aistudio.google.com, Gemini 3.8 Flash, Thinking level
+  Low vs High, Search grounding off), captured 2026-10-14 by hand. Three Deviations rows record the send-time
+  intervals, the Claude self-reports and the Thoughts panel.
 - Claude block of the chat captures: 10 of 60 runs (claude.ai incognito, Sonnet 5.5, Effort Low vs
   High), captured 2026-10-14. Three usage-limit stops are in `data/captures/superseded/`; three
   Deviations rows record the operator and settings, the usage-limit handling and the fetch prompts.
