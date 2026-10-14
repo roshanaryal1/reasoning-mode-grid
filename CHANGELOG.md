@@ -7,6 +7,9 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions follo
 
 ### Changed
 
+- Rater packets drop removed self-identification lines with no marker, and the empty header shell
+  they leave, because the markers' count and position differed by family. Rebuild packets before scoring.
+
 - Pre-registration registered on OSF: <https://osf.io/nj2zp/>.
 - Pre-registration frozen on 2026-10-13 (tag `prereg-v1`).
 - App checks on 2026-10-13. Gemini moves to Google AI Studio with Gemini 3.8 Flash
@@ -63,6 +66,16 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions follo
 
 ### Added
 
+- `modegrid cells`: cell means per family and mode (`results/cell_means.csv`), and with `--figure`
+  Figure 1 of the paper outline (needs the new `paper` extra, matplotlib). Reruns give the same file.
+- `modegrid rank-agreement`: Kendall's tau-b between each pair of raters and Kendall's W across all,
+  on how they rank the 12 cells, for the total and each dimension. The LA-P5 portability check.
+- `data/scores/RATER_SHA256SUMS`: hashes of the four files every rater kit is built from, recorded
+  before scoring as pre-registration section 3 asks, and checked in CI.
+- Paper drafts written before scoring: `paper/introduction.md`, `paper/related-work.md`,
+  `paper/methods.md` and `paper/appendix.md`.
+- `docs/related-work.md`: every citation re-checked on 2026-10-14, with corrected titles,
+  peer-reviewed versions and five newer papers, two of them close to this design.
 - `modegrid rater-kit` and `modegrid rater-rows`: one self-contained file per answer per rater (fixed
   prompt in `docs/rater-prompt.md`, rubric, protocol, memory checker, one answer), and collection of the
   CSV rows raters return, with checks, into `data/scores/<rater>.csv` once all 60 are in.
@@ -117,6 +130,17 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions follo
 - `docs/venues.md`: venue research with dates and sources, and the submission timeline.
 - `docs/collaboration.md` and `AUTHORS.md`: co-author split, access rules that keep
   scoring blind, CRediT roles.
+
+### Fixed
+
+- `modegrid validate` failed on `data/scores/adjudicated-blind.csv` (keyed by `blind_id`) and on the
+  per-rater `*-unblinded.csv` sheets (keyed by `run_id`), so the Phase 3 check could never pass. It now
+  reads the id column from each sheet's header, and checks that `adjudicated.csv` covers exactly the
+  manifest's 60 main runs. Found by a full rehearsal of Phases 3 and 4 on the real captures with
+  made-up rater rows.
+- The CI guard against committing the blinding key early looked for `data/scores/rater*.csv`, which
+  never exists, so it would have failed the correct commit after scoring. It now needs all three sheets.
+- The runbook adds the gitignored blinding key with `git add -f`.
 
 ## [0.1.0] - 2026-10-01
 

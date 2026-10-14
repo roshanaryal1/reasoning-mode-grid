@@ -116,8 +116,8 @@ def test_redaction_masks_identity():
     text = "Model name: Claude Sonnet 5, knowledge cutoff 2026\n\n# Plan\nUse Claude Code and the DeepSeek API."
     out = redact(text, ["Claude Sonnet 5", "Claude", "DeepSeek"])
     assert "Sonnet" not in out
-    assert "self-identification line removed" in out
-    assert "# Plan" in out
+    assert "REDACTED" not in out and "removed" not in out
+    assert out.startswith("# Plan")
 
 
 @pytest.mark.parametrize(
@@ -131,9 +131,22 @@ def test_redaction_masks_identity():
 )
 def test_redaction_removes_model_label_lines(line):
     out = redact(f"# Plan\n\n{line}\n\nBody.", [])
-    assert "self-identification line removed" in out
+    assert out == "# Plan\n\nBody."
     assert "Sonnet" not in out and "Qwen3.8" not in out
     assert "Body." in out
+
+
+def test_redaction_leaves_no_header_shell():
+    # What a removed header leaves at the top would itself hint at the family.
+    text = "# Response Header\n\n**Model:** X 1\nKnowledge cutoff: 2025\n\n---\n\n## Decisions\n\nBody."
+    assert redact(text, []) == "## Decisions\n\nBody."
+    text = "**System Metadata:**\n- Model name: X\n\n---\n\n### Plan\n\n\n\nBody."
+    assert redact(text, []) == "### Plan\n\nBody."
+
+
+def test_redaction_without_header_keeps_top_as_written():
+    text = "---\n\n# Response Header\n\nBody."
+    assert redact(text, []) == text
 
 
 def test_redaction_keeps_model_table_rows_in_header():
@@ -606,3 +619,28 @@ def test_agreement_reports_total_alpha(tmp_path, capsys):
     assert main(["agreement", *paths, "--out", str(out)]) == 0
     dims = [line.split(",")[0] for line in out.read_text().splitlines()[1:]]
     assert dims[-1] == "total"
+
+
+def test_validate_reads_every_score_sheet_shape(tmp_path, monkeypatch, grid_path, capsys):
+    # Rater and consensus sheets use blind_id, unblinded ones run_id. A run-level
+    # adjudicated.csv must cover exactly the manifest's main runs.
+    g = load_grid(grid_path)
+    runs = build_manifest(g)
+    manifest = tmp_path / "runs.csv"
+    write_manifest(runs, manifest)
+    (tmp_path / "captures").mkdir()
+    scores_dir = tmp_path / "data" / "scores"
+    families = sorted({r.family for r in runs})
+    by_run = synthetic_scores(families, g.replicates, g.prompts[0].id, seed=1)
+    by_blind = {f"B{i:03d}": s for i, s in enumerate(by_run.values(), start=1)}
+    write_scores(by_blind, scores_dir / "human.csv", id_col="blind_id")
+    write_scores(by_blind, scores_dir / "adjudicated-blind.csv", id_col="blind_id")
+    write_scores(by_run, scores_dir / "human-unblinded.csv")
+    write_scores(by_run, scores_dir / "adjudicated.csv")
+    monkeypatch.chdir(tmp_path)
+    base = ["--config", str(grid_path), "--manifest", str(manifest), "--captures", str(tmp_path / "captures")]
+    assert main([*base, "validate"]) == 0
+    assert capsys.readouterr().out.strip().endswith("ok")
+    write_scores(dict(list(by_run.items())[:-1]), scores_dir / "adjudicated.csv")
+    assert main([*base, "validate"]) == 1
+    assert "missing" in capsys.readouterr().out
