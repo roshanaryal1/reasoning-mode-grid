@@ -21,6 +21,11 @@ Claude Code; D2 to D4 cannot be scored if those names are masked.
    text, and would name the family outright. Captures keep them; only packets
    drop them.
 
+4. Self-disclosure (decided 2026-10-15): a conflict-of-interest sentence in which
+   an answer names its maker, even with the name masked ("Disclosure: I am a
+   [REDACTED] model, so discount my view on Claude Code"). See
+   `strip_self_disclosure`.
+
 What cannot be removed: style, length, and formatting habits. A rater may still
 guess. Raters record a guess per answer (`guess_family`, `guess_mode`) so the
 paper can report how often blinding failed.
@@ -156,6 +161,41 @@ def redact(text: str, terms: list[str] | tuple[str, ...], header_lines: int = 12
     return out
 
 
+# Self-disclosure (decided 2026-10-15, see the Deviations table). Some answers explain a
+# conflict of interest ("Disclosure: I am a [REDACTED] model, so discount my view on Claude
+# Code"). Masking the name is not enough: the sentence still names the vendor through its
+# own product. The disclosure sentence goes; the recommendation it qualifies stays.
+_DISCLOSURE = re.compile(
+    r"[^\S\n]*(?:\*\*|__)?(?:disclosure|conflict of interest)(?:\*\*|__)?[^\S\n]*:[^\S\n]*(?:\*\*|__)?"
+    r"[^\n]*?\b(?:I|I'm|I’m|my|me)\b[^\n]*?(?:\.(?=\s|$)|$)",
+    re.IGNORECASE | re.MULTILINE,
+)
+_DISCLOSURE_NOTED = re.compile(r"[^\S\n]*\bconflict of interest noted\b\.?", re.IGNORECASE)
+_DISCLOSURE_REF = re.compile(r"[^\S\n]*\((?:see )?(?:the )?disclosure(?: above| below)?\)", re.IGNORECASE)
+_BARE_BULLET = re.compile(r"^\s*(?:[-*+]|\d+\.)?\s*$")
+
+
+def strip_self_disclosure(text: str) -> str:
+    """Remove conflict-of-interest disclosures in which an answer names its own maker."""
+    out: list[str] = []
+    removed_last = False
+    for line in text.splitlines():
+        new = line
+        for pattern in (_DISCLOSURE, _DISCLOSURE_NOTED, _DISCLOSURE_REF):
+            new = pattern.sub("", new)
+        if new != line:
+            if _BARE_BULLET.match(new):
+                removed_last = True
+                continue
+            indent = line[: len(line) - len(line.lstrip())]
+            new = indent + new.lstrip()
+        if removed_last and not new.strip() and out and not out[-1].strip():
+            continue
+        removed_last = False
+        out.append(new)
+    return "\n".join(out)
+
+
 def build_packets(
     captures: list[Capture],
     terms: list[str],
@@ -178,7 +218,7 @@ def build_packets(
     answers_dir = out_dir / "answers"
     answers_dir.mkdir(parents=True, exist_ok=True)
     for (blind_id, _), cap in zip(key, order, strict=True):
-        body = redact(strip_app_artifacts(cap.final_answer), terms)
+        body = strip_self_disclosure(redact(strip_app_artifacts(cap.final_answer), terms))
         (answers_dir / f"{blind_id}.md").write_text(f"# {blind_id}\n\n{body}\n", encoding="utf-8")
 
     for rater in raters:
