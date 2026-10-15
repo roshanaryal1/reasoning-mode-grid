@@ -7,6 +7,10 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions follo
 
 ### Changed
 
+- Model correction, confirmed by the author: the GPT block ran GPT-6 and the Grok block ran Grok 4.7
+  (both modes), not the pre-registered GPT-5.6 Sol and Grok 4.6. Rater `llm-b` is GPT-6. Recorded in
+  the Deviations table, the mode registry, threats to validity and the paper drafts. The API checks for
+  these two families ran on the planned models. No change to any analysis group.
 - Rater packets drop conflict-of-interest disclosures in which an answer names its own maker
   ("Disclosure: I am a [REDACTED] model, so discount my view on ..."). 4 packets change. Rebuild
   packets before scoring.

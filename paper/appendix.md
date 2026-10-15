@@ -13,16 +13,16 @@ the model reasons. The API check does not show what a chat app runs internally.
 | Family | Chat app, fast | Chat app, reasoning | API model | API fast | API reasoning | Docs read | Reasoning tokens (fast vs reasoning) |
 |---|---|---|---|---|---|---|---|
 | Claude | claude.ai, Sonnet 5.5, Effort Low | claude.ai, Sonnet 5.5, Effort High | `claude-sonnet-5-5` | adaptive thinking, effort low | adaptive thinking, effort high | Anthropic API reference, 2026-10-06 | 0 vs 14,864 |
-| GPT | chatgpt.com (paid), GPT-5.6 Sol, Thinking effort Instant | same, Thinking effort High | `gpt-5.6-sol` | `reasoning_effort: none` | `reasoning_effort: high` | OpenAI model page, 2026-10-06 | 0 vs 6,000 |
+| GPT | chatgpt.com (paid), GPT-6, Thinking effort Instant | same, Thinking effort High | `gpt-5.6-sol` | `reasoning_effort: none` | `reasoning_effort: high` | OpenAI model page, 2026-10-06 | 0 vs 6,000 |
 | Gemini | aistudio.google.com, Gemini 3.8 Flash, Thinking level Low, Search grounding off | same, Thinking level High | `gemini-3.8-flash` | `reasoning_effort: low` | `reasoning_effort: high` | Gemini thinking docs, 2026-10-13 | 0 vs 4,911 |
 | Qwen | chat.qwen.ai, Qwen3.8-Max, Fast | same, Thinking | `qwen3.8-max` | `enable_thinking: false` | `enable_thinking: true` | Alibaba Model Studio docs, 2026-10-06 | 0 vs 23,805 |
 | DeepSeek | chat.deepseek.com, DeepThink off, Search off | same, DeepThink on | `deepseek-v4.1-flash` (Alibaba-hosted) | `enable_thinking: false` | `enable_thinking: true` | Alibaba Model Studio docs, 2026-10-13 | 0 vs 1,367 |
-| Grok | grok.com, Fast | grok.com, Expert | `grok-4.6` | `reasoning_effort: low` | `reasoning_effort: xhigh` | xAI reasoning docs, 2026-10-05 | 131 vs 4,627 |
+| Grok | grok.com, Grok 4.7, Fast | grok.com, Grok 4.7, Expert | `grok-4.6` | `reasoning_effort: low` | `reasoning_effort: xhigh` | xAI reasoning docs, 2026-10-05 | 131 vs 4,627 |
 
 Notes on the evidence:
 
 - **Fast floor.** GPT, Qwen and DeepSeek can switch reasoning fully off. Claude Sonnet 5.5
-  rejects `thinking: disabled`, Gemini 3.8 Flash has no level below low, and Grok 4.6
+  rejects `thinking: disabled`, Gemini 3.8 Flash has no level below low, and Grok 4.7
   cannot disable reasoning. For those three, "fast" is the lowest available setting. Claude
   and Gemini returned zero reasoning tokens at that setting on this one call, but we keep
   them in the lowest-available group because their documentation says reasoning cannot be
@@ -33,14 +33,15 @@ Notes on the evidence:
   on Alibaba Model Studio, a third-party host. None of this affects the evidence that the
   switch works.
 - **Model identity in the app.** Claude, GPT, Gemini and Qwen show the model name in the
-  model picker. DeepSeek and Grok show none, so for them the model is the author's
-  observation (DeepSeek) or the one given when the plan was frozen (Grok 4.6).
-- **Releases just before collection.** GPT-6 reached ChatGPT on 7 October 2026. OpenAI says
-  the rollout does not retire older models and that an explicit GPT-5.6 Sol choice stays on
-  GPT-5.6. [Confirm from the screenshots.] Grok 4.7 was released on 21 September for the
-  API, and sources disagree on whether it reached grok.com's hardest modes in early October.
-  No release note for any of the six models was found inside the collection window. Sources
-  are in the mode registry, "Vendor releases around the collection window".
+  model picker. The author confirmed that grok.com ran Grok 4.7 in both modes. DeepSeek
+  shows no model name, so its model is the author's observation.
+- **Planned and actual models.** The pre-registration listed GPT-5.6 Sol and Grok 4.6. GPT-6
+  reached ChatGPT on 7 October 2026 and Grok 4.7 reached grok.com in early October, and the
+  apps served those during collection. The API checks for these two families ran on the
+  planned API models, so they show the switch on GPT-5.6 Sol and Grok 4.6 only. GPT-6 Sol
+  accepts `reasoning.effort: none` in OpenAI's API, and Grok 4.7 cannot disable reasoning,
+  so neither family changes group in robustness check 4. No release note for any of the six
+  models was found inside the collection window. Sources are in the mode registry.
 - **Superseded checks.** Earlier API checks for Gemini (on 3.6 Flash and before an adapter
   fix) and DeepSeek (on V4 Pro) are kept in `data/captures/superseded/` with the reason for
   each.
@@ -84,7 +85,8 @@ summary:
 | Operators and send times | Three blocks sent by an AI browser assistant at the author's request, three by the author. Send times recorded as exact times or as bounded intervals where chats ran side by side | None on scores. Disclosed for transparency |
 | Replacements | 6 failed attempts replaced: 3 Claude reasoning runs stopped by a usage limit (treated as the app being down), 1 DeepSeek cut-off, 1 DeepSeek app error, 1 Qwen run sent in the wrong mode (treated like a wrong model). One extra Qwen chat kept, unscored | 60 valid answers from 66 attempts. No family dropped |
 | App behaviour | Claude, GPT and Grok searched the web by themselves, with no switch to stop it. Two DeepSeek fast answers were finished with the app's own "Continue" button | Family differences may include live search. Stated as a limitation |
-| Model self-reports | DeepSeek and Gemini answers named Claude models, GPT answers named "GPT-6", Grok answers named "Grok 4.7". The app's model picker is taken as the evidence. GPT-6 and Grok 4.7 are real models released shortly before collection (Appendix A) | DeepSeek and Grok contrasts described as vendor chat settings. GPT model to confirm from the screenshots |
+| Models that ran | GPT ran GPT-6 and Grok ran Grok 4.7, not the pre-registered GPT-5.6 Sol and Grok 4.6, confirmed by the author. Each ran one model in both modes. The GPT captures' `model_returned` field is corrected in the Deviations table, not in the write-once captures. Rater `llm-b` is GPT-6 too | API checks for those two families cover the planned models only. No change of analysis group |
+| Model self-reports | DeepSeek and Gemini answers named Claude models, which is wrong. GPT ("GPT-6") and Grok ("Grok 4.7") answers named themselves correctly | DeepSeek contrast described as a vendor chat setting |
 | Reasoning traces | Kept where the app showed them. One GPT trace not captured | None. Raters never see traces |
 | Blinding, before scoring | Four fixes: chat-app clutter removed, bare "Model:" label lines removed, removed header lines leave no marker, and self-disclosures naming the answer's maker removed | Same rule for every packet. Key unchanged |
 | Raters | Two LLM raters named after the freeze, as the plan requires. One answer per session from a fixed kit, instructions hashed before scoring | None |
