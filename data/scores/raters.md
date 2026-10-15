@@ -7,7 +7,7 @@ Raters never receive the key, the captures, the manifest or the reasoning traces
 | --- | --- | --- | --- | --- | --- |
 | `human.csv` | Human, not an author and not the observer | n/a | To be named before scoring | Yes, for D3 and D4 | To be recorded |
 | `llm-a.csv` | LLM | Anthropic | Claude Opus 5.5 (`claude-opus-5-5`) | Yes | To be recorded |
-| `llm-b.csv` | LLM | OpenAI | GPT-5.6 Sol, Thinking effort High | Yes | To be recorded |
+| `llm-b.csv` | LLM | OpenAI | GPT-6, Thinking effort High (changed from GPT-5.6 Sol on 2026-10-15, before scoring) | Yes | To be recorded |
 
 Both LLM raters come from vendors whose families are scored. Their scores for their own
 vendor's family (`llm-a` on `claude`, `llm-b` on `gpt`) are also reported separately.

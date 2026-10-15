@@ -258,3 +258,24 @@ Sources:
 - Gemini Enterprise release notes: <https://docs.cloud.google.com/gemini/enterprise/docs/release-notes>
 - Qwen3.8-Max blog: <https://qwen.ai/blog?id=qwen3.8>
 - DeepSeek V4.1-Flash release: <https://api-docs.deepseek.com/news/news260910/>
+
+## Author confirmation, 2026-10-15
+
+The two open questions above are settled by the author, from the apps:
+
+| Family | Model that ran | Both modes | Effect |
+|---|---|---|---|
+| GPT | GPT-6 in chatgpt.com, Thinking effort Instant vs High | Same model | Section 1 listed GPT-5.6 Sol. Deviations row. The API check ran on `gpt-5.6-sol`, so it shows the switch on the planned model, not on GPT-6. OpenAI documents `reasoning.effort: none` for GPT-6 Sol, so GPT stays in the true-off group. A check on the GPT-6 API model would confirm it |
+| Grok | Grok 4.7 in grok.com, Fast vs Expert | Same model | Section 1 listed Grok 4.6. Deviations row. The Fast and Expert model split is ruled out. The API check ran on `grok-4.6`. Grok 4.7 cannot disable reasoning (low, medium, high, xhigh), so Grok stays in the lowest-available group |
+
+The GPT and Grok self-reports ("GPT-6", "Grok 4.7") were correct. The DeepSeek and Gemini
+self-reports (Claude model names) remain model errors.
+
+`configs/grid.yaml` still names `gpt-5.6-sol` and `grok-4.6`, because those are the models
+the API check called, and the API-check captures record them.
+
+Sources for the reasoning settings:
+
+- OpenAI reasoning guide (GPT-6 Sol and Luna accept `none`): <https://developers.openai.com/api/docs/guides/reasoning>
+- Using GPT-6: <https://developers.openai.com/api/docs/guides/latest-model>
+- Grok 4.7 on Oracle Cloud (effort levels, reasoning cannot be turned off): <https://docs.oracle.com/iaas/Content/generative-ai/x-ai-grok-4-7.htm>
