@@ -279,3 +279,11 @@ Sources for the reasoning settings:
 - OpenAI reasoning guide (GPT-6 Sol and Luna accept `none`): <https://developers.openai.com/api/docs/guides/reasoning>
 - Using GPT-6: <https://developers.openai.com/api/docs/guides/latest-model>
 - Grok 4.7 on Oracle Cloud (effort levels, reasoning cannot be turned off): <https://docs.oracle.com/iaas/Content/generative-ai/x-ai-grok-4-7.htm>
+
+### API checks on the served models (added 2026-10-15)
+
+`configs/grid.yaml` lists `api_check_models: [gpt-6-sol]` under GPT and `[grok-4.7]` under
+Grok. They add four API-check runs (`apicheck2`) with the same mode settings, appended to
+the manifest. Runbook Phase 2b says how to run them. The `gpt-6-sol` id is the GPT-6 variant
+that OpenAI documents as accepting `reasoning_effort: none`. Confirm it in the account's
+model list before running.

@@ -113,15 +113,19 @@ def collect_rows(
         with out.open(newline="", encoding="utf-8") as fh:
             have = {r["blind_id"]: r for r in csv.DictReader(fh) if r.get("D1", "").strip()}
     for reply in replies:
-        for row in parse_rows(Path(reply).read_text(encoding="utf-8")):
-            check_row(row)
-            b = row["blind_id"]
-            if b not in allowed:
-                raise ScoreError(f"{b} is not on this rater's sheet")
-            old = have.get(b)
-            if old and [old[d] for d in DIMS] != [row[d] for d in DIMS]:
-                raise ScoreError(f"{b} already scored with different values; resolve by hand")
-            have[b] = row
+        try:
+            for row in parse_rows(Path(reply).read_text(encoding="utf-8")):
+                check_row(row)
+                b = row["blind_id"]
+                if b not in allowed:
+                    raise ScoreError(f"{b} is not on this rater's sheet")
+                old = have.get(b)
+                if old and [old[d] for d in DIMS] != [row[d] for d in DIMS]:
+                    raise ScoreError(f"{b} already scored with different values; resolve by hand")
+                have[b] = row
+        except ScoreError as exc:
+            # Name the file: on scoring day there are 60 of them per rater.
+            raise ScoreError(f"{reply}: {exc}") from exc
     out.parent.mkdir(parents=True, exist_ok=True)
     with out.open("w", newline="", encoding="utf-8") as fh:
         w = csv.DictWriter(fh, fieldnames=SHEET_COLS, lineterminator="\n")

@@ -73,6 +73,15 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions follo
 
 ### Added
 
+- `docs/scoring-day.md`: the author's checklist for running the 120 LLM rating sessions and
+  collecting the human sheet, with fixes for every `rater-rows` error and an open question on the
+  rubric's leftover LA-P1 notes.
+- `docs/human-rater-brief.md`: a plain-language brief for the human rater. Restates the rules and
+  adds none. Hashed with the other rater instructions.
+- Second API checks on the models the apps served: `api_check_models` in the config (`gpt-6-sol`,
+  `grok-4.7`) adds four `apicheck2` runs, appended so no existing run is renumbered. `run --dry-run`
+  shows each run's model, and `check-modes` reports each API-check model on its own row. Runbook
+  Phase 2b.
 - `.zenodo.json` for the Zenodo GitHub integration (title, creator, licence, links to the OSF
   registration and the LA-P1 dataset), and the OSF registration in `CITATION.cff`.
 - `make paper`: stitches the paper drafts into one manuscript (Markdown and HTML).
@@ -154,6 +163,9 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions follo
 
 ### Fixed
 
+- `modegrid rater-rows` stopped with a Python traceback on a bad reply and did not say which file.
+  It now prints one line naming the reply file and the problem, saves nothing from that batch, and
+  exits 1. Found in a practice scoring run.
 - `CITATION.cff` used the reference type `dataset`, which the CFF 1.2.0 schema does not allow, so
   GitHub could not offer "Cite this repository". It is now `data`, and the file validates.
 - `modegrid analyze` computed the random-effects variance components but never wrote them. They are

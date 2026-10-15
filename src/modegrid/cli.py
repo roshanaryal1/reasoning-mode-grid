@@ -24,7 +24,7 @@ from .ownvendor import own_vendor, write_own_vendor
 from .plan import API_CHECK, MAIN, build_manifest, read_manifest, write_manifest
 from .providers import adapter_for, with_retries
 from .raterkit import build_kit, collect_rows
-from .scores import consensus, disagreements, load_key, load_scores, unblind, write_scores
+from .scores import ScoreError, consensus, disagreements, load_key, load_scores, unblind, write_scores
 from .synthetic import Effect, power, synthetic_scores
 
 DEFAULT_CONFIG = "configs/grid.yaml"
@@ -60,7 +60,7 @@ def cmd_run(args: argparse.Namespace) -> int:
         todo = todo[: args.limit]
     if args.dry_run:
         for r in todo:
-            print(r.run_id)
+            print(f"{r.run_id}  ({grid.api_check_model(r.family, r.mode, r.replicate)})")
         print(f"{len(todo)} run(s) would execute")
         return 0
     adapters = {}
@@ -71,8 +71,8 @@ def cmd_run(args: argparse.Namespace) -> int:
         if fam.id not in adapters:
             adapters[fam.id] = adapter_for(fam)
         text = prompt.text()
-        print(f"[{r.order}] {r.run_id} ...", flush=True)
-        model = mode.model or fam.model
+        print(f"[{r.order}] {r.run_id} ({grid.api_check_model(fam.id, mode.id, r.replicate)}) ...", flush=True)
+        model = grid.api_check_model(fam.id, mode.id, r.replicate)
         adapter, params = adapters[fam.id], mode.params
         limit = fam.max_tokens or grid.max_tokens
         comp = with_retries(
@@ -273,7 +273,12 @@ def cmd_rater_rows(args: argparse.Namespace) -> int:
     """Collect returned CSV rows. The sheet goes to data/scores only once all answers are in."""
     sheet = Path(args.packets) / f"scoresheet-{args.rater}.csv"
     work = Path(args.packets) / "collected" / f"{args.rater}.csv"
-    filled, missing = collect_rows(args.replies, sheet, work)
+    try:
+        filled, missing = collect_rows(args.replies, sheet, work)
+    except ScoreError as exc:
+        print(f"ERROR {exc}")
+        print("Nothing was saved from this batch. Fix that reply file and run the same command again.")
+        return 1
     print(f"{args.rater}: {filled} of {filled + len(missing)} scored; working sheet {work}")
     if missing:
         print(f"still to score: {' '.join(missing)}")
@@ -406,13 +411,19 @@ def cmd_check_modes(args: argparse.Namespace) -> int:
     runs = [r for r in read_manifest(args.manifest) if r.set == API_CHECK]
     caps = {p.stem: read_capture(p) for p in Path(args.captures).glob("*.md")}
     rows = []
-    for fam in sorted({r.family for r in runs}):
+    # One row per family and API-check replicate: each replicate past the first calls a
+    # different model (api_check_models), and averaging two models would hide both.
+    for fam, rep in sorted({(r.family, r.replicate) for r in runs}):
+        label = fam if rep == 1 else f"{fam} (check {rep})"
         cells = {}
         for mode in PRIMARY_MODES:
-            ids = [r.run_id for r in runs if r.family == fam and r.mode == mode and r.run_id in caps]
-            cells[mode] = [caps[i] for i in ids]
+            ids = [r.run_id for r in runs if r.family == fam and r.mode == mode and r.replicate == rep]
+            cells[mode] = [caps[i] for i in ids if i in caps]
+        if not cells["fast"] and not cells["reasoning"] and rep > 1:
+            rows.append((label, "-", "-", "-", "-", "-", "not run yet"))
+            continue
         if not cells["fast"] or not cells["reasoning"]:
-            rows.append((fam, "-", "-", "-", "-", "-", "missing capture(s)"))
+            rows.append((label, "-", "-", "-", "-", "-", "missing capture(s)"))
             continue
 
         def stats(capset: list[Capture]) -> tuple[float, float | None, str]:
@@ -440,7 +451,7 @@ def cmd_check_modes(args: argparse.Namespace) -> int:
             verdict = "no reasoning token count, confirm from vendor console"
         if fm != rm:
             verdict += f"; models differ ({fm} vs {rm}), confirm same weights"
-        rows.append((fam, f"{fw:.0f}", f"{rw:.0f}", _n(fr), _n(rr), fm if fm == rm else f"{fm} / {rm}", verdict))
+        rows.append((label, f"{fw:.0f}", f"{rw:.0f}", _n(fr), _n(rr), fm if fm == rm else f"{fm} / {rm}", verdict))
 
     lines = [
         "# Mode check (API)",

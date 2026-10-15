@@ -110,8 +110,8 @@ on reasoning and returned no visible answer, and the Claude reasoning call stopp
 32,000-token limit. Neither affects the evidence that the switch works. The GPT and Grok
 checks ran on the pre-registered models (`gpt-5.6-sol`, `grok-4.6`), not on the GPT-6 and
 Grok 4.7 that the apps served, so for those two families they show the documented switch on
-the planned model only. [Re-run both checks on GPT-6 and Grok 4.7 if the API ids are
-available.] Claude and Gemini
+the planned model only. [Results of the second checks on `gpt-6-sol` and `grok-4.7`, runbook Phase
+2b.] Claude and Gemini
 show zero reasoning tokens at their lowest setting on this call, although their
 documentation says reasoning cannot be disabled, so we keep them in the "lowest available"
 group.

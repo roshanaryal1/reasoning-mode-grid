@@ -110,3 +110,17 @@ def test_cli_rater_rows_writes_final_sheet_only_when_complete(tmp_path):
     assert main([*args, str(second)]) == 0
     rows = list(csv.DictReader((final_dir / "llm-a.csv").open()))
     assert [r["blind_id"] for r in rows] == ["B003", "B002", "B001"]
+
+
+def test_cli_rater_rows_names_the_bad_file_and_saves_nothing(tmp_path, capsys):
+    from modegrid.cli import main
+
+    p = _packets(tmp_path)
+    good, bad = tmp_path / "good.txt", tmp_path / "bad.txt"
+    good.write_text(_row("B001"), encoding="utf-8")
+    bad.write_text(_row("B002", scores="2,1,2,1,0,1,2,1,3"), encoding="utf-8")
+    args = ["rater-rows", "llm-a", "--packets", str(p), "--final-dir", str(tmp_path / "scores")]
+    assert main([*args, str(good), str(bad)]) == 1
+    out = capsys.readouterr().out
+    assert f"ERROR {bad}: B002 D9='3'" in out and "Nothing was saved" in out
+    assert not (p / "collected" / "llm-a.csv").exists()

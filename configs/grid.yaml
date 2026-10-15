@@ -71,6 +71,9 @@ families:
     api_key_env: OPENAI_API_KEY
     model: gpt-5.6-sol        # decided 2026-10-06; the model the author's ChatGPT runs
     max_tokens: 6000          # account limit 10,000 tokens/min; input ~3,500 + 6,000 fits
+    # Added 2026-10-15: chatgpt.com served GPT-6 during collection (Deviations table), so a
+    # second API check calls it (apicheck2). Confirm the id in the OpenAI model list first.
+    api_check_models: [gpt-6-sol]
     notes: >-
       Decided 2026-10-06: GPT-5.6 Sol. API docs (read 2026-10-06): gpt-5.6-sol
       accepts reasoning_effort none, low, medium (default), high, xhigh, max; none
@@ -183,6 +186,9 @@ families:
     api_key_env: XAI_API_KEY
     model: grok-4.6           # decided 2026-10-05; the model the app runs on every plan
     redact_terms: [Elon, X Premium]
+    # Added 2026-10-15: grok.com served Grok 4.7 in both modes (Deviations table), so a second
+    # API check calls it (apicheck2). Same reasoning_effort settings: 4.7 also accepts low to xhigh.
+    api_check_models: [grok-4.7]
     notes: >-
       Decided 2026-10-05: grok-4.6, reasoning_effort low vs xhigh. xAI docs: grok-4.6
       accepts low, medium, high (default), xhigh, and reasoning cannot be disabled, so

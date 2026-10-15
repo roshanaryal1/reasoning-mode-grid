@@ -46,6 +46,9 @@ class Family:
     redact_terms: tuple[str, ...] = ()
     notes: str = ""
     max_tokens: int | None = None  # API-check output limit for this family; None uses the grid's
+    # Extra API-check models, run after the planned one (apicheck2, apicheck3, ...). Used when the
+    # chat app served a newer model than the one the first API check called.
+    api_check_models: tuple[str, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -88,6 +91,14 @@ class Grid:
             if fam.id == family_id:
                 return fam
         raise KeyError(family_id)
+
+    def api_check_model(self, family_id: str, mode_id: str, replicate: int) -> str:
+        """The model an API-check run calls: the planned one, then any `api_check_models` in order."""
+        fam = self.family(family_id)
+        extra = replicate - self.api_check_replicates
+        if extra >= 1:
+            return fam.api_check_models[extra - 1]
+        return fam.modes[mode_id].model or fam.model
 
     def prompt(self, prompt_id: str) -> PromptSpec:
         for p in self.prompts:
@@ -149,6 +160,7 @@ def load_grid(path: str | Path) -> Grid:
                     redact_terms=tuple(f.get("redact_terms") or ()),
                     notes=f.get("notes", ""),
                     max_tokens=_family_max_tokens(f),
+                    api_check_models=tuple(str(m) for m in (f.get("api_check_models") or ())),
                 )
             )
         grid = Grid(

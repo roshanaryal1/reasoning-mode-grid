@@ -62,7 +62,8 @@ def test_manifest_is_complete_and_deterministic(grid_path, tmp_path):
     assert len(main) == expected
     assert all(r.channel == "web" for r in main), "main runs are chat captures"
     api_families = [f for f in grid.families if f.adapter]
-    assert len(checks) == len(api_families) * 2 * grid.api_check_replicates
+    extra = sum(len(f.api_check_models) for f in api_families)
+    assert len(checks) == len(api_families) * 2 * grid.api_check_replicates + 2 * extra
     assert all(r.channel == "api" for r in checks)
     assert len({r.run_id for r in runs}) == len(runs)
     assert [r.run_id for r in runs] == [r.run_id for r in build_manifest(grid)]
@@ -699,3 +700,43 @@ def test_self_disclosure_is_removed(text, expected):
 )
 def test_content_mentions_of_disclosure_stay(text):
     assert strip_self_disclosure(text) == text
+
+
+def test_extra_api_check_models_append_without_renumbering(grid_path, tmp_path):
+    # GPT and Grok served newer models than planned, so a second API check calls them. Adding
+    # it must leave every existing manifest row, the 60 scored runs above all, untouched.
+    grid = load_grid(grid_path)
+    runs = build_manifest(grid)
+    committed = read_manifest(Path(grid_path).parent.parent / "data" / "manifest" / "runs.csv")
+    assert runs == committed
+    extra = [r for r in runs if r.set == "api_check" and r.replicate == 2]
+    assert [r.run_id for r in extra] == [
+        "gpt__fast__p1-v1__apicheck2",
+        "gpt__reasoning__p1-v1__apicheck2",
+        "grok__fast__p1-v1__apicheck2",
+        "grok__reasoning__p1-v1__apicheck2",
+    ]
+    assert min(r.order for r in extra) > max(r.order for r in runs if r not in extra)
+    assert grid.api_check_model("gpt", "fast", 1) == "gpt-5.6-sol"
+    assert grid.api_check_model("gpt", "reasoning", 2) == "gpt-6-sol"
+    assert grid.api_check_model("grok", "fast", 2) == "grok-4.7"
+    assert grid.api_check_model("claude", "fast", 1) == "claude-sonnet-5-5"
+
+
+def test_check_modes_reports_each_api_check_model_on_its_own_row(tmp_path, monkeypatch, capsys):
+    monkeypatch.chdir(Path(__file__).resolve().parent.parent)
+    manifest = tmp_path / "runs.csv"
+    assert main(["--manifest", str(manifest), "plan"]) == 0
+    caps_dir = tmp_path / "caps"
+    for r in read_manifest(manifest):
+        if r.set == "api_check" and r.family == "gpt" and r.replicate == 1:
+            write_capture(_cap(r.run_id, usage={"reasoning_tokens": 0 if r.mode == "fast" else 900}), caps_dir)
+    out = tmp_path / "mode_check.md"
+    assert main(["--manifest", str(manifest), "--captures", str(caps_dir), "check-modes", "--out", str(out)]) == 0
+    text = out.read_text()
+    assert "| gpt | 3 | 3 | 0 | 900 |" in text
+    assert "| gpt (check 2) | - | - | - | - | - | not run yet |" in text
+    capsys.readouterr()
+    assert main(["--manifest", str(manifest), "--captures", str(caps_dir), "run", "--dry-run", "--family", "gpt"]) == 0
+    printed = capsys.readouterr().out
+    assert "gpt__fast__p1-v1__apicheck2  (gpt-6-sol)" in printed
