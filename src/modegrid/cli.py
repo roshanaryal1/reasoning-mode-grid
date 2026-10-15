@@ -60,7 +60,7 @@ def cmd_run(args: argparse.Namespace) -> int:
         todo = todo[: args.limit]
     if args.dry_run:
         for r in todo:
-            print(r.run_id)
+            print(f"{r.run_id}  ({grid.api_check_model(r.family, r.mode, r.replicate)})")
         print(f"{len(todo)} run(s) would execute")
         return 0
     adapters = {}
@@ -71,8 +71,8 @@ def cmd_run(args: argparse.Namespace) -> int:
         if fam.id not in adapters:
             adapters[fam.id] = adapter_for(fam)
         text = prompt.text()
-        print(f"[{r.order}] {r.run_id} ...", flush=True)
-        model = mode.model or fam.model
+        print(f"[{r.order}] {r.run_id} ({grid.api_check_model(fam.id, mode.id, r.replicate)}) ...", flush=True)
+        model = grid.api_check_model(fam.id, mode.id, r.replicate)
         adapter, params = adapters[fam.id], mode.params
         limit = fam.max_tokens or grid.max_tokens
         comp = with_retries(
@@ -406,13 +406,19 @@ def cmd_check_modes(args: argparse.Namespace) -> int:
     runs = [r for r in read_manifest(args.manifest) if r.set == API_CHECK]
     caps = {p.stem: read_capture(p) for p in Path(args.captures).glob("*.md")}
     rows = []
-    for fam in sorted({r.family for r in runs}):
+    # One row per family and API-check replicate: each replicate past the first calls a
+    # different model (api_check_models), and averaging two models would hide both.
+    for fam, rep in sorted({(r.family, r.replicate) for r in runs}):
+        label = fam if rep == 1 else f"{fam} (check {rep})"
         cells = {}
         for mode in PRIMARY_MODES:
-            ids = [r.run_id for r in runs if r.family == fam and r.mode == mode and r.run_id in caps]
-            cells[mode] = [caps[i] for i in ids]
+            ids = [r.run_id for r in runs if r.family == fam and r.mode == mode and r.replicate == rep]
+            cells[mode] = [caps[i] for i in ids if i in caps]
+        if not cells["fast"] and not cells["reasoning"] and rep > 1:
+            rows.append((label, "-", "-", "-", "-", "-", "not run yet"))
+            continue
         if not cells["fast"] or not cells["reasoning"]:
-            rows.append((fam, "-", "-", "-", "-", "-", "missing capture(s)"))
+            rows.append((label, "-", "-", "-", "-", "-", "missing capture(s)"))
             continue
 
         def stats(capset: list[Capture]) -> tuple[float, float | None, str]:
@@ -440,7 +446,7 @@ def cmd_check_modes(args: argparse.Namespace) -> int:
             verdict = "no reasoning token count, confirm from vendor console"
         if fm != rm:
             verdict += f"; models differ ({fm} vs {rm}), confirm same weights"
-        rows.append((fam, f"{fw:.0f}", f"{rw:.0f}", _n(fr), _n(rr), fm if fm == rm else f"{fm} / {rm}", verdict))
+        rows.append((label, f"{fw:.0f}", f"{rw:.0f}", _n(fr), _n(rr), fm if fm == rm else f"{fm} / {rm}", verdict))
 
     lines = [
         "# Mode check (API)",

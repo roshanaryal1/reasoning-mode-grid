@@ -71,3 +71,7 @@ order,run_id,family,mode,primary,prompt_id,replicate,channel,set
 70,deepseek__reasoning__p1-v1__apicheck1,deepseek,reasoning,True,p1-v1,1,api,api_check
 71,grok__fast__p1-v1__apicheck1,grok,fast,True,p1-v1,1,api,api_check
 72,grok__reasoning__p1-v1__apicheck1,grok,reasoning,True,p1-v1,1,api,api_check
+73,gpt__fast__p1-v1__apicheck2,gpt,fast,True,p1-v1,2,api,api_check
+74,gpt__reasoning__p1-v1__apicheck2,gpt,reasoning,True,p1-v1,2,api,api_check
+75,grok__fast__p1-v1__apicheck2,grok,fast,True,p1-v1,2,api,api_check
+76,grok__reasoning__p1-v1__apicheck2,grok,reasoning,True,p1-v1,2,api,api_check

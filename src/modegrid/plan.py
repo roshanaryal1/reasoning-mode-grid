@@ -87,6 +87,30 @@ def build_manifest(grid: Grid) -> list[Run]:
                         set=API_CHECK,
                     )
                 )
+    # Extra API-check models go last, so adding one never renumbers an existing run.
+    for fam in grid.families:
+        if fam.adapter is None or not fam.api_check_models:
+            continue
+        for mode in fam.modes.values():
+            if not mode.primary:
+                continue
+            for k in range(1, len(fam.api_check_models) + 1):
+                order += 1
+                prompt = grid.prompts[0]
+                rep = grid.api_check_replicates + k
+                runs.append(
+                    Run(
+                        order=order,
+                        run_id=make_run_id(fam.id, mode.id, prompt.id, rep, API_CHECK),
+                        family=fam.id,
+                        mode=mode.id,
+                        primary=True,
+                        prompt_id=prompt.id,
+                        replicate=rep,
+                        channel="api",
+                        set=API_CHECK,
+                    )
+                )
     return runs
 
 

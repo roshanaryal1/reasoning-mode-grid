@@ -73,6 +73,10 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions follo
 
 ### Added
 
+- Second API checks on the models the apps served: `api_check_models` in the config (`gpt-6-sol`,
+  `grok-4.7`) adds four `apicheck2` runs, appended so no existing run is renumbered. `run --dry-run`
+  shows each run's model, and `check-modes` reports each API-check model on its own row. Runbook
+  Phase 2b.
 - `.zenodo.json` for the Zenodo GitHub integration (title, creator, licence, links to the OSF
   registration and the LA-P1 dataset), and the OSF registration in `CITATION.cff`.
 - `make paper`: stitches the paper drafts into one manuscript (Markdown and HTML).
