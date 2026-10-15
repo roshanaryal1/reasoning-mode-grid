@@ -73,6 +73,11 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions follo
 
 ### Added
 
+- `docs/scoring-day.md`: the author's checklist for running the 120 LLM rating sessions and
+  collecting the human sheet, with fixes for every `rater-rows` error and an open question on the
+  rubric's leftover LA-P1 notes.
+- `docs/human-rater-brief.md`: a plain-language brief for the human rater. Restates the rules and
+  adds none. Hashed with the other rater instructions.
 - Second API checks on the models the apps served: `api_check_models` in the config (`gpt-6-sol`,
   `grok-4.7`) adds four `apicheck2` runs, appended so no existing run is renumbered. `run --dry-run`
   shows each run's model, and `check-modes` reports each API-check model on its own row. Runbook
