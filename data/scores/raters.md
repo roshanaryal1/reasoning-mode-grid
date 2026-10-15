@@ -23,17 +23,18 @@ does not change.
 Pre-registration section 3 asks for the raters' instructions to be hashed before scoring
 starts. Every kit file built by `modegrid rater-kit` is made from four of these files (all
 but the human brief), the same for all three raters. Hashes recorded 2026-10-14, and for the
-human brief 2026-10-15, before any real scoring. CI checks
+human brief 2026-10-15, before any real scoring. The rater prompt and the human brief were
+re-hashed on 2026-10-15 after rule 8 was added (Deviations table). CI checks
 them (`sha256sum -c data/scores/RATER_SHA256SUMS`), so an edit during scoring fails the
 build and needs a Deviations row.
 
 | File | Role in the kit | sha256 |
 | --- | --- | --- |
-| `docs/rater-prompt.md` | Fixed rater prompt (the block between the START and END markers) | `31994d35ab03a7760d52bf9b0d350ec05f6374e70f213245e00683ddf5079446` |
+| `docs/rater-prompt.md` | Fixed rater prompt (the block between the START and END markers) | `9ddd38ccf0d35003625780a8f7f186f06736212d0a727aeaea8b6b74149cc93f` |
 | `docs/scoring.md` | Scoring protocol | `483479ff96358e7d6256e8f895f108a74fd298f48cdd18ba4e4e520a6c6ebb99` |
 | `vendor/llm-architects/docs/rubric.md` | Rubric, v1 table plus v2 anchors | `515368bdf639e4a338425a47bc902d957d590f4d5aa9979e185e4d3a0f50c985` |
-| `docs/human-rater-brief.md` | Plain-language brief for the human rater only. Restates the rules, adds none. Added 2026-10-15, before scoring | `9da08e33adc02e51ad94965a3397a13d3aeb826126025b9d2b9d5fb26d5ea5aa` |
+| `docs/human-rater-brief.md` | Plain-language brief for the human rater only. Restates the rules, adds none. Added 2026-10-15, before scoring | `d63dfd802d22cb521757a33c22a829163b13b984dc76fc568cbd5dc7c841cb2d` |
 | `vendor/llm-architects/scripts/memory_budget.py` | Memory checker for D1 | `ebb13a82c62f6aab116958e9ea521e342adf59a45ce8d9a5ef1411ff0bd59991` |
 
 The prompt block alone (the text the kit uses) hashes to
-`d41b8da761719bdecc4a621dbae7225a90eaf64e0f89767d04731d61e31ed924`.
+`30ab4e75238bdb7e1fb2e74227ce89ebee65fd29c2038f93eb95bd1f69f91c2d`.

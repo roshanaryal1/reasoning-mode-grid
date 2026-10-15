@@ -7,6 +7,9 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions follo
 
 ### Changed
 
+- Rater prompt rule 8: raters ignore the vendored rubric's leftover LA-P1 notes (file paths, the
+  "Anchor" bullet naming a model, remarks about earlier raters naming DeepSeek answers, "Current
+  scores"). The rubric is unchanged. Prompt and human brief re-hashed, kits rebuilt.
 - Model correction, confirmed by the author: the GPT block ran GPT-6 and the Grok block ran Grok 4.7
   (both modes), not the pre-registered GPT-5.6 Sol and Grok 4.6. Rater `llm-b` is GPT-6. Recorded in
   the Deviations table, the mode registry, threats to validity and the paper drafts. The API checks for

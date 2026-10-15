@@ -20,7 +20,6 @@ shaped the advice below. Its scores were thrown away.
 - [ ] Copy `data/blinding/key.csv` somewhere outside the repo. Never send it to a rater.
 - [ ] Fill in `data/scores/raters.md`: the human rater's name, and leave the run dates for
   when you finish.
-- [ ] Decide the open question at the bottom of this page (the rubric's leftover notes).
 - [ ] Make three folders: `replies/llm-a/`, `replies/llm-b/` and somewhere to keep the human
   rater's sheet when it comes back.
 
@@ -106,25 +105,9 @@ by side in different browser tabs, one chat per tab, as long as each chat holds 
 Spread it over several days if you like. The order within a rater does not matter for the
 analysis, but keep to NN order so you never lose track.
 
-## Open question for you: the rubric's leftover notes
+## The rubric's leftover notes (settled 2026-10-15)
 
-The vendored rubric (`vendor/llm-architects/docs/rubric.md`, pinned by hash) still carries
-notes written for LA-P1, and every kit file includes them:
-
-- "score `claude-sonnet-5` like any other ... exclude it from cross-response means" names a
-  model inside a blind study.
-- "Raters missed two clear recommend-then-forbid contradictions (DeepSeek Docker / Ollama)"
-  could prime a rater against answers that look like DeepSeek's.
-- It says to record scores in `analysis/scoring/...md` and to run
-  `analysis/scripts/memory_budget.py`, which do not match the kit. The rater prompt's own
-  instructions (a CSV row, `python memory_budget.py`) are clear, so this is only confusing.
-
-The rater prompt says the v2 anchors override the v1 table, but it does not tell raters to
-ignore these notes. Two ways forward, both before any scoring:
-
-- **Leave it.** Report it as a limitation. The blinding check measures any leak.
-- **Add one line to the rater prompt**, for example: "Ignore the rubric's 'Notes for raters'
-  bullets about LA-P1 files, the anchor model and earlier raters. Follow this prompt and the
-  scoring protocol." That changes `docs/rater-prompt.md`, so it needs a Deviations row, new
-  hashes in `data/scores/RATER_SHA256SUMS` and a kit rebuild. The vendored rubric itself
-  stays unchanged.
+The vendored rubric still carries notes written for LA-P1: file paths, an "Anchor" bullet
+that names a model, and a remark that names DeepSeek answers. Rater prompt rule 8 now tells
+every rater to ignore those parts. The rubric file itself is unchanged. Recorded in the
+Deviations table.

@@ -41,6 +41,12 @@ Rules:
 7. Also guess which family wrote it (one of: claude, deepseek, gemini, gpt, grok, qwen)
    and which mode (fast or reasoning). Leave a guess blank if you have no idea. Guesses do
    not affect scores.
+8. The rubric was written for an earlier study, and parts of it still refer to that study.
+   Ignore its file paths (such as `analysis/scoring/` and `data/responses/`), the "Anchor"
+   bullet about a named model, the remarks about what earlier raters missed, and its
+   "Current scores" section. Record your scores only in the CSV row below, and run the
+   memory checker as `python memory_budget.py`. Every scoring rule in the rubric still
+   applies, including the web-verification rules for D3 and D4 and the note on D6.
 
 Work through the answer, do the searches and the memory check, then finish your reply
 with exactly one fenced CSV block in this form and nothing after it:
