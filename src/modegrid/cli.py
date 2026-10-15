@@ -24,7 +24,7 @@ from .ownvendor import own_vendor, write_own_vendor
 from .plan import API_CHECK, MAIN, build_manifest, read_manifest, write_manifest
 from .providers import adapter_for, with_retries
 from .raterkit import build_kit, collect_rows
-from .scores import consensus, disagreements, load_key, load_scores, unblind, write_scores
+from .scores import ScoreError, consensus, disagreements, load_key, load_scores, unblind, write_scores
 from .synthetic import Effect, power, synthetic_scores
 
 DEFAULT_CONFIG = "configs/grid.yaml"
@@ -273,7 +273,12 @@ def cmd_rater_rows(args: argparse.Namespace) -> int:
     """Collect returned CSV rows. The sheet goes to data/scores only once all answers are in."""
     sheet = Path(args.packets) / f"scoresheet-{args.rater}.csv"
     work = Path(args.packets) / "collected" / f"{args.rater}.csv"
-    filled, missing = collect_rows(args.replies, sheet, work)
+    try:
+        filled, missing = collect_rows(args.replies, sheet, work)
+    except ScoreError as exc:
+        print(f"ERROR {exc}")
+        print("Nothing was saved from this batch. Fix that reply file and run the same command again.")
+        return 1
     print(f"{args.rater}: {filled} of {filled + len(missing)} scored; working sheet {work}")
     if missing:
         print(f"still to score: {' '.join(missing)}")

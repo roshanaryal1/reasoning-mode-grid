@@ -158,6 +158,9 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions follo
 
 ### Fixed
 
+- `modegrid rater-rows` stopped with a Python traceback on a bad reply and did not say which file.
+  It now prints one line naming the reply file and the problem, saves nothing from that batch, and
+  exits 1. Found in a practice scoring run.
 - `CITATION.cff` used the reference type `dataset`, which the CFF 1.2.0 schema does not allow, so
   GitHub could not offer "Cite this repository". It is now `data`, and the file validates.
 - `modegrid analyze` computed the random-effects variance components but never wrote them. They are
