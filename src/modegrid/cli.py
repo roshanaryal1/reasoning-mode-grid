@@ -24,6 +24,7 @@ from .ownvendor import own_vendor, write_own_vendor
 from .plan import API_CHECK, MAIN, build_manifest, read_manifest, write_manifest
 from .providers import adapter_for, with_retries
 from .raterkit import build_kit, collect_rows
+from .report import write_report
 from .scores import ScoreError, consensus, disagreements, load_key, load_scores, unblind, write_scores
 from .synthetic import Effect, power, synthetic_scores
 
@@ -298,13 +299,25 @@ def cmd_blinding_check(args: argparse.Namespace) -> int:
     n_families = len({f for f, _ in runs.values()})
     print(f"chance: family 1/{n_families}, mode 1/2. Small p = rater beat chance = blinding leaked.\n")
     print(f"{'sheet':<28}{'guess':<14}{'guessed':>9}{'correct':>9}{'acc':>7}{'chance':>8}{'p':>8}")
+    rows: list[dict[str, object]] = []
     for sheet in args.files:
         res = guess_accuracy(sheet, key, runs, n_families)
         for field, r in res.items():
+            rows.append({"rater": Path(sheet).stem, "guess": field, **r})
             print(
                 f"{Path(sheet).name:<28}{field:<14}{int(r['guessed']):>6}/{int(r['items']):<2}"
                 f"{int(r['correct']):>9}{r['accuracy']:>7.2f}{r['chance']:>8.2f}{r['p_value']:>8.3f}"
             )
+    if args.out:
+        out = Path(args.out)
+        out.parent.mkdir(parents=True, exist_ok=True)
+        fields = ["rater", "guess", "items", "guessed", "correct", "accuracy", "chance", "p_value"]
+        with out.open("w", newline="", encoding="utf-8") as fh:
+            w = csv.writer(fh, lineterminator="\n")
+            w.writerow(fields)
+            for row in rows:
+                w.writerow([row["rater"], row["guess"], *(f"{float(row[k]):.4f}" for k in fields[2:])])  # type: ignore[arg-type]
+        print(f"\nwrote {out}")
     return 0
 
 
@@ -403,6 +416,12 @@ def cmd_own_vendor(args: argparse.Namespace) -> int:
         )
     if args.out:
         print(f"\nwrote {write_own_vendor(rows, args.out)}")
+    return 0
+
+
+def cmd_report(args: argparse.Namespace) -> int:
+    """Every number paper/results.md asks for, in its order, in one file."""
+    print(f"wrote {write_report(args.results, args.scores, args.out)}")
     return 0
 
 
@@ -579,6 +598,7 @@ def build_parser() -> argparse.ArgumentParser:
     bc = sub.add_parser("blinding-check", help="rater guess accuracy vs chance")
     bc.add_argument("files", nargs="+", help="rater score sheets with guess_family / guess_mode filled")
     bc.add_argument("--key", default="data/blinding/key.csv")
+    bc.add_argument("--out", default="", help="also write the table as CSV, e.g. results/blinding_check.csv")
     bc.set_defaults(func=cmd_blinding_check)
 
     ba = sub.add_parser("blinding-audit", help="before scoring: family fingerprints left in the packets")
@@ -621,6 +641,12 @@ def build_parser() -> argparse.ArgumentParser:
     ov.add_argument("--boot", type=int, default=5000)
     ov.add_argument("--seed", type=int, default=20261001)
     ov.set_defaults(func=cmd_own_vendor)
+
+    rp = sub.add_parser("report", help="after the analysis: every number the Results section needs, in one file")
+    rp.add_argument("--results", default="results")
+    rp.add_argument("--scores", default="data/scores")
+    rp.add_argument("--out", default="", help="default results/report.md")
+    rp.set_defaults(func=cmd_report)
 
     d = sub.add_parser("demo", help="synthetic end-to-end dry run")
     d.add_argument("--out", default="")

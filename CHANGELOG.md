@@ -5,6 +5,12 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions follo
 
 ## [Unreleased]
 
+### Added
+
+- `modegrid report` writes `results/report.md`: every number `paper/results.md` asks for, in its
+  order, with only the pre-registered rules applied. `make results` runs the whole of Phase 4 and
+  the report in one step. `modegrid blinding-check --out` saves its table as CSV.
+
 ### Changed
 
 - Rater prompt rule 8: raters ignore the vendored rubric's leftover LA-P1 notes (file paths, the
