@@ -94,9 +94,10 @@ modegrid validate      # says which row is wrong, if any
 ## When all three sheets are in
 
 1. Record the first and last scoring date for each rater in `data/scores/raters.md`.
-2. Run runbook Phase 3 steps 3 to 5: agreement, consensus, unblind, and commit the key with
-   `git add -f`.
-3. Tell me, and I can run Phase 4 and fill in the Results section.
+2. Run `make results`. It runs agreement, consensus, unblind and the whole of Phase 4, and
+   writes `results/report.md` with every number the Results section needs.
+3. Commit the key with `git add -f data/blinding/key.csv`, then the sheets and `results/`.
+4. Fill in `paper/results.md` from `results/report.md`.
 
 ## Pace
 

@@ -60,3 +60,29 @@ paper: ## Stitch the paper drafts into paper/build/manuscript.md and .html (need
 	cat $(PAPER_SECTIONS) > paper/build/manuscript.md
 	pandoc paper/build/manuscript.md --standalone --toc --metadata title="LA-P4 manuscript draft" -o paper/build/manuscript.html
 	@echo "wrote paper/build/manuscript.md and paper/build/manuscript.html"
+
+RATERS = human llm-a llm-b
+SHEETS = $(foreach r,$(RATERS),data/scores/$(r).csv)
+UNBLINDED = $(foreach r,$(RATERS),data/scores/$(r)-unblinded.csv)
+
+.PHONY: results
+results: ## After scoring: agreement, consensus, unblind, the full analysis and results/report.md (runbook Phases 3 and 4)
+	modegrid agreement $(SHEETS) --out results/agreement.csv
+	modegrid agreement data/scores/human.csv data/scores/llm-a.csv --out results/agreement-human-llm-a.csv
+	modegrid agreement data/scores/human.csv data/scores/llm-b.csv --out results/agreement-human-llm-b.csv
+	modegrid consensus $(SHEETS)
+	modegrid unblind data/scores/adjudicated-blind.csv
+	modegrid validate
+	modegrid analyze --agreement results/agreement.csv --note "Confirmatory analysis, prereg-v1"
+	for r in $(RATERS); do \
+	  modegrid unblind data/scores/$$r.csv --out data/scores/$$r-unblinded.csv && \
+	  modegrid analyze --scores data/scores/$$r-unblinded.csv --out results/$$r || exit 1; \
+	done
+	modegrid own-vendor $(UNBLINDED) --out results/own_vendor.csv
+	modegrid blinding-check $(SHEETS) --out results/blinding_check.csv
+	modegrid analyze --families gpt,qwen,deepseek --out results/fast-off
+	modegrid analyze --families claude,gemini,grok --out results/fast-lowest
+	modegrid rank-agreement $(UNBLINDED) --out results/cell_rank_agreement.csv
+	modegrid cells --figure figure1.pdf
+	modegrid report
+	@echo "Done. Read results/report.md. Then commit the key: git add -f data/blinding/key.csv"

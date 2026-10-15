@@ -740,3 +740,25 @@ def test_check_modes_reports_each_api_check_model_on_its_own_row(tmp_path, monke
     assert main(["--manifest", str(manifest), "--captures", str(caps_dir), "run", "--dry-run", "--family", "gpt"]) == 0
     printed = capsys.readouterr().out
     assert "gpt__fast__p1-v1__apicheck2  (gpt-6-sol)" in printed
+
+
+def test_cli_blinding_check_writes_csv(tmp_path, monkeypatch):
+    monkeypatch.chdir(Path(__file__).resolve().parent.parent)
+    manifest = tmp_path / "runs.csv"
+    assert main(["--manifest", str(manifest), "plan"]) == 0
+    runs = [r for r in read_manifest(manifest) if r.set == "main"][:6]
+    key = tmp_path / "key.csv"
+    sheet = tmp_path / "llm-a.csv"
+    with key.open("w", newline="") as kf, sheet.open("w", newline="") as sf:
+        kw, sw = csv.writer(kf), csv.writer(sf)
+        kw.writerow(["blind_id", "run_id"])
+        sw.writerow(["blind_id", "guess_family", "guess_mode"])
+        for i, r in enumerate(runs):
+            kw.writerow([f"B{i:03d}", r.run_id])
+            sw.writerow([f"B{i:03d}", r.family, r.mode])
+    out = tmp_path / "blinding_check.csv"
+    args = ["--manifest", str(manifest), "blinding-check", str(sheet), "--key", str(key), "--out", str(out)]
+    assert main(args) == 0
+    rows = list(csv.DictReader(out.open()))
+    assert [(r["rater"], r["guess"]) for r in rows] == [("llm-a", "guess_family"), ("llm-a", "guess_mode")]
+    assert float(rows[1]["accuracy"]) == 1.0

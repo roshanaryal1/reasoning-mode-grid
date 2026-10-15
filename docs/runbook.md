@@ -186,11 +186,13 @@ ChatGPT served before choosing another id.
    rows are in:
 
    ```bash
-   modegrid rater-rows llm-a replies/llm-a-*.txt
+   modegrid rater-rows llm-a replies/llm-a/*.txt
    ```
 
-   Send the human rater the `packets/answers/` folder, their own score sheet, the rubric
-   (`vendor/llm-architects/docs/rubric.md`, v2 anchors) and [scoring.md](scoring.md).
+   Send the human rater `rater-kit-human.zip`: the `packets/answers/` folder, their own
+   score sheet, the rubric (`vendor/llm-architects/docs/rubric.md`, v2 anchors),
+   [scoring.md](scoring.md), the memory checker and [human-rater-brief.md](human-rater-brief.md).
+   [scoring-day.md](scoring-day.md) is the session-by-session checklist.
    Give each LLM rater the same packet and instructions, with web search on.
    Before any scoring, record in `data/scores/raters.md` which vendor, model id and run
    date are `llm-a` and `llm-b`. They must be two different vendors.
@@ -232,6 +234,16 @@ Check: `data/scores/adjudicated.csv` has 60 rows and `modegrid validate` prints 
 
 ## Phase 4. Analyse (1 day)
 
+One command runs Phase 3 steps 3 to 5 (without the `git add`) and everything below, then
+collects every number the Results section needs into `results/report.md`:
+
+```bash
+pip install -e ".[paper]"   # matplotlib for Figure 1, once
+make results
+```
+
+The steps it runs are listed here, so each one can also be run and checked on its own.
+
 ```bash
 modegrid analyze --agreement results/agreement.csv --note "Confirmatory analysis, prereg-v1"
 ```
@@ -255,7 +267,8 @@ modegrid own-vendor data/scores/human-unblinded.csv data/scores/llm-a-unblinded.
     data/scores/llm-b-unblinded.csv --out results/own_vendor.csv
 
 # Blinding-failure rate: did raters guess family or mode better than chance?
-modegrid blinding-check data/scores/human.csv data/scores/llm-a.csv data/scores/llm-b.csv
+modegrid blinding-check data/scores/human.csv data/scores/llm-a.csv data/scores/llm-b.csv \
+    --out results/blinding_check.csv
 
 # Robustness check 4: split by fast-mode floor (true off vs lowest available)
 modegrid analyze --families gpt,qwen,deepseek --out results/fast-off
@@ -292,6 +305,16 @@ modegrid cells --figure figure1.pdf   # writes results/cell_means.csv and result
 
 The PDF carries no creator, producer or date metadata, and the same scores give the same file.
 
+Last, collect the numbers for the Results section:
+
+```bash
+modegrid report   # writes results/report.md, in the order of paper/results.md
+```
+
+It reads only the files above and applies only the pre-registered rules: the 0.667 and
+0.800 alpha bars, the mode-blinding rule, the H3 outcomes, and the CI against p-value check.
+A file not made yet is named with the command that makes it. Re-run it after any change.
+
 ## Phase 5. Write and submit (1 to 2 weeks)
 
 Follow [paper-plan.md](paper-plan.md) and [`paper/outline.md`](../paper/outline.md).
@@ -312,7 +335,7 @@ Before submitting:
 - The 60 scored runs use the chat apps, so they cost only your subscriptions and time.
   Free tiers can hide the reasoning mode or cap usage, so check each app has the mode
   before you start.
-- The 12 API checks cost a few dollars in total. The prompt is about 3,500 tokens and a
+- The 16 API checks cost a few dollars in total. The prompt is about 3,500 tokens and a
   long reasoning answer is about 15,000. Run Claude's 2 calls first and read the usage
   in the captures before running the rest.
 - Never use server-side model fallbacks. A fallback answers from a different model.

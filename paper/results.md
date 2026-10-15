@@ -15,10 +15,11 @@ Source files after Phase 4 of the runbook:
 | `results/cell_means.csv`, `results/figure1.pdf` | `modegrid cells --figure figure1.pdf` | Figure 1 and its table |
 | `results/<rater>/variance_table.md` | robustness check 3 | The same analysis on each rater's own scores |
 | `results/fast-off/`, `results/fast-lowest/` | robustness check 4 | True-off and lowest-available families |
-| `modegrid blinding-check` output | blinding check | Family and mode guess accuracy per rater, with p-values |
+| `results/blinding_check.csv` | `modegrid blinding-check ... --out` | Family and mode guess accuracy per rater, with p-values |
 | `results/cell_rank_agreement.csv` | `modegrid rank-agreement` | Kendall's tau-b and W on cell rankings (exploratory) |
 | `results/blinding_audit.csv` | `modegrid blinding-audit` | Pre-scoring audit (already done) |
 | `results/own_vendor.csv` | `modegrid own-vendor` | Each LLM rater on its own vendor's family |
+| `results/report.md` | `modegrid report` | All of the above, in this section's order (added 2026-10-15, before scoring) |
 
 ## 4.1 Data and reliability
 
