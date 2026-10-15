@@ -192,7 +192,10 @@ separately.
 fixed rater prompt, the rubric, the scoring protocol, the memory checker and one blinded
 answer. Each LLM rater used a new chat for every answer with memory, history and personal
 connectors off and web search on, and returned one CSV row. Each rater had their own
-random reading order. All three raters got the same instructions.
+random reading order. All three raters got the same instructions. The rubric, reused
+unchanged from LA-P1, still carries notes about that study: one names a model, and another
+describes what earlier raters missed in certain answers. A rule in the rater prompt told raters
+to ignore those parts.
 
 **Blinding.** Raters saw only the final answer. Reasoning panels, interface labels,
 timestamps and capture metadata were removed. Self-identification lines near the top of an

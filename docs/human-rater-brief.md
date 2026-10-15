@@ -65,6 +65,12 @@ D9 is 0.
 The task told the AI that today is 31 August 2026. Judge how current an answer is (D2)
 against that date, not against the day you score.
 
+## The rubric's old notes
+
+The rubric was written for an earlier study. Rule 8 of the rater prompt says what to skip:
+its file paths, the "Anchor" bullet about a named model, the remarks about what earlier
+raters missed, and the "Current scores" section. Every scoring rule in it still applies.
+
 ## Time
 
 Plan about 10 to 20 minutes per answer, more for the first few. Breaks are fine. You do not
