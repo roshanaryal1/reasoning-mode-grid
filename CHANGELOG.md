@@ -7,6 +7,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions follo
 
 ### Changed
 
+- Human rater recorded as Rater H1 (anonymous at their request), before scoring.
 - API check 2 ran on 2026-10-19. GPT-6 switch confirmed (0 vs 6,000 reasoning tokens). Grok 4.7 at
   effort xhigh stopped twice after a one-sentence preamble, so its check 2 is inconclusive; Grok stays
   lowest available on check 1. Recorded in the Deviations table. No analysis group changes.
