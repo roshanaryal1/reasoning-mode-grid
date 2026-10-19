@@ -7,6 +7,9 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions follo
 
 ### Changed
 
+- API check 2 ran on 2026-10-19. GPT-6 switch confirmed (0 vs 6,000 reasoning tokens). Grok 4.7 at
+  effort xhigh stopped twice after a one-sentence preamble, so its check 2 is inconclusive; Grok stays
+  lowest available on check 1. Recorded in the Deviations table. No analysis group changes.
 - Fixed capture `qwen__reasoning__p1-v1__r2`: its answer section held the study prompt. The answer was
   re-copied from the original chat (nothing re-sent). Recorded in the Deviations table. Packets and
   rater kits rebuilt.
