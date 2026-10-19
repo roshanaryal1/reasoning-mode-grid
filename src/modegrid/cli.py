@@ -155,9 +155,10 @@ def cmd_new_capture(args: argparse.Namespace) -> int:
 def cmd_validate(args: argparse.Namespace) -> int:
     grid = load_grid(args.config)
     problems: list[str] = []
+    prompt_texts: dict[str, str] = {}
     for p in grid.prompts:
         try:
-            p.text()
+            prompt_texts[p.id] = p.text()
         except Exception as exc:
             problems.append(str(exc))
     runs = {r.run_id: r for r in read_manifest(args.manifest)} if Path(args.manifest).exists() else {}
@@ -167,7 +168,8 @@ def cmd_validate(args: argparse.Namespace) -> int:
         except Exception as exc:
             problems.append(f"{path}: {exc}")
             continue
-        problems += [f"{path}: {msg}" for msg in check_capture(cap)]
+        prompt = prompt_texts.get(str(cap.meta.get("prompt_id")))
+        problems += [f"{path}: {msg}" for msg in check_capture(cap, prompt)]
         if runs and cap.run_id not in runs:
             problems.append(f"{path}: run_id not in manifest")
         if cap.run_id != path.stem:

@@ -97,6 +97,19 @@ def test_capture_round_trip(tmp_path):
         write_capture(cap, tmp_path)
 
 
+def test_pasted_prompt_is_not_an_answer():
+    meta = {k: "x" for k in ("run_id", "family", "mode", "native_label", "channel", "model_requested")}
+    meta |= {"model_returned": "m", "prompt_id": "p", "prompt_sha256": "h", "replicate": 1, "run_by": "me"}
+    meta |= {"date_run": "2026-10-13T01:00:00+00:00"}
+    line = "the build must be local, private and run on a 32 GB Mac mini."
+    prompt = "\n".join(f"Requirement {i}: {line}" for i in range(8))
+    pasted = Capture(meta=dict(meta), final_answer=prompt)
+    assert any("study prompt" in p for p in check_capture(pasted, prompt))
+    quoting = Capture(meta=dict(meta), final_answer="My answer.\n" + prompt.splitlines()[0] + "\nMore of my answer.")
+    assert check_capture(quoting, prompt) == []
+    assert check_capture(pasted) == []  # no prompt given, no check
+
+
 def test_changed_run_time_needs_a_reason():
     meta = {k: "x" for k in ("run_id", "family", "mode", "native_label", "channel", "model_requested")}
     meta |= {"model_returned": "m", "prompt_id": "p", "prompt_sha256": "h", "replicate": 1, "run_by": "me"}

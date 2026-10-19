@@ -97,8 +97,20 @@ def read_capture(path: str | Path) -> Capture:
     return parse_capture(Path(path).read_text(encoding="utf-8"))
 
 
-def check_capture(capture: Capture) -> list[str]:
+def echoes_prompt(answer: str, prompt: str, min_lines: int = 5) -> bool:
+    """True when the answer repeats several long lines of the prompt (a paste of the prompt, not a reply).
+
+    Answers quote the odd requirement, so one or two shared lines are allowed.
+    """
+    prompt_lines = {line.strip() for line in prompt.splitlines() if len(line.strip()) >= 60}
+    shared = {line.strip() for line in answer.splitlines()} & prompt_lines
+    return len(shared) >= min_lines
+
+
+def check_capture(capture: Capture, prompt: str | None = None) -> list[str]:
     problems = [f"missing front-matter key {k!r}" for k in REQUIRED_KEYS if k not in capture.meta]
+    if prompt and echoes_prompt(capture.final_answer, prompt):
+        problems.append("final answer contains the study prompt (was the prompt pasted instead of the answer?)")
     truncated_check = capture.meta.get("set") == "api_check" and capture.meta.get("finish_reason") in {
         "length",
         "max_tokens",
