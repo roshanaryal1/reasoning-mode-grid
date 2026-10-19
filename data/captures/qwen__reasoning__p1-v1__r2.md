@@ -23,134 +23,2207 @@ interface: web app, fresh chat, signed in, no custom instructions, memory off
 
 ## Final answer
 
-**Context for you, the responding model:**
-- Today's date is **31 August 2026**. Research and cite the current state of the ecosystem as of this date.
-- If you have web/tool access, use it and cite primary sources. If you do not, answer from knowledge and say so explicitly.
-- This response will be compared side-by-side with responses from ~10 other AI systems, then synthesized into a research paper and used as a build specification. Be concrete, evidence-based, and decisive.
-- At the very top of your response, state: your model name and version, your knowledge cutoff (if known), and whether web browsing/tools were enabled for this answer.
+Qwen3.8 | knowledge cutoff: 2026 as configured; exact cutoff date not exposed to me | web browsing/tools: **OFF** for this answer.  
+Target date given: **31 August 2026**. Because I could not browse, the following is a knowledge-based architecture and selection. I am being decisive, but you should verify exact package/model tags before installing because local AI tooling changes quickly.
 
 ---
 
-I want you to act as a senior AI infrastructure architect and researcher. I am building a fully local, always-on autonomous AI workstation and want you to research the latest technology available as of today and determine the best architecture and tools for my specific hardware and requirements.
+## Decisions at a glance
 
-## My hardware
+| Layer | Final pick for 32 GB M6 Mac mini | Why |
+|---|---|---|
+| Local inference engine | **Ollama** as default daemon | Mature, Metal-accelerated, OpenAI-compatible API, easy model management, good always-on behavior |
+| Performance alternative | **llama.cpp / llama-server** or **MLX** | llama.cpp gives finer control; MLX can be faster for some Apple-optimized models but is less operationally boring |
+| Primary coding model | **Qwen3-Coder-30B-A3B, Q4_K_M or equivalent 4-bit GGUF** | Large enough for real coding/tool use; MoE-style low active compute is much better for 32 GB Apple Silicon than dense 30B/70B |
+| Primary planning/research model | **Qwen3-30B-A3B, Q4_K_M** or fallback to the coder model | Good general reasoning/instruction model; batch separately to avoid model swapping |
+| Small fast model | **Qwen3-8B-Instruct Q4/Q5** or **Phi-4 14B Q4** if memory allows | Routing, classification, summarization, query generation, cheap retries |
+| Embedding model | **bge-m3** or **nomic-embed-text** via Ollama | Small, local, good enough for memory/research retrieval |
+| Agent harness | **Custom thin Python supervisor** over existing tools | You need an operating environment, not a chatbot; frameworks add abstraction but not the exact always-on queue/security semantics you need |
+| Coding executor | **Aider** | Best lightweight Git-native coding agent for local models; good repo map, patching, commits, test iteration |
+| Optional stronger sandbox executor | **OpenAI Codex CLI** or **OpenHands** in a container/VM | Useful if you want stronger sandboxing for untrusted repos; heavier |
+| Research pipeline | **Custom grounded pipeline**: SearXNG + arXiv/Semantic Scholar/OpenAlex/Crossref + Docling/marker/PyMuPDF + SQLite evidence store | Prevents hallucinated citations by only allowing citations from stored evidence |
+| Persistent memory | **SQLite + FTS5 + Markdown + Git**, later **sqlite-vec** | Boring, reliable, low RAM; vector DB only when needed |
+| Multi-agent coordination | **SQLite-backed task queue with logical agents and model-class worker pools** | 100+ logical agents, 1–2 actual LLM workers |
+| Browser automation | **Playwright** with isolated profile | Deterministic, scriptable, no personal cookies by default |
+| Computer control boundary | **Dedicated non-admin macOS user + workspace isolation + Git worktrees + optional OrbStack/Colima containers** | Safer than giving a GUI computer-use model broad macOS control |
+| Always-on service manager | **launchd daemons** | Native macOS, survives reboot, can run as dedicated user |
+| Remote access | **Tailscale + local web dashboard + SSH + ntfy/Pushover** | No public ports; phone/laptop access over private mesh |
+| Storage layout | Internal: OS, active repos, DB, logs, active models. External: model archive, papers, datasets, backups | Internal for reliability/latency; external for bulk |
 
-- Apple Mac mini
-- M6 chip (base M6, not Pro/Max)
-- 32 GB unified memory
-- 512 GB internal SSD
-- 1 TB external SSD
-- The machine can remain powered on 24/7
-- I want the system to continue working when I am away from home or sleeping.
+---
 
-## What I want to build
+# 1. Local inference on a 32 GB unified-memory Apple Silicon Mac mini
 
-A personal autonomous AI system that can:
+## 1.1 Hardware reality
 
-1. Work continuously for many hours without me supervising it.
-2. Continue working overnight while I sleep.
-3. Be remotely controllable from my phone/laptop when I am away.
-4. Work across any project or directory on my computer, rather than being tied to one repository.
-5. Perform serious software development: understand existing repositories, plan features, write code, modify files, run commands, run tests, debug, review code, use Git, create branches/worktrees, iterate until a task is completed.
-6. Perform autonomous research: web research, literature research, find and compare papers, collect evidence, verify claims, identify contradictions, synthesize findings, produce research reports.
-7. Work with documents, PDFs, datasets, Markdown, code, and other files.
-8. Run experiments and analyze results.
-9. Create documentation automatically.
-10. Maintain persistent memory about projects, decisions, research, experiments, and previous work.
-11. Spawn or coordinate many specialized subagents.
-12. Potentially manage 100+ logical subagents, while intelligently limiting the number of simultaneous LLM inference processes according to my hardware.
-13. Dynamically create specialized agents when a task requires them rather than requiring me to manually configure every agent.
-14. Allow different agents to have different roles, tools, permissions, context, and objectives.
-15. Automatically decide which model is appropriate for each task.
-16. Prefer local/private processing wherever practical.
-17. Be able to use external web resources when necessary for research.
-18. Operate the computer autonomously, while maintaining sensible security boundaries around sensitive personal data, credentials, financial information, and destructive system operations.
+A base M6 Mac mini with 32 GB unified memory is a capable local AI machine, but it is not a GPU server. The limiting factors are:
 
-## The most important requirement
+1. **RAM capacity**: macOS plus normal services will usually consume several GB. You should plan for roughly **18–24 GB usable for model weights + KV cache** if you want stability.
+2. **Memory bandwidth**: token generation on Apple Silicon is strongly bandwidth-bound. A dense 32B/70B model can fit at low quantization but may be too slow for high-agency loops.
+3. **KV cache**: long contexts consume RAM quickly. Do not casually enable 128k context on 32 GB.
+4. **Swap risk**: if the system starts swapping heavily, agent performance collapses and SSD wear increases.
 
-I do NOT want a chatbot or coding autocomplete. I want an agentic operating environment capable of:
+Therefore the correct design goal is:
 
-planning → delegating → executing → observing → verifying → correcting → documenting → continuing
+> **Maximize completed, verified tasks per hour, not maximum model size.**
 
-with minimal human intervention. The system should wake up, inspect its task queue, decide what needs to be done, execute work, evaluate the results, create follow-up tasks, and continue until the objective or predefined stopping conditions are reached.
+For your machine, the sweet spot is:
 
-## Research requirements
+- One large “serious” model at a time.
+- Prefer MoE / low-active-parameter models where available.
+- 4-bit weights, Q4_K_M or equivalent.
+- 8k–32k context, not 128k by default.
+- A small model for routing/classification/short summarization.
+- Model swapping only in batches, not per tiny task.
 
-Do NOT assume that any particular existing product, framework, model, agent platform, inference engine, orchestration framework, or protocol is the correct answer. Do not recommend tools because they are popular. Search the current ecosystem broadly and identify the best technologies available right now. Prioritize primary sources: official documentation, GitHub repositories, release notes, technical benchmarks, model cards, developer documentation, current community discussions, recent technical articles, independent benchmarks. Look beyond technologies commonly mentioned on Reddit or YouTube.
+## 1.2 Inference engine comparison
 
-Investigate specifically:
+| Option | Best category | Verdict for you |
+|---|---|---|
+| **Ollama** | Best mature/stable default | **Use this.** Easy daemon, OpenAI-compatible API, model lifecycle, Metal support, good enough concurrency controls. |
+| **llama.cpp / llama-server** | Best fine-grained control | Excellent alternative if you need more control over GGUF loading, KV cache, or specific builds. Slightly more manual. |
+| **MLX / mlx-lm** | Best Apple-native/cutting-edge | Very promising on Apple Silicon; can be faster for MLX-optimized models, but operationally less boring than Ollama for 24/7. Use selectively if a model is materially better in MLX form. |
+| **LM Studio** | Best GUI/local server for manual use | Nice for experimentation, not the best headless always-on daemon. |
+| **LocalAI** | Broad multi-backend server | Too much abstraction for a single Mac unless you specifically need its compatibility surface. |
+| **vLLM / SGLang / TensorRT-LLM** | Server GPU ecosystems | Not the right primary choice on Apple Silicon for this build. |
+| **KoboldCpp / llamafile / GPT4All / Jan** | Simple local chat/runners | Useful for quick tests, not the backbone of an autonomous lab. |
 
-1. **Local inference.** Compare the strongest practical local inference options for a 32 GB unified-memory Apple Silicon machine. Consider model quality, coding ability, reasoning ability, agentic/tool-use ability, context length, quantization, memory requirements, inference speed, concurrency, Apple Silicon optimization, Metal acceleration, model loading/unloading, multiple-model operation, stability, maturity. Determine which models I should actually run locally. Do not simply choose the largest model that technically fits. Optimize for useful work per hour, not parameter count.
+## 1.3 Models I would actually run
 
-2. **Agent runtimes / harnesses.** Research the latest agent runtimes/harnesses. Compare systems providing: autonomous loops, tool use, terminal access, filesystem access, browser access, code execution, sandboxing, persistent sessions, subagents, agent spawning, task delegation, retries, state management, long-running tasks, background execution, scheduling, observability, permissions, remote control. Determine whether I should use one existing agent harness, multiple complementary systems, or build a custom orchestration layer on top of existing technology.
+### Primary coding/tool model
 
-3. **Multi-agent architecture.** Research the best current approach for running many agents on limited hardware. Explain the difference between: 100 actual simultaneous model instances, 100 logical agents, agent definitions, task queues, worker pools, dynamic subagents, sequential execution, parallel execution, model routing, hierarchical agents, swarm architectures, coordinator/worker architectures. Design the architecture that gives the highest useful throughput on 32 GB unified memory.
+**Qwen3-Coder-30B-A3B, Q4_K_M or Q5_K_M if stable.**
 
-4. **Coding agents.** Compare the best current autonomous coding systems. Evaluate: repository understanding, terminal execution, code editing, test execution, debugging, Git integration, worktrees, long-running tasks, autonomous iteration, code review, context management, local model support, sandboxing. Determine which is best for my machine and requirements.
+Why:
 
-5. **Research agents.** Investigate the best current technology for autonomous research: web search, source discovery, academic literature discovery, PDF analysis, citation extraction, evidence tracking, claim verification, contradiction detection, synthesis, report generation. Determine the best architecture for preventing hallucinated citations and unsupported claims.
+- Coding-specialized.
+- 30B total with low active parameters is far more practical than a dense 30B on Apple Silicon.
+- Good fit for tool calling, repository edits, debugging loops.
+- 4-bit fits reasonably in 32 GB while leaving room for KV cache and OS.
 
-6. **Persistent memory.** Compare: filesystem memory, SQLite, relational databases, vector databases, knowledge graphs, embeddings, hybrid memory, episodic memory, semantic memory, project-specific memory, global memory. Determine what I should use initially and what to add later as the system grows. Avoid unnecessary infrastructure.
+If the exact Ollama tag differs, choose the closest official/community Q4_K_M GGUF from a trusted source.
 
-7. **Computer control.** Research the safest and most capable current technologies for giving an autonomous agent broad access to a computer: terminal control, filesystem control, browser control, GUI/computer-use, application control, process management, sandboxing, virtual machines, containers, dedicated OS users, permission systems, credential isolation, network isolation. I want maximum practical autonomy without giving an AI unrestricted access to sensitive personal information by default.
+### Primary planning/general/research model
 
-8. **Always-on operation.** Determine how to make the system operate 24/7: macOS background services, launch agents/daemons, automatic restart, crash recovery, task persistence, queues, scheduled jobs, monitoring, logging, watchdogs, sleep prevention, remote access, network security. The system should recover automatically if an agent crashes or the computer restarts.
+**Qwen3-30B-A3B, Q4_K_M**, if available.
 
-9. **Remote access.** Best current approaches for: secure remote commands, status dashboards, notifications, task submission, logs, approvals, emergency stop, authentication, encrypted connections. Do not expose unnecessary services directly to the public internet.
+Why:
 
-10. **Storage architecture.** Given 512 GB internal + 1 TB external SSD, determine what should live on each drive: models, databases, embeddings, Git repositories, research papers, datasets, logs, temporary agent workspaces, backups, caches. Consider external SSD throughput and reliability.
+- Better general reasoning/research synthesis than a coding-only model.
+- Still practical at 32 GB if loaded alone or with only a tiny model.
 
-## Required final architecture
+If model swapping is annoying, you can use the coder model for planning too. That is acceptable.
 
-After researching everything, design the best complete system for my exact machine. Give a concrete layered architecture (interface → supervisor → orchestrator → task queue → specialized agents → model router → local inference → tools → persistent memory), but do NOT assume that shape is correct — change it if your research shows a better design.
+### Small utility model
 
-## Independently compare the market
+**Qwen3-8B-Instruct Q4/Q5**.
 
-For every major category identify: (1) best overall, (2) best for my specific hardware, (3) best open-source option, (4) best lightweight option, (5) best mature/stable option, (6) best cutting-edge option, (7) what I should actually use. Include alternatives I may not know about. If two technologies are close, explain the tradeoff and choose one for my use case.
+Alternative: **Phi-4 14B Q4** if you can afford the extra memory and want stronger small-model reasoning.
 
-## Hardware optimization
+Use for:
 
-Calculate approximately how my 32 GB unified memory should be allocated. Account for: macOS, inference model weights, KV cache, context windows, agent processes, databases, browser, development tools, filesystem cache. Determine: ideal model size, ideal quantization, ideal context window, number of concurrent large-model workers, number of concurrent small-model workers, whether model swapping is worthwhile, whether multiple models should remain loaded, expected bottlenecks. Do not claim precise performance numbers unless supported by benchmarks.
+- Task classification.
+- Query generation.
+- Short summaries.
+- JSON extraction.
+- Retry triage.
+- Deciding whether to escalate to a larger model.
 
-## Cost
+### Embeddings
 
-Prefer free/open-source/local technologies where practical. Identify: completely local/free components, optional paid components, cloud APIs genuinely worth using, situations where local inference is better, situations where cloud inference is worth temporarily using. The system must remain useful without mandatory cloud APIs.
+**bge-m3** if you want stronger multilingual/long-document retrieval.  
+**nomic-embed-text** if you want lighter and simpler.
 
-## Security
+I would start with **bge-m3** if your research corpus is nontrivial; otherwise nomic-embed-text is fine.
 
-Design a security model for autonomous operation. The agent should be highly autonomous but NOT blindly trusted. Include: permissions, sandboxing, dedicated user accounts, workspace isolation, Git safeguards, secrets management, network controls, destructive-command controls, human approval thresholds, emergency kill switch, audit logs, resource limits, time limits, token limits, runaway-agent protection. Explain exactly which operations should require approval and which can be fully autonomous.
+### Optional stronger local reasoning model
 
-## Implementation plan
+**DeepSeek-R1-distilled 32B** or similar Q4 model can be useful for hard reasoning, but it is usually slower and less tool-friendly. Use it as an occasional specialist, not the always-loaded worker.
 
-Give a practical roadmap in phases: (1) minimal working system, (2) autonomous coding, (3) research agents, (4) persistent memory, (5) multi-agent orchestration, (6) 24/7 operation, (7) remote access, (8) advanced optimization. For every phase provide: exact technologies, installation commands where applicable, configuration, directory structure, architecture, how components communicate, how to test it, common failure modes, how to roll back.
+### Models I would not make primary on 32 GB
 
-## Final deliverables
+- Dense 70B models: too slow and memory-hungry.
+- 120B+ models: not practical.
+- 128k-context dense models with large KV cache: likely to thrash memory.
+- Very large vision/multimodal models unless you have a specific need.
 
-Provide, clearly labeled:
-- **A.** Recommended technology stack — table: Layer | Recommended technology | Alternatives | Why
-- **B.** Complete architecture diagram — show how everything connects
-- **C.** Hardware/resource plan — expected RAM/storage usage
-- **D.** Agent architecture — how to have 100+ logical agents without running 100 LLMs simultaneously
-- **E.** Model strategy — exactly which models for: planning, coding, debugging, research, summarization, classification, final synthesis
-- **F.** 24/7 architecture — how the system continues overnight and recovers from failures
-- **G.** Remote-control architecture — how to securely interact from a phone while away
-- **H.** Security architecture — how to give broad computer capability without exposing personal secrets
-- **I.** Exact installation plan — step-by-step, executable on the Mac
-- **J.** What NOT to install — popular technologies that would be redundant, unnecessary, immature, or counterproductive here
-- **K.** Future upgrade path — what to change when moving to 64/96/128+ GB unified memory or adding a dedicated GPU/server
+## 1.4 Practical memory estimate
 
-## Most important instruction
+Approximate, not exact:
 
-Do the research first. Do not give a generic answer from existing knowledge. Verify current versions, capabilities, hardware support, and project activity as of today. Make decisions based on evidence and benchmarks, not brand popularity. The result should be a practical, production-quality architecture for a personal 24/7 autonomous AI research lab running primarily on a 32 GB M6 Mac mini.
+| Component | Estimated RAM |
+|---|---:|
+| macOS + background services | 6–9 GB |
+| Orchestrator, queue, API, workers | 2–4 GB |
+| Small 8B Q4 model + small KV | 4–6 GB |
+| Large 30B MoE Q4 weights | 16–20 GB |
+| KV cache for 16k–32k context | 2–6 GB |
+| Browser/Playwright when researching | 1–3 GB |
+| Databases, file cache, tools | 1–3 GB |
 
-## Response format (for comparability across models)
+With one large model loaded, you are near the practical ceiling. Therefore:
 
-Please structure your answer as:
-1. Header line: model name + version, knowledge cutoff, browsing on/off
-2. Short "decisions at a glance" table (your final picks per layer)
-3. Numbered sections 1–10 matching the investigation areas above
-4. Lettered deliverables A–K
-5. A "Sources" list with URLs, marking each primary or secondary
+- **Large model workers: 1 concurrent.**
+- **Small model workers: 1–2 concurrent**, only if memory pressure stays low.
+- **Embedding worker: bursty**, unload when done.
+- **Browser worker: 1 concurrent.**
+
+Useful settings:
+
+- `num_ctx`: 16384 for coding, 8192–32768 for research depending on memory.
+- Q4_K_M weights.
+- Quantized KV cache if supported.
+- Flash attention if supported.
+- Unload idle models.
+- Batch tasks by model to avoid swapping.
+
+---
+
+# 2. Agent runtimes / harnesses
+
+## 2.1 What you actually need
+
+You need an **agent operating environment**, not a chat UI. The required primitives are:
+
+- Persistent task queue.
+- Long-running background jobs.
+- Tool execution with permissions.
+- Filesystem and Git operations.
+- Terminal execution with timeouts.
+- Browser automation.
+- Memory read/write.
+- Model routing.
+- Approval workflow.
+- Audit logs.
+- Crash recovery.
+- Remote status/control.
+
+Most chat agents and coding assistants do not provide enough of these in the right shape.
+
+## 2.2 Runtime/harness comparison
+
+| System | Best category | Verdict for you |
+|---|---|---|
+| **Custom thin Python supervisor** | Best for your exact requirements | **Use this.** It is not a framework; it is the glue that enforces your queue/security/budget model. |
+| **Aider** | Best lightweight coding executor | **Use as coding executor.** Excellent Git-native editing with local models. |
+| **OpenHands** | Best full autonomous software-engineer sandbox | Strong, but heavier. Good optional component if you want containerized execution. |
+| **Codex CLI** | Best terminal sandbox agent | Very useful optional executor, especially if its macOS sandboxing works well for your setup. |
+| **Goose** | Best MCP-native extensible assistant | Interesting, but I would not make it the core always-on orchestrator for this build. |
+| **Cline / Roo-style IDE agents** | Best interactive IDE copilot | Not ideal for headless 24/7 operation. |
+| **Claude Code** | Excellent proprietary coding agent | Great if you accept cloud dependency and cost, but violates your local-first default. Optional paid fallback only. |
+| **LangGraph / Pydantic AI / Smolagents** | Libraries for building agents | Useful inside your custom supervisor if desired, but not a replacement for the supervisor. |
+| **AutoGen / CrewAI** | Multi-agent conversation frameworks | Too chatty/abstract for constrained hardware and auditable autonomous operation. |
+
+## 2.3 Recommended harness architecture
+
+Use a **custom supervisor** that owns:
+
+1. SQLite task queue.
+2. Agent definitions.
+3. Model routing.
+4. Tool permissions.
+5. Budgets.
+6. Approval gates.
+7. Logging.
+8. Scheduler.
+9. Health checks.
+
+Delegate specialized work to mature executors:
+
+- **Aider** for repository-aware code changes.
+- **Playwright** for browser research.
+- **Python subprocess tools** for file operations, search, parsing.
+- Optional **Codex CLI/OpenHands** for higher-risk command execution.
+
+This gives you the best balance of autonomy, control, and stability.
+
+---
+
+# 3. Multi-agent architecture on limited hardware
+
+## 3.1 Critical distinction
+
+You should not run 100 simultaneous LLM instances. That is impossible on 32 GB.
+
+Instead:
+
+- **100+ logical agents** are definitions: role, prompt, tools, permissions, memory scope, budget, model class.
+- **1–3 physical model workers** execute tasks claimed from the queue.
+- Logical agents become active only when a task is claimed.
+
+This is the difference between:
+
+| Concept | Meaning |
+|---|---|
+| Model instance | Actual loaded weights consuming RAM/compute |
+| Logical agent | Row in database with role and policy |
+| Task | Unit of work assigned to an agent |
+| Worker pool | Process that claims tasks requiring a given model class |
+| Coordinator | Agent that creates/delegates child tasks |
+| Swarm | Many peer agents communicating; usually inefficient here |
+| Hierarchical blackboard | Coordinator + workers + shared task/event store; preferred |
+
+## 3.2 Recommended multi-agent pattern
+
+Use a **hierarchical coordinator-worker architecture with a blackboard/task queue**.
+
+Do not use a free-form swarm. Swarms are hard to audit and waste tokens. On 32 GB, you need deterministic scheduling.
+
+### Core tables
+
+```sql
+agents(
+  id, name, role, system_prompt, tool_policy_json,
+  model_class, memory_scope, max_parallel, created_at
+)
+
+tasks(
+  id, parent_id, agent_id, type, status,
+  model_class, payload_json, result_json,
+  priority, attempts, max_attempts,
+  budget_tokens, tokens_used,
+  lease_worker, lease_expires_at,
+  created_at, updated_at
+)
+
+events(
+  id, task_id, agent_id, kind, payload_json,
+  created_at
+)
+
+approvals(
+  id, task_id, kind, description, status,
+  requested_at, resolved_at, resolution_note
+)
+```
+
+### Worker pools
+
+| Worker pool | Concurrency | Purpose |
+|---|---:|---|
+| `large_coder` | 1 | Coding, debugging, complex tool use |
+| `large_reasoner` | 1, usually same physical slot as coder | Planning, synthesis, hard research |
+| `small_utility` | 1–2 | Classification, summarization, extraction |
+| `embedding` | burst | Embeddings, indexing |
+| `browser` | 1 | Web retrieval, UI automation if needed |
+| `shell_tools` | 1–2 | Non-LLM commands: grep, git, tests, builds |
+
+### Dynamic subagents
+
+A coordinator may create a new agent definition automatically:
+
+```json
+{
+  "name": "pdf-librarian",
+  "role": "Extract claims and citations from PDFs",
+  "model_class": "small_utility",
+  "tools": ["read_file", "pdf_to_markdown", "write_evidence"],
+  "permissions": {
+    "filesystem": ["research/inbox", "research/papers"],
+    "network": false,
+    "shell": false
+  },
+  "budget": {
+    "max_tokens": 100000,
+    "max_wall_seconds": 1800
+  }
+}
+```
+
+Then it creates tasks for that agent.
+
+### Rules for 100+ agents
+
+- Agents are cheap; inference is expensive.
+- Tasks are grouped by `model_class` to avoid swapping.
+- Each task has token, time, and retry budgets.
+- Child tasks inherit a fraction of parent budget.
+- Max recursion depth: 3.
+- Max children per parent: 10–25.
+- Any task needing approval pauses and notifies.
+- Any expired lease is requeued.
+- Any failed task gets postmortem event.
+
+This gives high useful throughput without memory explosion.
+
+---
+
+# 4. Coding agents
+
+## 4.1 Coding agent comparison
+
+| Agent | Repository understanding | Git integration | Local models | Sandbox | Always-on suitability | Verdict |
+|---|---|---:|---:|---|---|---|
+| **Aider** | Good repo map + file selection | Excellent | Excellent | Weak by default | Good when wrapped | **Primary coding executor** |
+| **OpenHands** | Good event-stream agent | Good | Good | Strong with containers | Heavy | Optional advanced sandbox |
+| **Codex CLI** | Good terminal/patch agent | Good | Good via OpenAI-compatible endpoint | Stronger CLI sandbox | Good | Optional executor |
+| **Goose** | MCP tools/extensions | Good | Good | Moderate | Moderate | Not primary |
+| **Cline/Roo** | IDE-oriented | Moderate | Good | Weak/moderate | Poor for headless | Not primary |
+| **Claude Code** | Excellent | Excellent | Poor local-first | Moderate | Excellent but cloud | Paid optional only |
+
+## 4.2 Why Aider is the best fit here
+
+Aider is lightweight, local-model-friendly, and Git-native. It is especially good for:
+
+- Repository maps.
+- Editing files with diffs.
+- Automatic commits.
+- Running lint/test commands when configured.
+- Iterating with local models through LiteLLM/Ollama.
+- Working inside a directory without needing a heavy server.
+
+It is not a full autonomous operating system, which is why your custom supervisor should wrap it.
+
+## 4.3 Coding workflow
+
+For each coding task:
+
+1. Supervisor receives task.
+2. Create or reuse a bare repo mirror:
+   ```bash
+   git clone --bare <repo-url> /AgentLab/workspaces/repos/<project>.git
+   ```
+3. Create isolated worktree:
+   ```bash
+   git -C /AgentLab/workspaces/repos/<project>.git worktree add \
+     /AgentLab/workspaces/wt/task-123 -b agent/task-123 origin/main
+   ```
+4. Aider operates only inside that worktree.
+5. Run:
+   - linters
+   - type checkers
+   - unit tests
+   - build commands
+6. If failures occur, feed logs back to Aider.
+7. Stop after N attempts or budget exhaustion.
+8. Review agent reads diff and produces review.
+9. Human approval required for:
+   - merge to protected branch
+   - push to shared remote
+   - force push
+   - dependency additions
+   - deployment
+
+## 4.4 Coding safeguards
+
+- No direct work on `main`.
+- Branches only: `agent/task-*`.
+- Worktrees only.
+- No force push.
+- No destructive reset outside worktree.
+- Pre-commit hooks.
+- Dependency changes require approval by default.
+- Secrets never present in worktree.
+- If untrusted code is executed, prefer container/VM.
+
+---
+
+# 5. Research agents
+
+## 5.1 Research agent comparison
+
+| Approach | Best category | Verdict |
+|---|---|---|
+| **Custom grounded research pipeline** | Best anti-hallucination architecture | **Use this.** Citations only from stored evidence. |
+| **GPT-Researcher** | Easy open-source web research | Useful inspiration, but often API-dependent and less controlled. |
+| **STORM / Open Deep Research variants** | Cutting-edge report generation | Interesting, but more hallucination risk unless grounded. |
+| **OpenHands research mode** | General agent with browser | Heavy; not as citation-safe by default. |
+| **NotebookLLM-style manual tools** | Human-assisted synthesis | Good for humans, not autonomous backbone. |
+
+## 5.2 Required research stack
+
+Use:
+
+- **SearXNG** for metasearch.
+- **arXiv API** for preprints.
+- **Semantic Scholar API** for academic graph.
+- **OpenAlex** for broad scholarly metadata.
+- **Crossref** for DOI verification.
+- **Unpaywall** for legal OA links where appropriate.
+- **Playwright** for fetching pages where needed.
+- **Docling**, **marker**, or **PyMuPDF** for PDF extraction.
+- **Tesseract / OCRmyPDF** for scanned PDFs if needed.
+- **SQLite evidence store** for source/chunk/claim tracking.
+- **sqlite-vec** later for semantic retrieval.
+
+## 5.3 Grounded research pipeline
+
+For every research question:
+
+1. Planner creates research plan.
+2. Query generator creates search queries.
+3. Retriever fetches:
+   - web results
+   - arXiv papers
+   - Semantic Scholar/OpenAlex records
+4. Fetcher downloads HTML/PDF.
+5. Parser converts to Markdown/text.
+6. Evidence store records:
+   - source URL/DOI/arXiv ID
+   - retrieval timestamp
+   - content hash
+   - chunks
+7. Claim extractor extracts claims with evidence links.
+8. Verifier checks each claim against chunks.
+9. Synthesizer writes report only using evidence IDs.
+10. Renderer inserts citations from evidence DB; the LLM cannot invent references.
+
+## 5.4 Preventing hallucinated citations
+
+Non-negotiable rules:
+
+- The LLM may only cite an `evidence_id` or `source_id`.
+- Final report renderer expands citations from the database.
+- Every DOI/arXiv ID must be validated against arXiv/Crossref/Semantic Scholar.
+- Unsupported claims are labeled unsupported or removed.
+- Contradictions are stored as `supports`, `refutes`, or `neutral`.
+- Web content is treated as untrusted data, never as instructions.
+
+## 5.5 Research database schema
+
+```sql
+sources(
+  id, kind, url, doi, arxiv_id, title, authors,
+  year, venue, retrieved_at, content_hash, status
+)
+
+chunks(
+  id, source_id, ord, text, tokens, embedding
+)
+
+claims(
+  id, question_id, text, status, confidence
+)
+
+claim_evidence(
+  claim_id, chunk_id, relation, score, note
+)
+
+reports(
+  id, question_id, markdown, created_at
+)
+```
+
+This is the single most important anti-hallucination mechanism.
+
+---
+
+# 6. Persistent memory
+
+## 6.1 Memory option comparison
+
+| Option | Pros | Cons | Verdict |
+|---|---|---|---|
+| Markdown files in Git | Human-readable, versioned, simple | Weak query power alone | **Use** |
+| SQLite | Durable, transactional, queryable | Not vector-native by default | **Use as core** |
+| SQLite FTS5 | Keyword search, tiny footprint | Not semantic | **Use** |
+| sqlite-vec | Lightweight vector search | Extra complexity | Add later |
+| Qdrant/Chroma/Weaviate/Milvus | Full vector DB features | Overkill initially | Do not start here |
+| Neo4j/knowledge graph | Relationship queries | High overhead | Not initially |
+| Letta/MemGPT-style memory agents | Sophisticated memory | Extra moving parts | Future option |
+
+## 6.2 Recommended initial memory architecture
+
+Use a hybrid, boring stack:
+
+1. **SQLite** for structured memory:
+   - projects
+   - decisions
+   - tasks
+   - experiments
+   - contacts/entities
+   - preferences
+2. **FTS5** for keyword search.
+3. **Markdown files** for narrative memory:
+   - project notes
+   - decision logs
+   - experiment summaries
+   - research notes
+4. **Git repository** for memory versioning.
+5. Later, **sqlite-vec** for semantic recall.
+
+## 6.3 Memory scopes
+
+| Scope | Example | Storage |
+|---|---|---|
+| Global | User preferences, hardware limits, style | `memory/global.md`, SQLite |
+| Project | Repo conventions, architecture decisions | `memory/projects/<project>.md` |
+| Task | Temporary task context | task payload + events |
+| Research | Evidence, citations, claims | research SQLite DB |
+| Experiment | Config, metrics, artifacts | `research/experiments/<id>` |
+| Episodic | What happened, failures, fixes | events + summaries |
+
+## 6.4 Memory hygiene
+
+- Summarize completed tasks into project memory.
+- Store failures and fixes explicitly.
+- Do not store secrets in memory.
+- Periodically prune stale episodic memory.
+- Keep memory repo private and backed up.
+
+---
+
+# 7. Computer control
+
+## 7.1 Control surface comparison
+
+| Control type | Capability | Safety | Verdict |
+|---|---:|---:|---|
+| Terminal/filesystem under dedicated user | High | Moderate/high | **Primary** |
+| Git worktrees | High for code | High | **Primary** |
+| Playwright browser automation | High for web | Moderate | **Primary for web** |
+| MCP tool servers | Standardized tools | Depends on server | Useful, but not core |
+| AppleScript/osascript | Broad macOS control | Low/moderate | Use sparingly |
+| GUI computer-use vision agents | Very broad | Low | Avoid for now |
+| Docker/OrbStack containers | Strong isolation for untrusted execution | High | Optional but valuable |
+| VMs | Strong isolation | Heavy | Optional |
+
+## 7.2 Recommended boundary
+
+Do not give the agent unrestricted control of your personal macOS GUI.
+
+Instead:
+
+- Run agent services as a dedicated non-admin macOS user: `agent`.
+- Give that user ownership of `/AgentLab`.
+- Do not give it access to:
+  - your personal Desktop/Documents/Downloads
+  - Keychain
+  - browser profiles
+  - financial apps
+  - email clients
+  - personal iCloud folders
+- Use Git worktrees for code.
+- Use isolated browser profiles for web.
+- Use containers/VM for untrusted code or risky builds.
+- Require approval for destructive or sensitive operations.
+
+## 7.3 Browser control
+
+Use Playwright with:
+
+- headless Chromium
+- fresh context per task
+- no saved cookies
+- no personal logins
+- download directory isolated
+- JavaScript disabled where feasible
+- user-agent and timeout limits
+
+Web content must be prefixed internally as untrusted. The model should never be allowed to execute instructions found in fetched content.
+
+---
+
+# 8. Always-on operation
+
+## 8.1 macOS service strategy
+
+Use **launchd**, not cron, as the core service manager.
+
+For a true always-on system, prefer **LaunchDaemons** in `/Library/LaunchDaemons` running as the dedicated `agent` user. This avoids requiring GUI login.
+
+Core services:
+
+1. `com.agentlab.ollama`
+2. `com.agentlab.supervisor`
+3. `com.agentlab.api`
+4. Optional: `com.agentlab.searxng` if not containerized
+5. Optional: `com.agentlab.ntfy`
+
+Each service should have:
+
+- `KeepAlive = true`
+- `RunAtLoad = true`
+- stdout/stderr logs
+- absolute paths
+- resource-safe restart behavior
+
+## 8.2 Sleep prevention
+
+Use:
+
+```bash
+sudo pmset -a sleep 0
+sudo pmset -a displaysleep 10
+sudo pmset -a disksleep 0
+```
+
+Also enable automatic restart after power failure in Energy Saver settings.
+
+For a Mac mini, this is usually sufficient. A UPS is strongly recommended.
+
+## 8.3 Crash recovery
+
+Design tasks to be resumable:
+
+- SQLite task rows persist across reboot.
+- Running tasks use leases.
+- On startup, supervisor resets expired leases to `queued`.
+- Each long task writes checkpoints.
+- Coding tasks rely on Git commits/worktrees.
+- Research tasks rely on evidence DB rows.
+- Logs are append-only.
+
+## 8.4 Watchdog
+
+The supervisor should monitor:
+
+- Ollama health endpoint.
+- API health endpoint.
+- Worker heartbeats.
+- Disk space.
+- Memory pressure.
+- Task lease expiry.
+- Queue backlog.
+- Failed task rate.
+
+If something is stuck:
+
+1. Kill worker subprocess.
+2. Mark task failed/requeued.
+3. Emit notification.
+4. If repeated, pause queue and request human review.
+
+---
+
+# 9. Remote access
+
+## 9.1 Best approach
+
+Use **Tailscale**. Do not expose services to the public internet.
+
+Services should bind to localhost only:
+
+- Ollama: `127.0.0.1:11434`
+- Dashboard/API: `127.0.0.1:8321`
+- SearXNG: `127.0.0.1:8888`
+- ntfy: `127.0.0.1:2586`
+
+Then use Tailscale SSH and Tailscale Serve to access them from your devices.
+
+## 9.2 Remote interaction surface
+
+| Need | Recommended |
+|---|---|
+| Secure shell | Tailscale SSH |
+| Web dashboard | FastAPI + HTMX or simple React, served locally, exposed via Tailscale |
+| Notifications | ntfy self-hosted or Pushover |
+| Task submission | Dashboard form or `agentctl submit` over SSH |
+| Approvals | Dashboard queue with approve/deny |
+| Logs | Dashboard log viewer + SSH tail |
+| Emergency stop | `agentctl panic` or dashboard button |
+
+## 9.3 Emergency stop
+
+Implement `agentctl` with:
+
+```bash
+agentctl pause
+agentctl resume
+agentctl stop-task <id>
+agentctl panic
+```
+
+`panic` should:
+
+1. Set global pause flag in SQLite.
+2. Stop workers from claiming new tasks.
+3. Kill active subprocesses where safe.
+4. Optionally unload models.
+5. Send notification.
+6. Require explicit resume.
+
+---
+
+# 10. Storage architecture
+
+## 10.1 Drive roles
+
+### Internal 512 GB SSD
+
+Keep latency-sensitive and reliability-sensitive data here:
+
+- macOS and applications.
+- Active Homebrew tools.
+- Orchestrator code.
+- SQLite databases.
+- Logs.
+- Active Git bare repos and current worktrees.
+- Active models, if possible.
+- Temporary agent scratch space, with quotas.
+
+### External 1 TB SSD
+
+Use for bulk and re-downloadable data:
+
+- Model archive.
+- Large optional models.
+- Research PDFs.
+- Datasets.
+- Experiment artifacts.
+- Backups.
+- Old worktree archives.
+- Paper corpus.
+
+Do not put the main SQLite task DB on the external drive if you can avoid it. If the cable disconnects or the drive sleeps, you do not want the core queue to corrupt.
+
+## 10.2 Approximate storage budget
+
+### Internal 512 GB
+
+| Item | Budget |
+|---|---:|
+| macOS + apps | 60–90 GB |
+| Active models | 50–80 GB |
+| Orchestrator + DB + logs | 10–30 GB |
+| Active repos/worktrees | 50–120 GB |
+| Scratch/cache | 20–40 GB |
+| Free buffer | 100+ GB |
+
+### External 1 TB
+
+| Item | Budget |
+|---|---:|
+| Model archive | 200–400 GB |
+| Papers/PDFs | 100–300 GB |
+| Datasets/artifacts | 100–300 GB |
+| Backups | 100–300 GB |
+
+If your external SSD is Thunderbolt/NVMe, it can be used for active models. If it is a slower USB drive, keep active models internal.
+
+---
+
+# A. Recommended technology stack
+
+| Layer | Recommended technology | Alternatives | Why |
+|---|---|---|---|
+| Inference daemon | Ollama | llama.cpp, MLX, LM Studio | Stable, local, OpenAI-compatible, easy ops |
+| Primary coding model | Qwen3-Coder-30B-A3B Q4 | Mistral Small 3.2 24B, gpt-oss-20b, Gemma 3 27B | Best practical coding/tool-use per GB/RAM |
+| Planning/research model | Qwen3-30B-A3B Q4 | DeepSeek-R1 distilled 32B, gpt-oss-20b | General reasoning/synthesis |
+| Small utility model | Qwen3-8B Q4/Q5 | Phi-4 14B | Cheap routing/summarization |
+| Embeddings | bge-m3 or nomic-embed-text | sentence-transformers MLX builds | Local retrieval |
+| Coding agent | Aider | Codex CLI, OpenHands, Goose | Git-native, local-model friendly |
+| Sandbox executor | Optional Codex CLI/OpenHands | sandbox-exec, OrbStack | Safer untrusted execution |
+| Orchestrator | Custom Python supervisor | LangGraph, Pydantic AI | You need exact queue/security semantics |
+| Queue/state | SQLite WAL + FTS5 | Postgres, Redis | Single-machine, simple, durable |
+| Vector memory later | sqlite-vec | LanceDB, Qdrant | Avoid premature infra |
+| Research search | SearXNG | Brave/Tavily/Serper APIs | Private metasearch; APIs optional |
+| Scholarly APIs | arXiv, Semantic Scholar, OpenAlex, Crossref, Unpaywall | Google Scholar scraping: avoid | Reliable metadata/citation validation |
+| PDF parsing | Docling, marker, PyMuPDF | GROBID | Practical local document conversion |
+| Browser automation | Playwright | Puppeteer, Selenium | Modern, scriptable, isolated contexts |
+| Service manager | launchd | cron, Docker restart policies | Native macOS boot/reboot recovery |
+| Remote network | Tailscale | WireGuard, Headscale, NetBird | Easiest secure private mesh |
+| Dashboard | FastAPI + HTMX/React | Open WebUI, LibreChat | Custom control plane, not chatbot |
+| Notifications | ntfy or Pushover | Telegram, email | Simple phone alerts |
+| Container runtime optional | OrbStack or Colima | Docker Desktop | Lighter than Docker Desktop |
+| Backup | Time Machine + restic | borg | Versioned, encrypted backups |
+| Firewall/outbound control | macOS firewall + LuLu/Little Snitch | pf | Human-visible network control |
+
+---
+
+# B. Complete architecture diagram
+
+```text
+                    Your phone/laptop
+                           |
+                      Tailscale mesh
+                           |
+        +------------------+------------------+
+        |                                     |
+   SSH / agentctl                   HTTPS dashboard
+        |                                     |
+        +------------------+------------------+
+                           |
+                   FastAPI control plane
+                    /        |        \
+          approvals       task view    logs/metrics
+                   \        |        /
+                    SQLite task/event store
+                           |
+                     Supervisor daemon
+             /       /       |       \        \
+     Planner   Coding    Research   Memory   Janitor
+     Agent     Agent     Agent      Curator  Agent
+        \        |          |         |       /
+         \       |          |         |      /
+          Model Router / Worker Pool Manager
+                  |         |          |
+             large_coder large_reasoner small_utility
+                  \         |          /
+                   Ollama local inference
+                    /       |       \
+        Qwen3-Coder  Qwen3-General  Qwen3-8B/bge-m3
+
+Tool layer:
+  Aider / Git worktrees / shell allowlist / Playwright /
+  SearXNG / arXiv / Semantic Scholar / OpenAlex / Crossref /
+  PDF parser / SQLite evidence store / filesystem tools
+
+Security boundary:
+  dedicated macOS user `agent`
+  /AgentLab workspace only
+  isolated browser profile
+  no personal keychain/browser/finance access
+  approval gates + audit log + kill switch
+```
+
+---
+
+# C. Hardware/resource plan
+
+## C.1 RAM plan
+
+| Component | Target |
+|---|---:|
+| macOS baseline | 6–9 GB |
+| Orchestrator/API/workers | 2–4 GB |
+| Large model weights | 16–20 GB |
+| Large model KV cache | 2–6 GB |
+| Small model, if co-loaded | 4–6 GB |
+| Browser | 1–3 GB when active |
+| SQLite/file cache | 1–3 GB |
+
+Practical policy:
+
+- If large model plus small model causes swap, unload small model during large-context tasks.
+- Keep one large model loaded at a time.
+- Use small model for frequent cheap calls.
+- Use embeddings in burst mode.
+- Keep `num_ctx` conservative.
+
+## C.2 Concurrency plan
+
+| Work type | Concurrent workers |
+|---|---:|
+| Large coding/reasoning LLM | 1 |
+| Small LLM | 1–2 if memory pressure is good |
+| Embedding | 1 burst |
+| Browser | 1 |
+| Shell/test/build commands | 1–2, bounded by CPU/IO |
+| File parsing | 1–2 |
+
+## C.3 Bottlenecks
+
+Expected bottlenecks:
+
+1. RAM capacity.
+2. Memory bandwidth during generation.
+3. KV cache for long contexts.
+4. Disk IO when loading models.
+5. Browser memory during research.
+6. Test/build CPU load.
+
+Do not expect datacenter throughput. Expect a slow but steady autonomous machine if tasks are batched and budgets are enforced.
+
+---
+
+# D. Agent architecture: 100+ logical agents without 100 LLMs
+
+## D.1 Core principle
+
+An agent is not a process. An agent is a policy object.
+
+```json
+{
+  "id": "agent-0007",
+  "name": "repo-test-fixer",
+  "role": "Fix failing tests in Python repositories",
+  "model_class": "large_coder",
+  "tools": ["read_file", "write_file", "run_tests", "git_diff"],
+  "permissions": {
+    "filesystem": ["/AgentLab/workspaces/wt/*"],
+    "network": false,
+    "shell_allowlist": ["pytest", "python", "git", "rg"]
+  },
+  "memory_scope": "project:myrepo",
+  "budget": {
+    "max_tokens": 300000,
+    "max_wall_seconds": 7200,
+    "max_attempts": 5
+  }
+}
+```
+
+## D.2 Execution flow
+
+1. Coordinator creates task.
+2. Task specifies `agent_id` and `model_class`.
+3. Worker pool for that model class claims task.
+4. Worker materializes agent context.
+5. Worker calls model and tools.
+6. Events are written.
+7. Result is verified.
+8. Follow-up tasks may be created.
+9. Task completes or escalates.
+
+## D.3 Scheduling rules
+
+- Group queued tasks by model class.
+- Prefer tasks that use the currently loaded model.
+- If no tasks for loaded model, wait briefly before swapping.
+- Never swap models for trivial tasks.
+- Use small model to decide if a task needs large model.
+- Escalate failed small-model tasks to large model only if budget allows.
+
+## D.4 Hierarchical roles
+
+| Role | Function |
+|---|---|
+| Supervisor | System health, queue, budgets |
+| Planner | Decomposes objectives |
+| Coder | Writes code |
+| Tester | Runs tests, verifies |
+| Reviewer | Reviews diff, flags issues |
+| Researcher | Finds sources |
+| Librarian | Parses/stores evidence |
+| Synthesizer | Writes final report |
+| Memory curator | Summarizes learnings |
+| Janitor | Cleans worktrees, caches, logs |
+| Watchdog | Monitors failures |
+
+This gives you a practical autonomous lab without impossible hardware demands.
+
+---
+
+# E. Model strategy
+
+| Task | Primary local model | Fallback | Notes |
+|---|---|---|---|
+| Task classification | Qwen3-8B | rule-based | Cheap, fast |
+| Planning | Qwen3-30B-A3B | Qwen3-Coder-30B-A3B | Use structured JSON plan |
+| Coding | Qwen3-Coder-30B-A3B | Mistral Small 3.2 24B / gpt-oss-20b | Best local workhorse |
+| Debugging | Qwen3-Coder-30B-A3B | cloud if approved | Needs test logs |
+| Research query generation | Qwen3-8B | Qwen3-30B-A3B | Small model sufficient |
+| Evidence extraction | Qwen3-8B or Qwen3-Coder | Qwen3-30B-A3B | Depends on complexity |
+| Summarization | Qwen3-8B | Qwen3-30B-A3B | Short summaries small; long synthesis large |
+| Final synthesis | Qwen3-30B-A3B | cloud API if allowed | Must cite evidence IDs |
+| Code review | Qwen3-Coder-30B-A3B | cloud API if allowed | Read-only diff review |
+| Embeddings | bge-m3 / nomic-embed-text | none | Local only |
+
+## Cloud use policy
+
+Cloud APIs are optional, not required.
+
+Worth using temporarily for:
+
+- Very hard debugging.
+- Large-scale architectural review.
+- Long-document synthesis beyond local context comfort.
+- High-stakes final review.
+- Better web search if SearXNG results are poor.
+
+Local is better for:
+
+- Private repositories.
+- Overnight bulk tasks.
+- Iterative coding.
+- Document parsing.
+- Memory and personal data.
+- Cost-controlled repeated work.
+
+Use **LiteLLM** or a thin router if you want optional cloud fallback with budgets.
+
+---
+
+# F. 24/7 architecture
+
+## F.1 Services
+
+Run as LaunchDaemons under the `agent` user:
+
+- Ollama.
+- Supervisor.
+- API/dashboard.
+- Optional SearXNG.
+- Optional ntfy.
+
+## F.2 Boot behavior
+
+At boot:
+
+1. launchd starts Ollama.
+2. Supervisor waits for Ollama health.
+3. Supervisor opens SQLite DB.
+4. Expired leases are reset.
+5. Queued tasks resume.
+6. API becomes available.
+7. Notification sent: system online.
+
+## F.3 Overnight behavior
+
+Before sleep or when leaving:
+
+```bash
+agentctl mode overnight
+```
+
+This should:
+
+- enable low-priority batch tasks
+- disable tasks requiring approval unless queued
+- cap token budgets
+- enable notifications only for failures/approvals
+- keep research/coding tasks running
+- pause nonessential model swapping
+
+## F.4 Failure handling
+
+| Failure | Response |
+|---|---|
+| Worker crash | launchd restarts supervisor; lease expires; task requeued |
+| Model OOM | reduce context, unload small model, retry smaller |
+| Ollama hang | watchdog restarts Ollama |
+| Disk nearly full | pause queue, alert |
+| External drive missing | pause model/research tasks that require it |
+| Network down | local tasks continue; web tasks pause |
+| Reboot | services restart automatically |
+
+---
+
+# G. Remote-control architecture
+
+## G.1 Network
+
+- Install Tailscale.
+- Enable Tailscale SSH.
+- Use Tailscale Serve for the dashboard.
+- No public ports.
+- No port forwarding.
+- No Cloudflare tunnel unless you specifically need public access.
+
+## G.2 Dashboard features
+
+The dashboard should show:
+
+- Active tasks.
+- Queued tasks.
+- Agent list.
+- Model load state.
+- Memory pressure.
+- Disk usage.
+- Recent logs.
+- Pending approvals.
+- Emergency stop.
+- Task submission form.
+- Notification settings.
+
+## G.3 Phone workflow
+
+From your phone:
+
+1. Open Tailscale dashboard URL.
+2. See queue and failures.
+3. Approve/deny pending actions.
+4. Submit new task.
+5. Receive ntfy/Pushover notification if approval required.
+
+## G.4 SSH workflow
+
+```bash
+ssh mini
+agentctl status
+agentctl tasks --queued
+agentctl approve <id>
+agentctl pause
+agentctl resume
+agentctl panic
+```
+
+---
+
+# H. Security architecture
+
+## H.1 Core principle
+
+The agent is autonomous but not trusted with your whole life.
+
+## H.2 User isolation
+
+Create:
+
+- `human`: your normal admin/user account.
+- `agent`: standard, non-admin user.
+
+Agent owns:
+
+```text
+/AgentLab
+/Users/agent/.cache/agentlab
+/Users/agent/Library/Logs/agentlab
+```
+
+Agent does not access:
+
+- your personal home directories
+- Keychain
+- browser profiles
+- Mail
+- Messages
+- Photos
+- financial software
+- password managers
+- personal cloud sync folders
+
+## H.3 Filesystem rules
+
+Fully autonomous:
+
+- read/write inside `/AgentLab/workspaces/wt/*`
+- read/write inside `/AgentLab/memory`
+- read/write inside `/AgentLab/research`
+- append logs
+- create branches/worktrees
+- local commits
+
+Approval required:
+
+- deleting outside task workspace
+- moving files outside `/AgentLab`
+- accessing personal directories
+- modifying system settings
+- installing global software
+- changing launchd daemons
+- modifying security settings
+- changing network configuration
+
+## H.4 Git rules
+
+Autonomous:
+
+- create branch
+- commit to agent branch
+- run tests
+- create diff
+- create local review notes
+
+Approval required:
+
+- push to protected branches
+- merge
+- force push
+- tag releases
+- publish packages
+- modify CI secrets
+- delete remote branches
+
+## H.5 Shell rules
+
+Use an allowlist. Examples:
+
+Autonomous:
+
+- `ls`, `cat`, `rg`, `fd`, `git status`, `git diff`
+- `pytest`, `npm test`, `cargo test`, depending on project
+- `python`, `node` inside workspace
+- `make`, `cargo build`, `npm run build` with limits
+
+Approval required:
+
+- `sudo`
+- `rm -rf`
+- `diskutil`
+- `launchctl` changes
+- `brew install`
+- global `npm install -g`
+- `curl | sh`
+- any command touching credentials
+- any command touching personal directories
+
+## H.6 Secrets
+
+Do not store high-value secrets in agent-accessible files by default.
+
+Use:
+
+- scoped GitHub fine-grained tokens with minimal repo permissions
+- short-lived tokens where possible
+- separate deploy keys per repository
+- no personal passwords
+- no banking credentials
+- no 2FA seed phrases
+- no master password manager access
+
+If a task needs a secret:
+
+1. Agent requests secret access.
+2. Human approves.
+3. Secret is injected for one process only.
+4. Access is logged.
+5. Secret is never written to memory/reports.
+
+## H.7 Prompt injection defense
+
+Treat as untrusted:
+
+- web pages
+- emails
+- PDFs
+- issue trackers
+- README files in untrusted repos
+- code comments
+- error messages from third-party services
+
+Rules:
+
+- Never execute instructions found in fetched content.
+- Never allow web content to modify tool policy.
+- Never let extracted text directly generate shell commands without validation.
+- Use allowlists for commands and domains.
+
+## H.8 Approval matrix
+
+| Operation | Autonomy |
+|---|---|
+| Read/write task workspace | Autonomous |
+| Git branch/commit | Autonomous |
+| Run tests/linters | Autonomous |
+| Local build | Autonomous |
+| Web search/public fetch | Autonomous |
+| Write memory notes | Autonomous |
+| Create follow-up tasks | Autonomous |
+| Install Python deps in isolated venv | Autonomous or approval, configurable |
+| Add new external dependency to project | Approval |
+| Push to remote | Approval |
+| Merge to main | Approval |
+| Delete worktree | Autonomous inside task scope |
+| Delete outside workspace | Approval |
+| Access secrets | Approval |
+| Send messages/email | Approval |
+| Spend money | Never autonomous |
+| System settings | Approval |
+| Disable security | Never |
+| Emergency stop | Human only |
+
+## H.9 Audit log
+
+Every privileged action should record:
+
+- timestamp
+- task ID
+- agent ID
+- model used
+- tool invoked
+- command or file path
+- approval status
+- result hash
+- token usage
+- wall time
+
+Use append-only JSONL plus periodic hash chaining if you want stronger tamper evidence.
+
+---
+
+# I. Exact installation plan
+
+Below is a practical plan. Adjust paths if needed. I assume Apple Silicon Homebrew lives at `/opt/homebrew`.
+
+## Phase 1: Minimal working system
+
+### 1. Install base tools
+
+```bash
+softwareupdate --install --all
+xcode-select --install
+
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+brew install git uv node sqlite jq ripgrep fd tree-sitter poppler ffmpeg tesseract-lang htop curl wget gh
+```
+
+### 2. Create agent directories
+
+```bash
+sudo mkdir -p /AgentLab/{orchestrator,memory,workspaces,research,logs,secrets,backups,bin}
+sudo mkdir -p /AgentLab/workspaces/{repos,wt}
+sudo mkdir -p /AgentLab/research/{inbox,papers,evidence,experiments,reports}
+sudo mkdir -p /AgentLab/memory/{global,projects,decisions}
+sudo mkdir -p /AgentLab/logs
+sudo mkdir -p /AgentLab/bin
+```
+
+### 3. Create dedicated agent user
+
+Prefer System Settings > Users & Groups and create a standard user named `agent`.
+
+If using CLI, verify syntax for your macOS version; conceptually:
+
+```bash
+sudo sysadminctl -addUser agent -fullName "Agent Lab" -password 'CHANGE_ME' -home /Users/agent -shell /bin/zsh
+```
+
+Then give agent ownership:
+
+```bash
+sudo chown -R agent:staff /AgentLab
+```
+
+Do not make `agent` an admin.
+
+### 4. Install Ollama
+
+```bash
+brew install ollama || brew install --cask ollama
+```
+
+Ensure the binary is available, likely:
+
+```bash
+/opt/homebrew/bin/ollama --version
+```
+
+or:
+
+```bash
+/usr/local/bin/ollama --version
+```
+
+### 5. Start Ollama manually for first test
+
+```bash
+ollama serve
+```
+
+In another terminal:
+
+```bash
+ollama pull qwen3:8b-instruct-q4_K_M
+ollama run qwen3:8b-instruct-q4_K_M "Say OK"
+```
+
+Pull the larger models after confirming stability:
+
+```bash
+ollama pull qwen3-coder:30b-a3b-instruct-q4_K_M
+ollama pull qwen3:30b-a3b-instruct-q4_K_M
+ollama pull bge-m3
+```
+
+If exact tags differ, search for the closest Q4_K_M variants from trusted publishers.
+
+### 6. Install Aider
+
+```bash
+brew install uv
+uv tool install aider-chat
+```
+
+Test:
+
+```bash
+mkdir -p /tmp/aider-test
+cd /tmp/aider-test
+git init
+echo "test" > README.md
+
+aider --model ollama/qwen3:8b-instruct-q4_K_M --yes --message "Create hello.txt containing hello"
+```
+
+If model naming needs `ollama_chat/`, adjust:
+
+```bash
+aider --model ollama_chat/qwen3:8b-instruct-q4_K_M
+```
+
+### 7. Create minimal SQLite queue
+
+Create `/AgentLab/orchestrator/db/agentlab.db` with Python:
+
+```bash
+sudo -u agent -H mkdir -p /AgentLab/orchestrator/db
+sudo -u agent -H sqlite3 /AgentLab/orchestrator/db/agentlab.db <<'SQL'
+CREATE TABLE IF NOT EXISTS tasks(
+  id INTEGER PRIMARY KEY,
+  parent_id INTEGER,
+  agent_id TEXT,
+  type TEXT NOT NULL,
+  status TEXT NOT NULL DEFAULT 'queued',
+  model_class TEXT,
+  payload_json TEXT,
+  result_json TEXT,
+  priority INTEGER DEFAULT 0,
+  attempts INTEGER DEFAULT 0,
+  max_attempts INTEGER DEFAULT 3,
+  budget_tokens INTEGER,
+  tokens_used INTEGER DEFAULT 0,
+  lease_worker TEXT,
+  lease_expires_at TEXT,
+  created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+  updated_at TEXT DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS events(
+  id INTEGER PRIMARY KEY,
+  task_id INTEGER,
+  agent_id TEXT,
+  kind TEXT,
+  payload_json TEXT,
+  created_at TEXT DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS approvals(
+  id INTEGER PRIMARY KEY,
+  task_id INTEGER,
+  kind TEXT,
+  description TEXT,
+  status TEXT DEFAULT 'pending',
+  requested_at TEXT DEFAULT CURRENT_TIMESTAMP,
+  resolved_at TEXT,
+  resolution_note TEXT
+);
+SQL
+```
+
+At the end of Phase 1, you have local inference, a coding executor, and a basic state store.
+
+---
+
+## Phase 2: Autonomous coding
+
+### 1. Install repo tooling
+
+```bash
+brew install gh pre-commit
+```
+
+### 2. Configure Aider defaults
+
+Create `/AgentLab/orchestrator/.aider.conf.yml`:
+
+```yaml
+model: ollama/qwen3-coder:30b-a3b-instruct-q4_K_M
+weak-model: ollama/qwen3:8b-instruct-q4_K_M
+map-tokens: 2048
+auto-commits: true
+auto-lint: true
+yes: true
+```
+
+Adjust model names if Ollama requires `ollama_chat/`.
+
+### 3. Create `.aiderignore`
+
+In each repo/worktree:
+
+```text
+node_modules/
+dist/
+build/
+.venv/
+__pycache__/
+.cache/
+*.log
+models/
+datasets/
+```
+
+### 4. Worktree helper script
+
+Create `/AgentLab/bin/agent-worktree`:
+
+```bash
+#!/bin/zsh
+set -e
+
+REPO_NAME=$1
+TASK_ID=$2
+BARE_DIR="/AgentLab/workspaces/repos/${REPO_NAME}.git"
+WT_DIR="/AgentLab/workspaces/wt/task-${TASK_ID}"
+BRANCH="agent/task-${TASK_ID}"
+
+git -C "$BARE_DIR" worktree add "$WT_DIR" -b "$BRANCH" origin/main
+echo "$WT_DIR"
+```
+
+Make executable:
+
+```bash
+chmod +x /AgentLab/bin/agent-worktree
+```
+
+### 5. Coding loop
+
+Your supervisor should:
+
+1. Create worktree.
+2. Run Aider with a task prompt.
+3. Run tests/lint.
+4. If failure, rerun Aider with failure logs.
+5. Stop after budget.
+6. Generate diff review.
+7. Request approval for push/merge.
+
+### 6. Test
+
+```bash
+/AgentLab/bin/agent-worktree myrepo 123
+cd /AgentLab/workspaces/wt/task-123
+aider --message "Add a failing test, then fix it"
+```
+
+Common failures:
+
+- Model name mismatch.
+- Aider cannot infer repo map.
+- Tests require environment variables.
+- Worktree path permissions.
+- Git remote credentials unavailable.
+
+Rollback:
+
+```bash
+git -C /AgentLab/workspaces/repos/myrepo.git worktree remove --force /AgentLab/workspaces/wt/task-123
+git -C /AgentLab/workspaces/repos/myrepo.git branch -D agent/task-123
+```
+
+---
+
+## Phase 3: Research agents
+
+### 1. Install Python environment
+
+```bash
+cd /AgentLab/orchestrator
+uv init
+uv add httpx beautifulsoup4 lxml playwright pydantic fastapi uvicorn apscheduler litellm pymupdf
+uv run playwright install chromium
+```
+
+### 2. Install SearXNG optional via OrbStack/Colima
+
+```bash
+brew install --cask orbstack
+# or:
+# brew install colima docker
+```
+
+Run SearXNG:
+
+```bash
+docker run -d \
+  --name searxng \
+  --restart unless-stopped \
+  -p 127.0.0.1:8888:8080 \
+  -v /AgentLab/research/searxng:/etc/searxng \
+  searxng/searxng
+```
+
+Test:
+
+```bash
+curl "http://127.0.0.1:8888/search?q=apple+silicon&format=json"
+```
+
+If JSON is disabled, enable JSON format in SearXNG settings.
+
+### 3. Install PDF parsing
+
+```bash
+uv add docling
+# or:
+# uv add marker-pdf
+```
+
+Test:
+
+```bash
+uv run python -c "import fitz; print(fitz.__doc__)"
+```
+
+### 4. Create evidence DB
+
+Use the research schema from section 5.
+
+### 5. Research pipeline rules
+
+- Every source gets a hash.
+- Every claim must have at least one evidence link.
+- Citations are rendered from DB only.
+- DOI/arXiv IDs validated.
+- Web text marked untrusted.
+
+Common failures:
+
+- SearXNG rate limits.
+- Paywalls.
+- PDF parsing failures.
+- Captchas.
+- Bad metadata.
+- Hallucinated DOIs.
+
+Rollback:
+
+- Delete only task-specific evidence rows.
+- Keep source archive immutable.
+- Regenerate reports from evidence.
+
+---
+
+## Phase 4: Persistent memory
+
+### 1. Enable SQLite FTS5
+
+```sql
+CREATE VIRTUAL TABLE memory_fts USING fts5(
+  scope, title, body, content='memory'
+);
+```
+
+### 2. Create memory directories
+
+```bash
+mkdir -p /AgentLab/memory/global
+mkdir -p /AgentLab/memory/projects
+mkdir -p /AgentLab/memory/decisions
+```
+
+### 3. Git-version memory
+
+```bash
+cd /AgentLab/memory
+git init
+git add .
+git commit -m "Initial memory repo"
+```
+
+### 4. Add embeddings later
+
+```bash
+uv add sqlite-vec
+```
+
+Useful when memory exceeds simple FTS recall.
+
+Common failures:
+
+- Memory bloat.
+- Duplicate notes.
+- Secrets accidentally stored.
+- Stale decisions.
+
+Rollback:
+
+- Use Git history.
+- Rebuild FTS index.
+- Re-embed from Markdown/SQLite source.
+
+---
+
+## Phase 5: Multi-agent orchestration
+
+### 1. Build worker pools
+
+Your Python supervisor should have workers for:
+
+- `large_coder`
+- `large_reasoner`
+- `small_utility`
+- `browser`
+- `embedding`
+- `shell_tools`
+
+### 2. Add leases
+
+Task claim logic:
+
+```sql
+UPDATE tasks
+SET status='running',
+    lease_worker=?,
+    lease_expires_at=datetime('now','+10 minutes')
+WHERE id IN (
+  SELECT id FROM tasks
+  WHERE status='queued' AND model_class=?
+  ORDER BY priority DESC, created_at
+  LIMIT 1
+)
+RETURNING *;
+```
+
+### 3. Add budgets
+
+Every task must have:
+
+- max tokens
+- max wall seconds
+- max attempts
+- max child tasks
+
+### 4. Add model batching
+
+Scheduler should prefer tasks whose `model_class` matches currently loaded model.
+
+Common failures:
+
+- Infinite child-task loops.
+- Token runaway.
+- Model swapping thrash.
+- Workers deadlocking on subprocesses.
+
+Rollback:
+
+- Pause queue.
+- Reset running tasks to queued.
+- Restore DB from backup if needed.
+
+---
+
+## Phase 6: 24/7 operation
+
+### 1. Power settings
+
+```bash
+sudo pmset -a sleep 0
+sudo pmset -a displaysleep 10
+sudo pmset -a disksleep 0
+```
+
+Enable automatic restart after power failure in System Settings.
+
+### 2. Install LaunchDaemon for Ollama
+
+Create `/Library/LaunchDaemons/com.agentlab.ollama.plist`:
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.agentlab.ollama</string>
+
+  <key>UserName</key>
+  <string>agent</string>
+
+  <key>ProgramArguments</key>
+  <array>
+    <string>/opt/homebrew/bin/ollama</string>
+    <string>serve</string>
+  </array>
+
+  <key>WorkingDirectory</key>
+  <string>/AgentLab</string>
+
+  <key>RunAtLoad</key>
+  <true/>
+
+  <key>KeepAlive</key>
+  <true/>
+
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>OLLAMA_HOST</key>
+    <string>127.0.0.1:11434</string>
+    <key>OLLAMA_KEEP_ALIVE</key>
+    <string>30m</string>
+    <key>OLLAMA_MAX_LOADED_MODELS</key>
+    <string>1</string>
+    <key>OLLAMA_NUM_PARALLEL</key>
+    <string>1</string>
+  </dict>
+
+  <key>StandardOutPath</key>
+  <string>/AgentLab/logs/ollama.out.log</string>
+
+  <key>StandardErrorPath</key>
+  <string>/AgentLab/logs/ollama.err.log</string>
+</dict>
+</plist>
+```
+
+Load:
+
+```bash
+sudo launchctl bootstrap system /Library/LaunchDaemons/com.agentlab.ollama.plist
+sudo launchctl enable system/com.agentlab.ollama
+```
+
+If Ollama is at `/usr/local/bin/ollama`, adjust path.
+
+### 3. Install supervisor daemon
+
+Create `/Library/LaunchDaemons/com.agentlab.supervisor.plist`:
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.agentlab.supervisor</string>
+
+  <key>UserName</key>
+  <string>agent</string>
+
+  <key>ProgramArguments</key>
+  <array>
+    <string>/opt/homebrew/bin/uv</string>
+    <string>run</string>
+    <string>--directory</string>
+    <string>/AgentLab/orchestrator</string>
+    <string>python</string>
+    <string>-m</string>
+    <string>agentlab.supervisor</string>
+  </array>
+
+  <key>WorkingDirectory</key>
+  <string>/AgentLab/orchestrator</string>
+
+  <key>RunAtLoad</key>
+  <true/>
+
+  <key>KeepAlive</key>
+  <true/>
+
+  <key>StandardOutPath</key>
+  <string>/AgentLab/logs/supervisor.out.log</string>
+
+  <key>StandardErrorPath</key>
+  <string>/AgentLab/logs/supervisor.err.log</string>
+</dict>
+</plist>
+```
+
+Load:
+
+```bash
+sudo launchctl bootstrap system /Library/LaunchDaemons/com.agentlab.supervisor.plist
+sudo launchctl enable system/com.agentlab.supervisor
+```
+
+### 4. Watchdog checks
+
+Supervisor should check:
+
+```bash
+curl -fsS http://127.0.0.1:11434/api/version
+curl -fsS http://127.0.0.1:8321/health
+```
+
+Common failures:
+
+- Wrong binary path.
+- Permission errors on `/AgentLab`.
+- External drive not mounted.
+- macOS update requiring reapproval.
+- Ollama model missing after upgrade.
+
+Rollback:
+
+```bash
+sudo launchctl bootout system/com.agentlab.supervisor
+sudo launchctl bootout system/com.agentlab.ollama
+```
+
+---
+
+## Phase 7: Remote access
+
+### 1. Install Tailscale
+
+```bash
+brew install --cask tailscale
+```
+
+Sign in and enable SSH.
+
+```bash
+sudo tailscale up --ssh
+```
+
+### 2. Run dashboard locally
+
+Example:
+
+```bash
+cd /AgentLab/orchestrator
+uv add fastapi uvicorn
+uv run uvicorn agentlab.api:app --host 127.0.0.1 --port 8321
+```
+
+### 3. Expose via Tailscale Serve
+
+```bash
+tailscale serve --bg 8321
+```
+
+Actual syntax may vary slightly by Tailscale version; check `tailscale serve --help`.
+
+### 4. Notifications
+
+Self-host ntfy:
+
+```bash
+docker run -d \
+  --name ntfy \
+  --restart unless-stopped \
+  -p 127.0.0.1:2586:80 \
+  binwiederhier/ntfy serve
+```
+
+Test:
+
+```bash
+curl -d "AgentLab online" http://127.0.0.1:2586/agentlab
+```
+
+Or use Pushover for simpler phone notifications.
+
+### 5. Emergency stop
+
+Create `/AgentLab/bin/agentctl` wrapper.
+
+Minimum behavior:
+
+```bash
+agentctl pause       # set pause flag in SQLite
+agentctl resume      # clear pause flag
+agentctl panic       # pause + kill active subprocesses
+```
+
+Common failures:
+
+- Tailscale not running after reboot.
+- Dashboard bound to wrong interface.
+- Firewall blocking local access.
+- SSH disabled.
+
+Rollback:
+
+- Disable Tailscale Serve.
+- Stop dashboard daemon.
+- Revert firewall changes.
+
+---
+
+## Phase 8: Advanced optimization
+
+Only after the system is stable.
+
+### 1. Model optimizations
+
+- Try Q5_K_M for small models if memory allows.
+- Try quantized KV cache.
+- Try flash attention if supported.
+- Compare Ollama vs llama.cpp vs MLX for your top model.
+- Benchmark real tasks, not synthetic token/s only.
+
+### 2. Context optimizations
+
+- Use Aider repo maps.
+- Use retrieved chunks, not full documents.
+- Use summaries of old conversations.
+- Use diff-focused context for code review.
+- Keep coding context around 16k unless necessary.
+
+### 3. Scheduler optimizations
+
+- Group tasks by model.
+- Cache embeddings.
+- Cache search results.
+- Deduplicate fetched URLs.
+- Preload models before scheduled batch windows.
+
+### 4. Observability
+
+Add:
+
+- task duration histograms
+- token usage per task type
+- failure categories
+- model swap count
+- memory pressure samples
+- disk usage alerts
+
+Optional:
+
+- Uptime Kuma
+- macmon or similar Apple Silicon monitor
+- OpenTelemetry if you later scale
+
+---
+
+# J. What NOT to install
+
+These are not universally bad, but they are likely redundant, immature, or counterproductive for this specific 32 GB local-first machine.
+
+| Technology | Why not primary here |
+|---|---|
+| Kubernetes | Massive overkill for one Mac mini |
+| Docker Desktop | Heavy; use OrbStack/Colima only if needed |
+| Milvus / Weaviate / Qdrant cluster | Premature vector infrastructure |
+| Neo4j | Do not add a graph DB until you have a proven graph workload |
+| Redis/Kafka/RabbitMQ | SQLite is enough for a single-machine queue initially |
+| LangChain as the core | Too much abstraction churn; use narrow libraries instead |
+| CrewAI/AutoGen as core | Chatty multi-agent abstractions can waste tokens and obscure control |
+| AutoGPT-style loops | Poor reliability, high token burn, weak verification |
+| Open Interpreter with broad system access | Too dangerous without strict boundaries |
+| GUI computer-use agents as primary control | Risky, slow, and brittle on macOS |
+| 70B+ dense local models | Poor useful work per hour on 32 GB |
+| Always-loaded multiple large models | Memory thrash |
+| 128k context by default | KV cache pressure |
+| Public exposure of Ollama/API | Security risk |
+| Cloud-only coding agents as mandatory dependency | Violates local-first requirement |
+| Multiple chat UIs as the core product | You need an operating environment, not chat surfaces |
+| Heavy notebook/ETL platforms | Use plain Python/DuckDB/pandas/Polars first |
+
+---
+
+# K. Future upgrade path
+
+## K.1 Move to 64 GB unified memory
+
+Changes:
+
+- Keep both coding and general large models loaded.
+- Increase context to 32k more safely.
+- Run 1 large worker plus 1–2 small workers more comfortably.
+- Add local reranker if retrieval quality needs it.
+- Increase concurrent shell/test workers slightly.
+
+## K.2 Move to 96–128 GB unified memory
+
+Changes:
+
+- Run larger MoE models.
+- Run multiple large workers.
+- Keep separate coding, planning, research, and review models loaded.
+- Use longer contexts for repository synthesis.
+- Add local vector index with larger embedding model.
+- Consider local vision models if useful.
+
+## K.3 Add a dedicated GPU/server
+
+Architecture changes:
+
+- Keep the Mac mini as orchestrator/security boundary.
+- Move inference to server with vLLM/SGLang/TensorRT-LLM if using NVIDIA/AMD hardware.
+- Expose OpenAI-compatible API over Tailscale only.
+- Keep private data on Mac.
+- Use model router to choose local Mac vs remote server.
+- Use remote GPU for embeddings and batch research.
+- Use local Mac for file access, Git, tools, and approvals.
+
+## K.4 Move from SQLite to Postgres
+
+Do this only when:
+
+- You have multiple machines.
+- You need stronger concurrent writes.
+- You need shared task queue across nodes.
+
+Until then, SQLite is better because it is simple and local.
+
+## K.5 Add containerized execution by default
+
+If you start running untrusted repositories:
+
+- Make OrbStack/Colima containers the default test environment.
+- Mount only task worktree.
+- No host network.
+- No secrets.
+- CPU/RAM limits.
+- Ephemeral filesystem where possible.
+
+---
+
+# Sources
+
+Because browsing was off, these are primary-source locations known from training, not live-verified links. Verify them before relying on exact versions.
+
+## Hardware / macOS
+
+1. Apple Mac mini — https://www.apple.com/mac-mini/ — primary  
+2. Apple developer documentation on macOS background tasks/launchd — https://developer.apple.com/documentation/ — primary  
+3. Apple launchd documentation / archives — https://developer.apple.com/library/archive/documentation/MacOSX/Conceptual/BPSystemStartup/Chapters/CreatingLaunchdJobs.html — primary  
+4. Apple pmset manual — local `man pmset` — primary  
+5. Apple sysadminctl manual — local `man sysadminctl` — primary  
+
+## Local inference engines
+
+6. Ollama — https://ollama.com — primary  
+7. Ollama GitHub — https://github.com/ollama/ollama — primary  
+8. llama.cpp — https://github.com/ggml-org/llama.cpp — primary  
+9. MLX — https://github.com/ml-explore/mlx — primary  
+10. MLX LM — https://github.com/ml-explore/mlx-lm — primary  
+11. LM Studio — https://lmstudio.ai — primary  
+12. LocalAI — https://github.com/mudler/LocalAI — primary  
+
+## Models
+
+13. Qwen GitHub — https://github.com/QwenLM — primary  
+14. Qwen Hugging Face — https://huggingface.co/Qwen — primary  
+15. Mistral models — https://mistral.ai — primary  
+16. Google Gemma — https://ai.google.dev/gemma — primary  
+17. Microsoft Phi models — https://huggingface.co/microsoft — primary  
+18. DeepSeek — https://github.com/deepseek-ai — primary  
+19. OpenAI open models / gpt-oss if applicable — https://openai.com — primary  
+
+## Agent/coding systems
+
+20. Aider — https://aider.chat — primary  
+21. Aider GitHub — https://github.com/Aider-AI/aider — primary  
+22. OpenHands — https://github.com/All-Hands-AI/OpenHands — primary  
+23. OpenAI Codex CLI — https://github.com/openai/codex — primary  
+24. Goose — https://github.com/block/goose — primary  
+25. Cline — https://github.com/cline/cline — primary  
+26. Claude Code docs — https://docs.anthropic.com — primary  
+27. Model Context Protocol — https://modelcontextprotocol.io — primary  
+
+## Agent frameworks considered but not chosen as core
+
+28. LangGraph — https://github.com/langchain-ai/langgraph — primary  
+29. AutoGen — https://github.com/microsoft/autogen — primary  
+30. CrewAI — https://github.com/crewAIInc/crewAI — primary  
+31. Pydantic AI — https://github.com/pydantic/pydantic-ai — primary  
+32. Smolagents — https://github.com/huggingface/smolagents — primary  
+33. Letta — https://github.com/letta-ai/letta — primary  
+
+## Memory / data
+
+34. SQLite — https://sqlite.org — primary  
+35. SQLite FTS5 — https://sqlite.org/fts5.html — primary  
+36. sqlite-vec — https://github.com/asg017/sqlite-vec — primary  
+37. LanceDB — https://github.com/lancedb/lancedb — primary  
+38. Qdrant — https://qdrant.tech — primary  
+39. DuckDB — https://duckdb.org — primary  
+
+## Research / documents
+
+40. SearXNG — https://github.com/searxng/searxng — primary  
+41. arXiv API — https://info.arxiv.org/help/api/index.html — primary  
+42. Semantic Scholar API — https://api.semanticscholar.org — primary  
+43. OpenAlex — https://openalex.org — primary  
+44. Crossref — https://www.crossref.org — primary  
+45. Unpaywall — https://unpaywall.org — primary  
+46. Docling — https://github.com/docling-project/docling — primary  
+47. marker — https://github.com/datalab-to/marker — primary  
+48. PyMuPDF — https://pymupdf.org — primary  
+49. GROBID — https://github.com/kermitt2/grobid — primary  
+
+## Browser / automation
+
+50. Playwright — https://playwright.dev — primary  
+51. Chromium — https://www.chromium.org — primary  
+
+## Operations / remote / security
+
+52. Tailscale — https://tailscale.com — primary  
+53. WireGuard — https://www.wireguard.com — primary  
+54. Headscale — https://github.com/juanfont/headscale — primary  
+55. FastAPI — https://fastapi.tiangolo.com — primary  
+56. Uvicorn — https://www.uvicorn.org — primary  
+57. ntfy — https://ntfy.sh — primary  
+58. Pushover — https://pushover.net — primary  
+59. Caddy — https://caddyserver.com — primary  
+60. OrbStack — https://orbstack.dev — primary  
+61. Colima — https://github.com/abiosoft/colima — primary  
+62. Docker docs — https://docs.docker.com — primary  
+63. restic — https://restic.net — primary  
+64. LuLu — https://objective-see.org/products/lulu.html — primary  
+65. Little Snitch — https://www.obdev.at/products/littlesnitch/index.html — primary  
+66. 1Password CLI — https://developer.1password.com/docs/cli — primary  
+67. Bitwarden CLI — https://bitwarden.com/help/cli/ — primary  
+68. LiteLLM — https://github.com/BerriAI/litellm — primary
 
 ## Reasoning trace (not shown to raters)
 
@@ -618,3 +2691,8 @@ chat.qwen.ai, new chat, Qwen3.8-Max, mode menu Thinking. The thinking panel's he
 reads "Thinking and Search"; the answer itself says browsing/tools OFF, as in run 5.
 Answer copied by the author from the app and written verbatim from the clipboard; the
 thinking panel was pasted by the author into the session and written verbatim from that.
+
+Corrected 2026-10-19: the Final answer section first held the study prompt, not the answer
+(the clipboard still had the prompt when the file was written on 2026-10-14). The answer
+was re-copied by the author from the same chat.qwen.ai chat on 2026-10-19 (9,126 words);
+nothing was re-sent. The reasoning trace is unchanged. See the Deviations table.
