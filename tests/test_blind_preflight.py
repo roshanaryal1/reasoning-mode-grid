@@ -13,12 +13,21 @@ ROOT = Path(__file__).resolve().parent.parent
 
 def _args(tmp_path: Path, grid_path: Path) -> list[str]:
     return [
-        "--config", str(grid_path),
-        "--manifest", str(ROOT / "data/manifest/runs.csv"),
-        "--captures", str(tmp_path / "captures"),
-        "blind", "--out", str(tmp_path / "packets"),
-        "--key", str(tmp_path / "secret" / "key.csv"),
-        "--raters", "human", "llm-a", "llm-b",
+        "--config",
+        str(grid_path),
+        "--manifest",
+        str(ROOT / "data/manifest/runs.csv"),
+        "--captures",
+        str(tmp_path / "captures"),
+        "blind",
+        "--out",
+        str(tmp_path / "packets"),
+        "--key",
+        str(tmp_path / "secret" / "key.csv"),
+        "--raters",
+        "human",
+        "llm-a",
+        "llm-b",
     ]
 
 
