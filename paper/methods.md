@@ -87,7 +87,7 @@ kept in its capture.
 ## 3.4 Checking each mode switch through the API
 
 Chat apps do not report reasoning tokens. To show that each documented switch changes how
-much the model reasons, we made one API call per family and mode (12 calls) with the
+much the model reasons, we made one initial API call per family and mode (12 calls), plus four later follow-up calls, with the
 documented API equivalent of each chat setting (Table 1) and the same prompt. These calls
 are evidence about the switch only: they were never scored, blinded or pooled with the
 chat answers, and they cannot show what a chat app runs internally.
@@ -103,18 +103,24 @@ API omits them).
 | Qwen | `qwen3.8-max` | 0 | 23,805 | switch confirmed |
 | DeepSeek | `deepseek-v4.1-flash` | 0 | 1,367 | switch confirmed |
 | Grok | `grok-4.6` | 131 | 4,627 | lowest available |
+| GPT (follow-up on observed model) | `gpt-6-sol` | 0 | 6,000 | switch confirmed; final answer empty |
+| Grok (follow-up on observed model) | `grok-4.7` | 1,648 | 363 | inconclusive; Expert answer stopped early |
 
-The DeepSeek and Qwen checks ran on Alibaba Model Studio, a third-party host. The GPT
-reasoning call spent its whole 6,000-token output limit (set by the account's rate limit)
-on reasoning and returned no visible answer, and the Claude reasoning call stopped at its
-32,000-token limit. Neither affects the evidence that the switch works. The GPT and Grok
-checks ran on the pre-registered models (`gpt-5.6-sol`, `grok-4.6`), not on the GPT-6 and
-Grok 4.7 that the apps served, so for those two families they show the documented switch on
-the planned model only. [Results of the second checks on `gpt-6-sol` and `grok-4.7`, runbook Phase
-2b.] Claude and Gemini
-show zero reasoning tokens at their lowest setting on this call, although their
-documentation says reasoning cannot be disabled, so we keep them in the "lowest available"
-group.
+The DeepSeek and Qwen checks ran on Alibaba Model Studio, a third-party host. The
+original GPT reasoning check used its whole 6,000-token output limit and returned
+no visible final answer; Claude's reasoning check stopped at its output limit.
+The checks still provide evidence about the API settings.
+
+The original GPT and Grok checks ran on preregistered models (`gpt-5.6-sol`
+and `grok-4.6`) rather than the GPT-6 and Grok 4.7 models seen in chat.
+On 2026-10-19 follow-up checks confirmed GPT-6's API switch (0 versus
+6,000 reasoning tokens), but Grok 4.7's follow-up was inconclusive:
+Expert stopped after a short preamble and reported fewer reasoning tokens
+than Fast (363 versus 1,648). We do not interpret that as validation of
+the consumer app's Fast/Expert distinction. API checks cannot verify hidden
+chat-app routing. Claude and Gemini returned zero reasoning tokens at their
+lowest level, but the documentation says thinking cannot be disabled,
+so they stay in the "lowest available" group.
 
 ## 3.5 Collecting the answers
 

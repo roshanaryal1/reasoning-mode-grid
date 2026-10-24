@@ -8,7 +8,8 @@ shaped the advice below. Its scores were thrown away.
 
 ## Before the first session
 
-- [ ] Pull `main` and rebuild, so the packets carry every blinding fix:
+- [ ] On the reviewed branch (or after the PR is merged), run `make preflight`, which
+  includes checks, fresh packets, kits and the blinding audit. Its underlying commands are:
 
   ```bash
   modegrid blind --raters human llm-a llm-b
@@ -18,8 +19,12 @@ shaped the advice below. Its scores were thrown away.
   ```
 
 - [ ] Copy `data/blinding/key.csv` somewhere outside the repo. Never send it to a rater.
-- [ ] Fill in `data/scores/raters.md`: the human rater's name, and leave the run dates for
-  when you finish.
+- [ ] Keep the registered human rater identified as anonymous **H1** (2026-10-19).
+  Do not publish their identity; add actual scoring dates when each rater finishes.
+- [ ] Check that all three kits have 60 distinct blind IDs and no capture metadata or key.
+  Manually verify the collection screenshots kept outside GitHub.
+- [ ] Keep draft or AI-assisted preliminary scores strictly outside all independent-rater
+  materials; do not prefill H1's sheet or show the drafts to the LLM raters.
 - [ ] Make three folders: `replies/llm-a/`, `replies/llm-b/` and somewhere to keep the human
   rater's sheet when it comes back.
 

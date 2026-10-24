@@ -8,6 +8,7 @@ import datetime as dt
 import getpass
 import hashlib
 import json
+import random
 import sys
 import tempfile
 from pathlib import Path
@@ -196,10 +197,43 @@ def cmd_validate(args: argparse.Namespace) -> int:
 
 
 def cmd_blind(args: argparse.Namespace) -> int:
+    """Fail closed on missing/invalid primary captures or a changed blind-ID mapping."""
     grid = load_grid(args.config)
     main_ids = {r.run_id for r in read_manifest(args.manifest) if r.set == MAIN}
-    caps = [read_capture(p) for p in sorted(Path(args.captures).glob("*.md")) if p.stem in main_ids]
-    caps = [c for c in caps if not check_capture(c)]
+    paths = {p.stem: p for p in Path(args.captures).glob("*.md")}
+    missing = sorted(main_ids - paths.keys())
+    if not main_ids or missing:
+        print(f"ERROR blind: {len(missing)} missing primary capture(s); first IDs: {missing[:5]}")
+        return 1
+
+    prompts = {p.id: p.text() for p in grid.prompts}
+    caps: list[Capture] = []
+    problems: list[str] = []
+    for run_id in sorted(main_ids):
+        path = paths[run_id]
+        try:
+            cap = read_capture(path)
+            if cap.run_id != run_id:
+                problems.append(f"{path}: front-matter run_id differs from filename")
+            problems.extend(f"{path}: {msg}" for msg in check_capture(cap, prompts.get(str(cap.meta.get("prompt_id")))))
+            caps.append(cap)
+        except Exception as exc:
+            problems.append(f"{path}: {exc}")
+    if problems:
+        for problem in problems:
+            print(f"ERROR blind: {problem}")
+        return 1
+
+    # Existing IDs may already be in circulation: never silently remap them.
+    existing_key = Path(args.key)
+    if existing_key.exists():
+        expected_order = list(caps)
+        random.Random(grid.seed).shuffle(expected_order)
+        expected = {f"B{i:03d}": cap.run_id for i, cap in enumerate(expected_order, start=1)}
+        if load_key(existing_key) != expected:
+            print("ERROR blind: existing blind-ID mapping differs; key not overwritten")
+            return 1
+
     terms = list(grid.global_redact_terms)
     for fam in grid.families:
         terms += [fam.vendor, fam.model, *fam.redact_terms]

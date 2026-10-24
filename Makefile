@@ -40,6 +40,18 @@ validate: ## Validate config, prompts, captures and score sheets
 .PHONY: check
 check: lint typecheck test vendored validate ## Everything CI runs
 
+RATERS = human llm-a llm-b
+
+.PHONY: preflight
+preflight: check ## Check primary captures, hashes, blinded packets and rater kits
+	sha256sum -c data/scores/RATER_SHA256SUMS
+	modegrid blind --raters $(RATERS)
+	modegrid rater-kit --raters $(RATERS)
+	modegrid blinding-audit
+	@test "$(find packets/answers -maxdepth 1 -name 'B*.md' | wc -l)" -eq 60
+	@test "$(find packets/kit -type f -name '*.md' | wc -l)" -eq 180
+	@echo "Pre-scoring integrity passed; keep data/blinding/key.csv private."
+
 .PHONY: demo
 demo: ## Synthetic end-to-end run (no API calls)
 	modegrid demo
@@ -61,7 +73,6 @@ paper: ## Stitch the paper drafts into paper/build/manuscript.md and .html (need
 	pandoc paper/build/manuscript.md --standalone --toc --metadata title="LA-P4 manuscript draft" -o paper/build/manuscript.html
 	@echo "wrote paper/build/manuscript.md and paper/build/manuscript.html"
 
-RATERS = human llm-a llm-b
 SHEETS = $(foreach r,$(RATERS),data/scores/$(r).csv)
 UNBLINDED = $(foreach r,$(RATERS),data/scores/$(r)-unblinded.csv)
 

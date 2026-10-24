@@ -20,11 +20,11 @@ portable across a grid.
 
 | | |
 |---|---|
-| Stage | Harness built and tested. Pre-registration frozen 2026-10-13 (tag `prereg-v1`) and registered on OSF: <https://osf.io/nj2zp/>. **All 60 chat captures and the 12 API checks are collected** (2026-10-13 to 2026-10-15). No scores yet. |
+| Stage | Harness built and tested. Pre-registration frozen 2026-10-13 (tag `prereg-v1`) and registered on OSF: <https://osf.io/nj2zp/>. **All 60 primary chat captures and 16 API checks are collected** (12 original checks, plus four follow-ups on 2026-10-19). No finalized independent rater sheets yet. |
 | Pilot | n = 1 family (DeepSeek, 3 modes, web app, v1 rubric). See [the pilot note](data/pilot/README.md): the adjudicated pilot scores do **not** yet support the claim. |
-| Design | 6 families x 2 modes x 5 replicates = 60 chat-app runs, 12 cells, plus 12 API calls that verify each mode switch |
+| Design | 6 families x 2 modes x 5 replicates = 60 chat-app runs, 12 cells, plus 12 original and four follow-up API checks (Grok 4.7 follow-up inconclusive) |
 | Venue | arXiv, then an ICLR 2027 workshop (about Feb 2027) plus TMLR. See [venues](docs/venues.md) |
-| Next | Blind scoring by three raters ([runbook](docs/runbook.md) Phase 3). The LLM raters are named in [`data/scores/raters.md`](data/scores/raters.md). The human rater is still to be named. API check results: [`results/mode_check.md`](results/mode_check.md) |
+| Next | Blind scoring by three raters ([runbook](docs/runbook.md) Phase 3). The LLM raters are named in [`data/scores/raters.md`](data/scores/raters.md). The human rater is registered as anonymous Rater H1 (2026-10-19); scoring is pending. API check results: [`results/mode_check.md`](results/mode_check.md) |
 
 ## What you get
 
@@ -33,7 +33,7 @@ portable across a grid.
 - A pre-registered analysis: a two-way variance decomposition (model family, mode,
   interaction, residual) per rubric dimension, with bootstrap CIs, permutation tests,
   a rank-based check and a length-adjusted check.
-- Chat-app capture templates for the 60 scored runs, plus API adapters for a 12-call
+- Chat-app capture templates for the 60 scored runs, plus API adapters for the original 12 calls and four follow-ups
   check that each mode switch works. The reasoning switch lives in YAML, not code.
 - Blinded rater packets, so raters never see which model or mode wrote an answer.
 - CI that runs lint, types, tests on Python 3.10 to 3.13, and validates the data.
@@ -50,10 +50,10 @@ make check          # lint, types, tests, data validation
 modegrid demo       # full pipeline on SYNTHETIC data, no API calls, no cost
 modegrid plan       # writes data/manifest/runs.csv (60 runs, random order)
 modegrid new-capture claude__fast__p1-v1__r1   # template for one chat run
-modegrid run --dry-run                          # the 12 API mode checks
+modegrid run --dry-run                          # 12 original + 4 follow-up API checks
 ```
 
-The full step-by-step guide is [docs/runbook.md](docs/runbook.md).
+The full step-by-step guide is [docs/runbook.md](docs/runbook.md). Before distributing rating materials, run `make preflight` and follow the [readiness gates](docs/pre-scoring-readiness.md).
 
 ## How the study works
 

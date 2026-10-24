@@ -7,8 +7,8 @@ Deviations table in `docs/preregistration.md` (section 10).
 ## A. Mode registry
 
 What each mode was, how it was switched, and the evidence. Chat settings were used for the
-60 scored answers. API settings were used once per cell to show the switch changes how much
-the model reasons. The API check does not show what a chat app runs internally.
+60 primary chat answers. Twelve original and four follow-up API calls measured
+reported reasoning usage. They cannot verify hidden chat-app routing.
 
 | Family | Chat app, fast | Chat app, reasoning | API model | API fast | API reasoning | Docs read | Reasoning tokens (fast vs reasoning) |
 |---|---|---|---|---|---|---|---|
@@ -18,6 +18,8 @@ the model reasons. The API check does not show what a chat app runs internally.
 | Qwen | chat.qwen.ai, Qwen3.8-Max, Fast | same, Thinking | `qwen3.8-max` | `enable_thinking: false` | `enable_thinking: true` | Alibaba Model Studio docs, 2026-10-06 | 0 vs 23,805 |
 | DeepSeek | chat.deepseek.com, DeepThink off, Search off | same, DeepThink on | `deepseek-v4.1-flash` (Alibaba-hosted) | `enable_thinking: false` | `enable_thinking: true` | Alibaba Model Studio docs, 2026-10-13 | 0 vs 1,367 |
 | Grok | grok.com, Grok 4.7, Fast | grok.com, Grok 4.7, Expert | `grok-4.6` | `reasoning_effort: low` | `reasoning_effort: xhigh` | xAI reasoning docs, 2026-10-05 | 131 vs 4,627 |
+| GPT follow-up | GPT-6, same app captures | Same | `gpt-6-sol` | `reasoning_effort: none` | `reasoning_effort: high` | 2026-10-19 | 0 vs 6,000, switch confirmed |
+| Grok follow-up | Grok 4.7, same app captures | Same | `grok-4.7` | `reasoning_effort: low` | `reasoning_effort: xhigh` | 2026-10-19 | 1,648 vs 363, inconclusive |
 
 Notes on the evidence:
 
@@ -38,9 +40,9 @@ Notes on the evidence:
 - **Planned and actual models.** The pre-registration listed GPT-5.6 Sol and Grok 4.6. GPT-6
   reached ChatGPT on 7 October 2026 and Grok 4.7 reached grok.com in early October, and the
   apps served those during collection. The API checks for these two families ran on the
-  planned API models, so they show the switch on GPT-5.6 Sol and Grok 4.6 only. GPT-6 Sol
-  accepts `reasoning.effort: none` in OpenAI's API, and Grok 4.7 cannot disable reasoning,
-  so neither family changes group in robustness check 4. No release note for any of the six
+  planned API models. Four follow-up calls checked GPT-6 and Grok 4.7 as served in the apps.
+  The GPT-6 API switch was confirmed, but Grok 4.7 was inconclusive (Expert stopped early).
+  Neither result verifies hidden chat-app routing or alters the frozen robustness groups. No release note for any of the six
   models was found inside the collection window. Sources are in the mode registry.
 - **Superseded checks.** Earlier API checks for Gemini (on 3.6 Flash and before an adapter
   fix) and DeepSeek (on V4 Pro) are kept in `data/captures/superseded/` with the reason for
@@ -85,11 +87,11 @@ summary:
 | Operators and send times | Three blocks sent by an AI browser assistant at the author's request, three by the author. Send times recorded as exact times or as bounded intervals where chats ran side by side | None on scores. Disclosed for transparency |
 | Replacements | 6 failed attempts replaced: 3 Claude reasoning runs stopped by a usage limit (treated as the app being down), 1 DeepSeek cut-off, 1 DeepSeek app error, 1 Qwen run sent in the wrong mode (treated like a wrong model). One extra Qwen chat kept, unscored | 60 valid answers from 66 attempts. No family dropped |
 | App behaviour | Claude, GPT and Grok searched the web by themselves, with no switch to stop it. Two DeepSeek fast answers were finished with the app's own "Continue" button | Family differences may include live search. Stated as a limitation |
-| Models that ran | GPT ran GPT-6 and Grok ran Grok 4.7, not the pre-registered GPT-5.6 Sol and Grok 4.6, confirmed by the author. Each ran one model in both modes. The GPT captures' `model_returned` field is corrected in the Deviations table, not in the write-once captures. Rater `llm-b` is GPT-6 too | API checks for those two families cover the planned models only. No change of analysis group |
+| Models that ran | GPT ran GPT-6 and Grok ran Grok 4.7, not the pre-registered GPT-5.6 Sol and Grok 4.6, confirmed by the author. Each ran one model in both modes. The GPT captures' `model_returned` field is corrected in the Deviations table, not in the write-once captures. Rater `llm-b` is GPT-6 too | Four follow-up calls: GPT-6 confirmed; Grok 4.7 inconclusive. No analysis group change |
 | Model self-reports | DeepSeek and Gemini answers named Claude models, which is wrong. GPT ("GPT-6") and Grok ("Grok 4.7") answers named themselves correctly | DeepSeek contrast described as a vendor chat setting |
 | Reasoning traces | Kept where the app showed them. One GPT trace not captured | None. Raters never see traces |
 | Blinding, before scoring | Four fixes: chat-app clutter removed, bare "Model:" label lines removed, removed header lines leave no marker, and self-disclosures naming the answer's maker removed | Same rule for every packet. Key unchanged |
-| Raters | Two LLM raters named after the freeze, as the plan requires. One answer per session from a fixed kit, instructions hashed before scoring | None |
+| Raters | Two LLM raters named after the freeze; human H1 registered anonymously 2026-10-19. One answer per session from a fixed kit, instructions hashed before scoring | Independent scores still pending |
 
 ## D2. Pre-scoring blinding audit
 
@@ -113,7 +115,7 @@ mode. Family guesses above chance are expected and do not change any hypothesis'
 ## E. Data and code availability
 
 Code (MIT) and data (CC-BY-4.0) at [GitHub tag] and [Zenodo DOI]. The release holds the
-configuration, the randomised manifest, all 72 captures (60 scored, 12 API checks) and the
+configuration, the randomised manifest, all 76 captures (60 primary chat answers, 12 initial and 4 follow-up API checks) and the
 superseded attempts, the blinding rules (packets are rebuilt from the captures and the
 committed key), the three rater sheets, the consensus scores and every analysis output.
 The prompt, rubric and memory checker are vendored from LA-P1 at commit `d5e39e7` and

@@ -60,6 +60,13 @@ jobs:
           diff -u data/manifest/runs.csv /tmp/runs.csv
       - name: Synthetic end-to-end run
         run: modegrid demo --boot 300 --out /tmp/demo
+      - name: Pre-scoring packets and blinding audit
+        run: |
+          modegrid blind --raters human llm-a llm-b
+          modegrid rater-kit --raters human llm-a llm-b
+          modegrid blinding-audit --out /tmp/blinding_audit.csv
+          test "$(find packets/answers -maxdepth 1 -name 'B*.md' | wc -l)" -eq 60
+          test "$(find packets/kit -type f -name '*.md' | wc -l)" -eq 180
       - name: Blinding key is not committed early
         run: |
           if git ls-files --error-unmatch data/blinding/key.csv >/dev/null 2>&1; then

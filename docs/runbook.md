@@ -131,42 +131,30 @@ Commit in small batches: `git commit -m "data: claude chat captures r1-r5"`.
 Check: 60 main captures plus 12 API checks in `data/captures/`, and
 `modegrid validate` prints `ok`.
 
-## Phase 2b. API checks for the models the apps served (GPT-6, Grok 4.7)
+## Phase 2b. Follow-up API checks on observed models (completed 2026-10-19)
 
-The first API checks called the planned models (`gpt-5.6-sol`, `grok-4.6`). The apps served
-GPT-6 and Grok 4.7, so four more calls check the switch on those (`apicheck2` in the
-manifest). Cost: a few dollars. Needs `OPENAI_API_KEY` and `XAI_API_KEY` in `.env`.
+The original API checks used `gpt-5.6-sol` and `grok-4.6`, while the chat
+captures used GPT-6 and Grok 4.7. Four follow-up `apicheck2` calls were
+recorded before scoring. These API captures are never rated or pooled
+with the 60 primary chat answers.
 
-1. Confirm the GPT-6 model id. In the OpenAI dashboard's model list, or:
+- **GPT-6 Sol:** fast 0 versus reasoning 6,000 reported reasoning tokens.
+  The API switch was confirmed, although no final answer was returned.
+- **Grok 4.7:** fast 1,648 versus Expert/xhigh 363 reported reasoning tokens.
+  The follow-up is **inconclusive**, not confirmation: the Expert answer
+  stopped after a short preamble. The API does not verify chat-app routing.
+  Preserve the frozen lowest-available robustness group and report
+  this uncertainty.
 
-   ```bash
-   curl -s https://api.openai.com/v1/models -H "Authorization: Bearer $OPENAI_API_KEY" | grep -o '"gpt-6[^"]*"'
-   ```
-
-   If the id is not `gpt-6-sol`, change `api_check_models` under `gpt` in
-   `configs/grid.yaml`.
-2. Look before spending, then run:
-
-   ```bash
-   modegrid run --dry-run --family gpt --family grok   # lists 4 runs, each with its model
-   modegrid run --family gpt --family grok
-   modegrid check-modes                                  # rewrites results/mode_check.md
-   ```
-
-3. Read the two new rows, "gpt (check 2)" and "grok (check 2)". Expected: GPT-6 shows 0
-   reasoning tokens in fast and more than 0 in reasoning ("switch confirmed"). Grok 4.7
-   shows fewer in fast than in reasoning ("lowest available"). If GPT-6 fast uses reasoning
-   tokens, GPT belongs in the lowest-available group for robustness check 4: record that in
-   the Deviations table before any analysis.
-4. Commit the four captures and `results/mode_check.md`.
-
-If a call fails with HTTP 400 on `reasoning_effort: none`, the id is a GPT-6 variant that
-cannot switch reasoning off (OpenAI lists GPT-6 Astra and GPT-6.1 Sol). Check which variant
-ChatGPT served before choosing another id.
+See `results/mode_check.md`, section 10 of `docs/preregistration.md`,
+and `data/captures/*apicheck2.md`. Further diagnostic calls would be
+exploratory and must be documented separately.
 
 ## Phase 3. Score blind (1 to 2 weeks, the long pole)
 
-1. Build the packets. Keep the key away from raters.
+1. Build the packets after `make preflight` passes. Keep the key away from raters;
+   blinding refuses missing/invalid primary captures and refuses to overwrite
+   an existing blind-ID mapping that no longer matches.
 
    ```bash
    modegrid blind --raters human llm-a llm-b
