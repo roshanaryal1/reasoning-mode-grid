@@ -409,14 +409,16 @@ def test_blind_skips_api_check_captures(tmp_path, monkeypatch):
     caps_dir = tmp_path / "caps"
     assert main(["--manifest", str(manifest), "plan"]) == 0
     runs = read_manifest(manifest)
-    main_run = next(r for r in runs if r.set == "main")
     check_run = next(r for r in runs if r.set == "api_check")
-    write_capture(_cap(main_run.run_id), caps_dir)
+    for run in runs:
+        if run.set == "main":
+            write_capture(_cap(run.run_id), caps_dir)
     write_capture(_cap(check_run.run_id), caps_dir)
     out, key = tmp_path / "packets", tmp_path / "key.csv"
     args = ["--manifest", str(manifest), "--captures", str(caps_dir), "blind", "--out", str(out), "--key", str(key)]
     assert main(args) == 0
-    assert len(list((out / "answers").glob("*.md"))) == 1
+    assert len(list((out / "answers").glob("*.md"))) == 60
+    assert check_run.run_id not in key.read_text()
 
 
 def test_new_capture_refuses_api_runs(tmp_path, monkeypatch):
