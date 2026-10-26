@@ -174,68 +174,18 @@ total & 4.136 & 0.233 & 3.872 & 1.658 \\
 
 \section{Pilot data and why it is excluded}
 
-The study grew out of three DeepSeek answers collected for LA-P1 on 2026-08-31, before this
-study was designed: one per mode (deep reasoning, fast, and fast with the DeepThink toggle),
-scored with the v1 rubric and adjudicated by hand.
+The study grew out of three DeepSeek answers collected for LA-P1 \citep{aryal2026lap1} on
+2026-08-31, before this study was designed: one per mode (deep reasoning, fast, and fast
+with the DeepThink toggle), scored with the v1 rubric and adjudicated by hand. Their scores
+belong to LA-P1 and are not reproduced here.
 
-{\def\LTcaptype{none} % do not increment counter
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\linewidth - 22\tabcolsep) * \real{0.0833}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 22\tabcolsep) * \real{0.0833}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 22\tabcolsep) * \real{0.0833}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 22\tabcolsep) * \real{0.0833}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 22\tabcolsep) * \real{0.0833}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 22\tabcolsep) * \real{0.0833}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 22\tabcolsep) * \real{0.0833}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 22\tabcolsep) * \real{0.0833}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 22\tabcolsep) * \real{0.0833}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 22\tabcolsep) * \real{0.0833}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 22\tabcolsep) * \real{0.0833}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 22\tabcolsep) * \real{0.0833}}@{}}
-\toprule\noalign{}
-\begin{minipage}[b]{\linewidth}\raggedright
-Pilot answer
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Mode
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Total (of 18)
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-D1
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-D2
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-D3
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-D4
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-D5
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-D6
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-D7
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-D8
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-D9
-\end{minipage} \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-deepseek-expert & reasoning & 8 & 1 & 1 & 1 & 1 & 1 & 0 & 1 & 2 & 0 \\
-deepseek-instant & fast & 9 & 1 & 2 & 1 & 2 & 0 & 0 & 1 & 2 & 0 \\
-deepseek-instant-deepthink & exploratory & 6 & 0 & 2 & 1 & 0 & 0 & 0 & 1 & 1 & 1 \\
-\end{longtable}
-}
-
-The pilot is excluded from every confirmatory analysis for three reasons: it predates the
+The pilot is excluded from every analysis for three reasons: it predates the
 pre-registration, it used the v1 rubric without the v2 anchors, and it has one answer per
-mode, so it cannot separate a mode effect from run-to-run noise.
-Its adjudicated totals do not show a reasoning advantage (8 versus 9), which the
-pre-registration states so that the result cannot be framed as confirming the pilot. On the
-original v1 fabrication audit the fast answers looked much worse, but most of those
-``fabrications'' were later shown to be real tools released after the auditor's training
-cutoff, which is why D3 and D4 now require web verification.
+mode, so it cannot separate a mode effect from run-to-run noise. As LA-P1 reports, its
+adjudicated totals did not show a reasoning advantage; the pre-registration records this so
+that the present result cannot be framed as confirming the pilot. LA-P1's early
+fabrication audit also flagged real tools released after the auditor's training cutoff as
+invented, which is why D3 and D4 here require web verification.
 
 \section{Deviations from the pre-registration}
 

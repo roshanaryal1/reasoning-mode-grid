@@ -72,8 +72,7 @@ LLMs are increasingly asked to design systems. On networked systems, Sahu et al.
 find that LLMs cannot yet do architectural reasoning reliably and that how the LLM is
 involved changes the outcome a lot. LA-P1 [Aryal, 2026] introduced the task and rubric we
 reuse, and captured one family (DeepSeek) in three modes, one answer each, with no
-controls. Its adjudicated totals did not show a reasoning advantage (reasoning 8, fast 9,
-of 18). That pilot cannot separate a mode effect from run-to-run noise. This paper is the
+controls. Its adjudicated totals did not show a reasoning advantage. That pilot cannot separate a mode effect from run-to-run noise. This paper is the
 controlled test.
 
 ## What is new here
