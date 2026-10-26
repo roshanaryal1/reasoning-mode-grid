@@ -2,8 +2,7 @@
 
 \section{Introduction}
 
-Leaderboards rank models. People who use these models choose more than a model. In every
-major chat app they also choose how hard the model thinks: Instant or High in ChatGPT,
+Leaderboards rank models. People who use these models choose more than a model. In most major chat apps they also choose how hard the model thinks: Instant or High in ChatGPT,
 Effort Low or High in Claude, Fast or Expert in Grok, DeepThink on or off in DeepSeek. The
 same weights can then behave like a different system. If the mode switch changes answer
 quality as much as switching vendor does, a comparison that names the model but not the
@@ -73,7 +72,7 @@ differs from one model to the next.
 Hybrid models expose reasoning as a switch on one set of weights. Work on these models asks
 how to switch and whether the switch is clean. HRBench compares prompt-based, routing and
 speculative switching strategies on six models and five math, science and code benchmarks
-\citep{ning2026hrbench}. Several studies show that the ``off'' mode is not fully off. \citet{wangs2025hybrid} find only partial separation between think and no-think modes, with reasoning
+\citep{ning2026hrbench}. Several studies show that the ``off'' mode is not fully off. \citet{wangs2026hybrid} find only partial separation between think and no-think modes, with reasoning
 behaviour leaking into no-think answers. \citet{liu2026leakage} attribute 42\% to 79\% of
 no-think gains to leaked thinking behaviour, and Path-Lock Expert separates the two modes
 at the architecture level to stop it \citep{wangs2026pathlock}. Thinking persists even under
@@ -599,8 +598,8 @@ On the total score (Table 4, ``total'' row):
 \item
   reasoning scores 1.37 points higher than fast out of 18, 95\% CI {[}0.77, 1.93{]};
 \item
-  permutation p is 0.007 for mode and below 0.001 for family. Both agree with their
-  intervals;
+  permutation p is 0.007 for mode, in agreement with the reasoning-minus-fast interval,
+  and below 0.001 for family (no separate interval is computed for the family effect);
 \item
   omega squared for the family x mode interaction is 0.184. It exceeds the mode effect
   (0.050) but not the family effect (0.577), so it does not exceed both main effects and
@@ -828,7 +827,7 @@ total & -0.527 & -0.570 & yes & -0.655 & 0.050 & 0.008 & 1.367 & 0.621 \\
 \item
   \textbf{Length.} After removing log answer length, the mode effect on the total falls by more
   than half: reasoning minus fast drops from 1.37 to 0.62 points, and omega squared for mode
-  from 0.050 to 0.008. Model \textgreater{} mode still holds (delta -0.655). As pre-registered, we
+  from 0.050 to 0.008. The adjusted delta stays negative (-0.655, a point estimate). As pre-registered, we
   report that the mode effect is not separable from answer length, not that length causes
   it. Reasoning answers are longer, and longer answers score higher; this design cannot
   tell the two apart. The effect also shrinks on D3, D5, D7 and D8, and almost vanishes on
@@ -936,12 +935,12 @@ Human & mode & 60 of 60 & 0.70 & 0.50 & 0.001 \\
 \texttt{llm-a} & family & 60 of 60 & 0.75 & 0.17 & \textless{} 0.001 \\
 \texttt{llm-a} & mode & 60 of 60 & 0.68 & 0.50 & 0.003 \\
 \texttt{llm-b} & family & 60 of 60 & 0.20 & 0.17 & 0.292 \\
-\texttt{llm-b} & mode & 60 of 60 & 0.60 & 0.50 & 0.077 \\
+\texttt{llm-b} & mode & 60 of 60 & 0.60 & 0.50 & 0.078 \\
 \end{longtable}
 }
 
 Two raters beat chance on mode: the human rater (0.70, p = 0.001) and \texttt{llm-a} (0.68,
-p = 0.003). \texttt{llm-b} did not (0.60, p = 0.077). As pre-registered, H1 to H4 were re-run on
+p = 0.003). \texttt{llm-b} did not (0.60, p = 0.078). As pre-registered, H1 to H4 were re-run on
 each rater's scores (Section 4.5, check 3). \texttt{llm-b}, the rater who did not beat chance,
 reaches the same H4 verdict as the consensus (model \textgreater{} mode). Not all three raters beat
 chance, so the ``mode blinding failed'' label does not apply. H4 is not supported in any
@@ -1137,9 +1136,9 @@ finding. D1, the memory-budget check that H1 expected reasoning to improve, did 
 all on average (0.00), even though it is the dimension where a careful calculation should
 help most.
 
-On D3, tool factuality, the estimates point the way H3 predicted, with family dominating
-and no mode effect, but D3's reliability is below the bar, so H3 is neither confirmed nor
-refuted. The competing account, that
+On D3, tool factuality, the exploratory variance comparison matches the direction H3
+predicted, with family dominating, and the mode-effect interval includes zero; D3's
+reliability is below the bar, so H3 is neither confirmed nor refuted. The competing account, that
 reasoning models invent more tools, did not appear: reasoning minus fast on D3 was -0.10
 with an interval that includes zero. This dimension carries a reliability warning of its
 own. Its alpha was the lowest of all (0.25), and the human rater's ranking of the 12 cells

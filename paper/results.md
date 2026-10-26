@@ -60,8 +60,8 @@ On the total score (Table 4, "total" row):
 - delta omega squared (mode minus family) is -0.527, 95% CI [-0.666, -0.417];
 - omega squared is 0.050 for mode and 0.577 for family;
 - reasoning scores 1.37 points higher than fast out of 18, 95% CI [0.77, 1.93];
-- permutation p is 0.007 for mode and below 0.001 for family. Both agree with their
-  intervals;
+- permutation p is 0.007 for mode, in agreement with the reasoning-minus-fast interval,
+  and below 0.001 for family (no separate interval is computed for the family effect);
 - omega squared for the family x mode interaction is 0.184. It exceeds the mode effect
   (0.050) but not the family effect (0.577), so it does not exceed both main effects and
   the "average effect only" label does not apply.
@@ -178,7 +178,7 @@ log answer length (`results/variance_table.md`, sensitivity checks).
    not a verdict.
 2. **Length.** After removing log answer length, the mode effect on the total falls by more
    than half: reasoning minus fast drops from 1.37 to 0.62 points, and omega squared for mode
-   from 0.050 to 0.008. Model > mode still holds (delta -0.655). As pre-registered, we
+   from 0.050 to 0.008. The adjusted delta stays negative (-0.655, a point estimate). As pre-registered, we
    report that the mode effect is not separable from answer length, not that length causes
    it. Reasoning answers are longer, and longer answers score higher; this design cannot
    tell the two apart. The effect also shrinks on D3, D5, D7 and D8, and almost vanishes on
@@ -231,10 +231,10 @@ the exact one-sided binomial p-value (`results/blinding_check.csv`).
 | `llm-a` | family | 60 of 60 | 0.75 | 0.17 | < 0.001 |
 | `llm-a` | mode | 60 of 60 | 0.68 | 0.50 | 0.003 |
 | `llm-b` | family | 60 of 60 | 0.20 | 0.17 | 0.292 |
-| `llm-b` | mode | 60 of 60 | 0.60 | 0.50 | 0.077 |
+| `llm-b` | mode | 60 of 60 | 0.60 | 0.50 | 0.078 |
 
 Two raters beat chance on mode: the human rater (0.70, p = 0.001) and `llm-a` (0.68,
-p = 0.003). `llm-b` did not (0.60, p = 0.077). As pre-registered, H1 to H4 were re-run on
+p = 0.003). `llm-b` did not (0.60, p = 0.078). As pre-registered, H1 to H4 were re-run on
 each rater's scores (Section 4.5, check 3). `llm-b`, the rater who did not beat chance,
 reaches the same H4 verdict as the consensus (model > mode). Not all three raters beat
 chance, so the "mode blinding failed" label does not apply. H4 is not supported in any

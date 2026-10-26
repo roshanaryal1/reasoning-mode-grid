@@ -3,8 +3,7 @@
 Draft written 2026-10-14, before any scoring. The last paragraph was written 2026-10-26,
 after the analysis.
 
-Leaderboards rank models. People who use these models choose more than a model. In every
-major chat app they also choose how hard the model thinks: Instant or High in ChatGPT,
+Leaderboards rank models. People who use these models choose more than a model. In most major chat apps they also choose how hard the model thinks: Instant or High in ChatGPT,
 Effort Low or High in Claude, Fast or Expert in Grok, DeepThink on or off in DeepSeek. The
 same weights can then behave like a different system. If the mode switch changes answer
 quality as much as switching vendor does, a comparison that names the model but not the

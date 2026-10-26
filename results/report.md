@@ -117,7 +117,7 @@ Fast-mode floor (robustness check 4):
 | llm-a | family | 60 of 60 | 0.75 | 0.17 | 0.000 |
 | llm-a | mode | 60 of 60 | 0.68 | 0.50 | 0.003 |
 | llm-b | family | 60 of 60 | 0.20 | 0.17 | 0.292 |
-| llm-b | mode | 60 of 60 | 0.60 | 0.50 | 0.077 |
+| llm-b | mode | 60 of 60 | 0.60 | 0.50 | 0.078 |
 
 Beat chance on mode (p < 0.05): human, llm-a. See the per-rater table in 4.5.
 

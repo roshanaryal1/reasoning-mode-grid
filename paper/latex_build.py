@@ -51,14 +51,14 @@ PARENTHETICAL = {
     "Madur, 2026": "madur2026moral",
     "Ning et al., 2026": "ning2026hrbench",
     "Potamitis et al., 2025": "potamitis2025reasonbench",
-    "S. Wang et al., 2026": "wangs2026pathlock",
+    "S. Wang et al., 2026b": "wangs2026pathlock",
     "Snell et al., 2025": "snell2025scaling",
     "Yuan et al., 2025": "yuan2025numerical",
     "Zhang et al., 2026": "zhang2026harness",
     "Zhao et al., 2026": "zhao2026tts",
 }
 TEXTUAL = {
-    "S. Wang et al. [2025]": "wangs2025hybrid",
+    "S. Wang et al. [2026a]": "wangs2026hybrid",
     "Liu and Honavar [2026]": "liu2026leakage",
     "Sahu et al. [2026]": "sahu2026architects",
 }

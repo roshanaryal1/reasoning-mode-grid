@@ -59,9 +59,9 @@ finding. D1, the memory-budget check that H1 expected reasoning to improve, did 
 all on average (0.00), even though it is the dimension where a careful calculation should
 help most.
 
-On D3, tool factuality, the estimates point the way H3 predicted, with family dominating
-and no mode effect, but D3's reliability is below the bar, so H3 is neither confirmed nor
-refuted. The competing account, that
+On D3, tool factuality, the exploratory variance comparison matches the direction H3
+predicted, with family dominating, and the mode-effect interval includes zero; D3's
+reliability is below the bar, so H3 is neither confirmed nor refuted. The competing account, that
 reasoning models invent more tools, did not appear: reasoning minus fast on D3 was -0.10
 with an interval that includes zero. This dimension carries a reliability warning of its
 own. Its alpha was the lowest of all (0.25), and the human rater's ranking of the 12 cells

@@ -148,6 +148,14 @@ NeurIPS 2026 per the arXiv comment, conference not yet held. S. Wang et al. 2025
 (2510.12680) was withdrawn from ICLR 2026. No published version found for HRBench, Thinking
 Leakage, MARGO, Lau, Madur or Sahu et al.
 
+## Second check, 2026-10-27 (Codex verification pass)
+
+- 2510.12680 S. Wang et al. was published at EMNLP 2026, pp. 3491-3511
+  (aclanthology.org/2026.emnlp-main.151, BibTeX checked: same seven authors). Now cited as
+  EMNLP 2026; in the text it is S. Wang et al. 2026a and Path-Lock is 2026b.
+- Path-Lock Expert: the arXiv PDF's author metadata (and XMP creator) give "Wang Yang";
+  the COLM OpenReview record says "Van Yang". "Wang Yang" kept.
+
 ## Own prior work
 
 - LA-P1, LLMs as Systems Architects (Cureus, under review; Zenodo DOI 10.5281/zenodo.22245991). Source of the prompt, rubric and the DeepSeek pilot.

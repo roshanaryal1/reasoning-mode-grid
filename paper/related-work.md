@@ -9,10 +9,10 @@ arXiv, Crossref or DataCite record; the list is in the References section.
 Hybrid models expose reasoning as a switch on one set of weights. Work on these models asks
 how to switch and whether the switch is clean. HRBench compares prompt-based, routing and
 speculative switching strategies on six models and five math, science and code benchmarks
-[Ning et al., 2026]. Several studies show that the "off" mode is not fully off. S. Wang et al. [2025] find only partial separation between think and no-think modes, with reasoning
+[Ning et al., 2026]. Several studies show that the "off" mode is not fully off. S. Wang et al. [2026a] find only partial separation between think and no-think modes, with reasoning
 behaviour leaking into no-think answers. Liu and Honavar [2026] attribute 42% to 79% of
 no-think gains to leaked thinking behaviour, and Path-Lock Expert separates the two modes
-at the architecture level to stop it [S. Wang et al., 2026]. Thinking persists even under
+at the architecture level to stop it [S. Wang et al., 2026b]. Thinking persists even under
 explicit instructions not to think, more so as the answer space opens [Lei et al., 2026]. These results bear on our design in two ways. A fast mode may still reason on an
 open-ended task, so we measure reasoning tokens for each mode through the API (Section
 3.4). And three of our six families offer only a lowest setting, not an off switch, which
