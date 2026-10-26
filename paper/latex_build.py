@@ -70,10 +70,12 @@ CITE = {"jair": "cite", "tmlr": "citep"}
 ANONYMISE = {
     "(<https://osf.io/nj2zp/>)": (
         "(link withheld for double-blind review; the frozen plan and its Deviations table are in the "
-        "anonymised repository)"
+        "anonymised repository, <https://anonymous.4open.science/r/model-mode-grid-review/>)"
     ),
-    "[GitHub tag and Zenodo DOI]": "[anonymised repository link]",
-    "[GitHub tag] and [Zenodo DOI]": "[anonymised repository link]",
+    "as tag `v1.0.0` of <https://github.com/roshanaryal1/reasoning-mode-grid>, archived on Zenodo "
+    "(<https://doi.org/10.5281/zenodo.23674817>)": "at the anonymised repository <https://anonymous.4open.science/r/model-mode-grid-review/>",
+    "are in tag `v1.0.0` of <https://github.com/roshanaryal1/reasoning-mode-grid>, archived at "
+    "<https://doi.org/10.5281/zenodo.23674817>": "are at the anonymised repository <https://anonymous.4open.science/r/model-mode-grid-review/>",
     # Project codes, the harness name and upstream fingerprints lead to the author's
     # public repositories, so they are replaced in the review version too.
     "An open harness, `modegrid`, that": "An open harness that",
@@ -97,6 +99,8 @@ FORBIDDEN = (
     "ba2acba8",
     "llm-architects",
     "zenodo.22245991",
+    "23674817",
+    "github.com/",
 )
 # Self-citations shown as anonymous in the review version, with neutral keys, because
 # hyperref writes citation keys into the PDF as link targets.
