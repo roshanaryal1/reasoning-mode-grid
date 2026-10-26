@@ -1,0 +1,28 @@
+# Broader impact statement
+
+Draft written 2026-10-27, after the analysis. TMLR asks for this section; it is optional.
+
+This study informs how language models are compared and chosen. Its main practical message,
+that the choice of model mattered more than the reasoning setting on this task, could be
+over-read in two ways. First, it holds for one open-ended design task, six families and one
+26-hour window; it is not evidence that reasoning modes are unhelpful in general, and on
+some families the reasoning setting changed scores a great deal. Second, the per-family
+scores are not a product ranking. They reflect one prompt, app settings that differed
+between vendors (including live web search in three apps) and models that the apps can
+change without notice. We report them to explain the variance decomposition, not to
+recommend a vendor.
+
+Two findings bear on evaluation practice beyond this paper. Both LLM raters scored their
+own vendor's answers higher than the other raters did, by about as much as the average
+effect of reasoning mode, so a study that uses a single LLM judge from a vendor it is
+comparing can mistake self-preference for an effect. And two of six models named a
+different vendor's model when asked to identify themselves, so a model's self-report is not
+reliable evidence of which model answered.
+
+Reasoning modes also use more computation per answer: in our API checks the reasoning
+setting used between 1,367 and 23,805 reasoning tokens per call, where the fast setting used
+0 to 131. Where reasoning does not improve the answer, the extra cost and energy buy little,
+which is one more reason to report the mode.
+
+The study collected no personal data. The 60 answers are model outputs to a fixed prompt
+about computer hardware. The human rater is not named, at their request.
