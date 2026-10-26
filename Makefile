@@ -52,7 +52,7 @@ plan: ## Regenerate the run manifest
 analyze: ## Confirmatory analysis into results/
 	modegrid analyze
 
-PAPER_SECTIONS = paper/abstract.md paper/introduction.md paper/related-work.md paper/methods.md paper/results.md paper/discussion.md paper/references.md paper/appendix.md
+PAPER_SECTIONS = paper/abstract.md paper/introduction.md paper/related-work.md paper/methods.md paper/results.md paper/discussion.md paper/broader-impact.md paper/references.md paper/appendix.md
 
 .PHONY: paper
 paper: ## Stitch the paper drafts into paper/build/manuscript.md and .html (needs pandoc for the HTML)

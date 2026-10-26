@@ -222,6 +222,11 @@ def write(target: str, anonymous: bool) -> list[Path]:
     paths[0].write_text(header + body, encoding="utf-8")
     paths[1].write_text(header + appendix, encoding="utf-8")
     if target == "tmlr":
+        if not anonymous:  # the same text serves both versions; it names no one
+            impact = strip_notes((PAPER / "broader-impact.md").read_text(encoding="utf-8"))
+            impact = re.sub(r"^# .*\n", "", impact.lstrip())
+            paths.append(out / "broader-impact.tex")
+            paths[-1].write_text(header + to_latex(impact), encoding="utf-8")
         bib = out / f"references{suffix}.bib"
         bib.write_text(header + bibtex(BIB.read_text(encoding="utf-8"), anonymous), encoding="utf-8")
         paths.append(bib)
