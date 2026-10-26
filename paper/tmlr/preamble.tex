@@ -1,0 +1,22 @@
+%% Shared by main.tex (anonymous submission) and preprint.tex (named preprint).
+\usepackage{hyperref}
+\usepackage{url}
+\usepackage{graphicx}
+\graphicspath{{../../results/}}
+
+%% Packages the pandoc-generated body needs.
+\usepackage{longtable}
+\usepackage{booktabs}
+\usepackage{calc}
+\usepackage{array}
+\providecommand{\tightlist}{\setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\makeatletter\@ifundefined{c@none}{\newcounter{none}}{}\makeatother
+\providecommand{\Description}[1]{}
+
+%% Wide tables: smaller type, and code-font cells may break at hyphens and underscores.
+\usepackage{etoolbox}
+\AtBeginEnvironment{longtable}{\footnotesize}
+\usepackage[htt]{hyphenat}
+\AtBeginEnvironment{longtable}{\renewcommand{\_}{\textunderscore\allowbreak}}
+
+\title{Model, Not Mode: A Pre-registered Model x Mode Grid\\on a Constrained Design Task}

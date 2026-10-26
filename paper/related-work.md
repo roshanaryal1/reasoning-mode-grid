@@ -34,7 +34,7 @@ and how much from something around it. On creative tasks, a variance decompositi
 originality as the prompt, and more in fluency [Haase et al., 2026]. For coding agents, the
 harness that runs the model can explain more variance than the model and can reverse model
 rankings [Zhang et al., 2026]. Test-time compute work shows that extra inference compute,
-spent well, can beat a larger model on math [Snell et al., 2024]. We apply the same
+spent well, can beat a larger model on math [Snell et al., 2025]. We apply the same
 variance-decomposition logic to a factor none of these studies varies: the reasoning mode
 of a fixed model, crossed with model identity, on a constrained task.
 
@@ -42,9 +42,9 @@ of a fixed model, crossed with model identity, on a constrained task.
 
 Reasoning does not only help. Reasoning-oriented RL fine-tuning raises hallucination rates
 [Li and Ng, 2025], reasoning LLMs hallucinate more than non-reasoning models on long-form
-factuality [Chen et al., 2025], and thinking can turn a correct direct answer into a wrong
+factuality [Chen et al., 2026], and thinking can turn a correct direct answer into a wrong
 one [K. Wang et al., 2026]. On closed-book knowledge tasks, more test-time computation
-does not reliably raise accuracy and often adds hallucinations [Zhao et al., 2025]. Reasoning-model errors on constrained problems often come
+does not reliably raise accuracy and often adds hallucinations [Zhao et al., 2026]. Reasoning-model errors on constrained problems often come
 from inventing problem features that were never given [Heyman and Zylberberg, 2025]. These
 works compare differently trained models or study training methods, not one model with
 reasoning switched on and off at inference time. They motivate a competing prediction for
@@ -54,7 +54,7 @@ our hypothesis H3: if the effect carries over, reasoning mode would lower tool f
 ## Run-to-run variance and LLM raters
 
 Repeated runs of one model with fixed settings give different outputs. Sources include
-hosted-service non-determinism at temperature 0 [Atil et al., 2024], floating-point
+hosted-service non-determinism at temperature 0 [Atil et al., 2025], floating-point
 non-associativity that shifts reasoning-model accuracy by up to 9% [Yuan et al., 2025], and
 early divergence in agent trajectories that moves single-run scores by 2 to 6 points
 [Bjarnason et al., 2026]. Across 12 models, 10 reasoning strategies and 30 trials
