@@ -82,4 +82,4 @@ To our knowledge, no prior study crosses reasoning mode with model identity and 
 answer-quality variance on an open-ended, constrained design task. We add a pre-registered
 6 x 2 design with replicates, a per-dimension decomposition with bias-corrected effect
 sizes, blinded scoring by human and LLM raters with web verification, and a reusable
-harness. [Repeat the literature search before submission.]
+harness. The search was last repeated on 2026-10-26.
