@@ -4,7 +4,7 @@ import pytest
 
 from modegrid import DIMS
 from modegrid.cli import main
-from modegrid.ownvendor import own_vendor
+from modegrid.ownvendor import own_vendor, replaced_consensus
 from modegrid.scores import write_scores
 from modegrid.synthetic import synthetic_scores
 
@@ -64,3 +64,54 @@ def test_cli_defaults_to_both_llm_raters(tmp_path, capsys):
     assert {(r["rater"], r["family"]) for r in rows} == {("llm-a", "claude"), ("llm-b", "gpt")}
     assert len(rows) == 2 * 10
     assert "self-preference" in capsys.readouterr().out
+
+
+def test_replaced_consensus_removes_planted_self_preference():
+    s = _sheets()
+    merged = replaced_consensus(s, [("llm-a", "claude"), ("llm-b", "gpt")])
+    # llm-a's bump on Claude D1 is replaced by the mean of human and llm-b, which agree.
+    for rid, row in merged.items():
+        for d in DIMS:
+            assert row[d] == s["human"][rid][d]
+
+
+def test_replaced_consensus_uses_mean_of_the_others():
+    a = {"claude__fast__p1-v1__r1": {d: 0 for d in DIMS}, "gpt__fast__p1-v1__r1": {d: 0 for d in DIMS}}
+    b = {k: {d: 1 for d in DIMS} for k in a}
+    c = {k: {d: 2 for d in DIMS} for k in a}
+    merged = replaced_consensus({"human": a, "llm-a": c, "llm-b": b}, [("llm-a", "claude")])
+    # Claude: llm-a's 2 becomes mean(0, 1) = 0.5, so the median of (0, 0.5, 1) is 0.5.
+    assert merged["claude__fast__p1-v1__r1"]["D1"] == 0.5
+    # GPT is untouched: median of (0, 2, 1) is 1.
+    assert merged["gpt__fast__p1-v1__r1"]["D1"] == 1
+
+
+def test_replaced_consensus_bad_inputs():
+    s = _sheets()
+    with pytest.raises(ValueError, match="odd number"):
+        replaced_consensus({"human": s["human"], "llm-a": s["llm-a"]}, [("llm-a", "claude")])
+    with pytest.raises(ValueError, match="no sheet"):
+        replaced_consensus(s, [("llm-c", "claude")])
+    short = {k: v for k, v in list(s["llm-b"].items())[1:]}
+    with pytest.raises(ValueError, match="same answers"):
+        replaced_consensus({**s, "llm-b": short}, [("llm-a", "claude")])
+
+
+def test_cli_writes_replaced_analysis(tmp_path, grid_path, monkeypatch):
+    from modegrid.config import load_grid
+    from modegrid.plan import build_manifest, write_manifest
+
+    manifest = tmp_path / "runs.csv"
+    write_manifest(build_manifest(load_grid(grid_path)), manifest)
+    files = []
+    for name, sheet in _sheets().items():
+        path = tmp_path / f"{name}-unblinded.csv"
+        write_scores(sheet, path)
+        files.append(str(path))
+    out_dir = tmp_path / "replaced"
+    args = ["--manifest", str(manifest), "--captures", str(tmp_path / "none"), "own-vendor", *files]
+    args += ["--boot", "50", "--perm", "50", "--out", str(tmp_path / "own.csv"), "--replaced-out", str(out_dir)]
+    assert main(args) == 0
+    md = (out_dir / "variance_table.md").read_text()
+    assert "Exploratory, not pre-registered" in md
+    assert "llm-a on claude" in md

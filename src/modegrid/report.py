@@ -245,14 +245,21 @@ def build_report(results: str | Path = "results", scores: str | Path = "data/sco
     out += ["## 4.5 Robustness", ""]
     if table is not None:
         out += [
-            "| Dim | delta (raw) | delta (ranks) | same sign | delta (length-adjusted) | shrinks |",
-            "|---|---|---|---|---|---|",
+            "| Dim | delta (raw) | delta (ranks) | same sign | delta (length-adjusted) "
+            "| reasoning - fast (raw) | reasoning - fast (length-adjusted) | mode effect shrinks |",
+            "|---|---|---|---|---|---|---|---|",
         ]
         for r in table:
             raw, rk, ln = (_num(r[k]) for k in ("delta_omega2", "rank_delta_omega2", "length_adj_delta_omega2"))
             same_sign = "n/a" if math.isnan(rk) else ("yes" if (raw > 0) == (rk > 0) else "no")
-            shrinks = "n/a" if math.isnan(ln) else ("yes" if abs(ln) < abs(raw) else "no")
-            out.append(f"| {r['dimension']} | {_f(raw)} | {_f(rk)} | {same_sign} | {_f(ln)} | {shrinks} |")
+            # Robustness check 2 is about the mode effect, not delta: delta mixes in the
+            # family share, so it can move for reasons unrelated to length.
+            me, me_ln = _num(r.get("mode_effect")), _num(r.get("length_adj_mode_effect"))
+            shrinks = "n/a" if math.isnan(me_ln) else ("yes" if abs(me_ln) < abs(me) else "no")
+            out.append(
+                f"| {r['dimension']} | {_f(raw)} | {_f(rk)} | {same_sign} | {_f(ln)} | {_f(me)} | {_f(me_ln)} "
+                f"| {shrinks} |"
+            )
         out += ["", "Per rater (robustness check 3), verdict and reasoning minus fast with 95% CI:", ""]
         out += ["| Rater | H1 (D1) | H2 (D9) | H3 (D3) | H4 (total) |", "|---|---|---|---|---|"]
         for rater in RATERS:
@@ -363,6 +370,20 @@ def build_report(results: str | Path = "results", scores: str | Path = "data/sco
                 f"{_f(r['baseline_gap'], 2)} | {_f(r['self_preference'], 2)} {_ci(lo, hi, 2)} | {side} |"
             )
         out.append("")
+
+    replaced = _by(_read(res / "own-vendor-replaced" / "variance_table.csv"), "dimension")
+    if replaced:
+        rt = replaced["total"]
+        out += [
+            "Exploratory, not pre-registered: H4 with each LLM rater's own-vendor scores replaced by the mean "
+            "of the other raters (`results/own-vendor-replaced/`).",
+            "",
+            f"- delta omega squared: {_f(rt['delta_omega2'])}, 95% CI {_ci(rt['ci_low'], rt['ci_high'])}",
+            f"- omega squared, mode: {_f(rt['omega2_mode'])}. Family: {_f(rt['omega2_family'])}",
+            f"- reasoning minus fast: {_effect(rt)}",
+            f"- verdict: {rt['verdict']} (consensus {t['verdict'] if t else 'not run'})",
+            "",
+        ]
 
     return "\n".join(out).rstrip() + "\n"
 

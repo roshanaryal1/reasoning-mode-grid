@@ -20,7 +20,7 @@ from .blind import build_packets, guess_accuracy
 from .capture import Capture, check_capture, manual_template, read_capture, word_count, write_capture
 from .cells import plot_cell_means, rank_agreement, write_cell_means, write_rank_agreement
 from .config import load_grid, unready_families
-from .ownvendor import own_vendor, write_own_vendor
+from .ownvendor import own_vendor, replaced_consensus, write_own_vendor
 from .plan import API_CHECK, MAIN, build_manifest, read_manifest, write_manifest
 from .providers import adapter_for, with_retries
 from .raterkit import build_kit, collect_rows
@@ -344,14 +344,18 @@ def cmd_blinding_audit(args: argparse.Namespace) -> int:
     return 1 if leaks else 0
 
 
+def _lengths(captures: str) -> dict[str, float] | None:
+    # Answer length in words. Chat apps report no token counts, and words are
+    # comparable across vendors whose tokenizers differ.
+    if not captures or not Path(captures).exists():
+        return None
+    return {p.stem: float(word_count(read_capture(p).final_answer)) for p in Path(captures).glob("*.md")}
+
+
 def cmd_analyze(args: argparse.Namespace) -> int:
     runs = read_manifest(args.manifest)
     scores = load_scores(args.scores, id_col="run_id")
-    # Answer length in words. Chat apps report no token counts, and words are
-    # comparable across vendors whose tokenizers differ.
-    lengths = None
-    if args.captures and Path(args.captures).exists():
-        lengths = {p.stem: float(word_count(read_capture(p).final_answer)) for p in Path(args.captures).glob("*.md")}
+    lengths = _lengths(args.captures)
     families = [f.strip() for f in args.families.split(",") if f.strip()] if args.families else None
     design, rows = run_analysis(
         runs,
@@ -405,9 +409,11 @@ def cmd_own_vendor(args: argparse.Namespace) -> int:
     """LLM raters on their own vendor's family, against the other raters (preregistration section 4)."""
     sheets = {Path(p).stem.removesuffix("-unblinded"): load_scores(p, id_col="run_id") for p in args.files}
     rows = []
-    for pair in args.pair or ["llm-a=claude", "llm-b=gpt"]:
-        rater, _, family = pair.partition("=")
-        rows += own_vendor(sheets, rater.strip(), family.strip(), n_boot=args.boot, seed=args.seed)
+    pairs = [
+        (r.strip(), f.strip()) for r, _, f in (p.partition("=") for p in args.pair or ["llm-a=claude", "llm-b=gpt"])
+    ]
+    for rater, family in pairs:
+        rows += own_vendor(sheets, rater, family, n_boot=args.boot, seed=args.seed)
     print("gap = this rater minus the mean of the other raters; self-preference = own-family gap - baseline gap\n")
     print(f"{'rater':<8}{'family':<9}{'measure':<8}{'own gap':>9}{'baseline':>10}{'self-pref':>11}  95% CI")
     for r in rows:
@@ -418,6 +424,22 @@ def cmd_own_vendor(args: argparse.Namespace) -> int:
         )
     if args.out:
         print(f"\nwrote {write_own_vendor(rows, args.out)}")
+    if args.replaced_out:
+        design, vrows = run_analysis(
+            read_manifest(args.manifest),
+            replaced_consensus(sheets, pairs),
+            args.prompt,
+            n_boot=args.boot,
+            n_perm=args.perm,
+            seed=args.seed,
+            lengths=_lengths(args.captures),
+        )
+        note = (
+            "Exploratory, not pre-registered: consensus with each LLM rater's own-vendor scores "
+            f"replaced by the mean of the other raters ({', '.join(f'{r} on {f}' for r, f in pairs)})"
+        )
+        write_outputs(design, vrows, args.replaced_out, note=note)
+        print(f"wrote {Path(args.replaced_out, 'variance_table.md')}")
     return 0
 
 
@@ -642,6 +664,13 @@ def build_parser() -> argparse.ArgumentParser:
     ov.add_argument("--out", default="results/own_vendor.csv")
     ov.add_argument("--boot", type=int, default=5000)
     ov.add_argument("--seed", type=int, default=20261001)
+    ov.add_argument("--perm", type=int, default=5000)
+    ov.add_argument("--prompt", default="p1-v1")
+    ov.add_argument(
+        "--replaced-out",
+        default="",
+        help="also re-run the analysis with own-vendor scores replaced (exploratory) into this directory",
+    )
     ov.set_defaults(func=cmd_own_vendor)
 
     rp = sub.add_parser("report", help="after the analysis: every number the Results section needs, in one file")

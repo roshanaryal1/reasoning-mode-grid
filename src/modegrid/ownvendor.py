@@ -20,6 +20,7 @@ seeded. Descriptive: no hypothesis rests on this.
 from __future__ import annotations
 
 import csv
+from collections.abc import Mapping
 from pathlib import Path
 
 import numpy as np
@@ -82,6 +83,39 @@ def own_vendor(
             }
         )
     return rows
+
+
+def replaced_consensus(sheets: Mapping[str, Scores], pairs: list[tuple[str, str]]) -> dict[str, dict[str, float]]:
+    """Median of the raters after each LLM rater's own-vendor scores are replaced.
+
+    For every (rater, family) pair, that rater's scores on the family's answers become
+    the mean of the other raters' scores. Exploratory and not pre-registered: it asks
+    whether H4 survives without self-preference. With three raters the median is then
+    the mean of the other two, so half points can appear.
+    """
+    names = list(sheets)
+    if len(names) < 3 or len(names) % 2 == 0:
+        raise ValueError(f"replaced consensus needs an odd number of raters (3 or more), got {len(names)}")
+    for rater, _ in pairs:
+        if rater not in sheets:
+            raise ValueError(f"no sheet for rater {rater!r}; have {sorted(names)}")
+    ids = set(sheets[names[0]])
+    if any(set(s) != ids for s in sheets.values()):
+        raise ValueError("all raters must score the same answers")
+    own = dict(pairs)
+    out: dict[str, dict[str, float]] = {}
+    for uid in sorted(ids):
+        family = uid.split("__")[0]
+        out[uid] = {}
+        for d in DIMS:
+            values = []
+            for name in names:
+                if own.get(name) == family:
+                    values.append(float(np.mean([sheets[o][uid][d] for o in names if o != name])))
+                else:
+                    values.append(float(sheets[name][uid][d]))
+            out[uid][d] = float(np.median(values))
+    return out
 
 
 FIELDS = [

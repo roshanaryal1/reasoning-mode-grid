@@ -1,9 +1,8 @@
 # 4. Results (draft)
 
-Skeleton written 2026-10-14, before any scoring. Filled 2026-10-26 from `results/report.md`
-(main `2ed948c`), in the skeleton's order. Every number has a source file and column, listed
-below. Every row is reported, including the ones that fail. The pre-registration ranks H4
-first.
+Skeleton written 2026-10-14, before any scoring. Filled 2026-10-26 from `results/report.md`,
+in the skeleton's order. Every number has a source file and column, listed below. Every row
+is reported, including the ones that fail. The pre-registration ranks H4 first.
 
 Source files after Phase 4 of the runbook:
 
@@ -146,29 +145,35 @@ not require interpreting these differences. They are reported as descriptive.
 
 ## 4.5 Robustness
 
-**Table 6.** Robustness checks 1 and 2: delta omega squared on raw scores, on ranks and
-after removing the linear effect of log answer length.
+**Table 6.** Robustness checks 1 and 2: delta omega squared on raw scores and on ranks, and
+delta, omega squared for mode and reasoning minus fast after removing the linear effect of
+log answer length (`results/variance_table.md`, sensitivity checks).
 
-| Dim | delta (raw) | delta (ranks) | Same sign | delta (length-adjusted) |
-|---|---|---|---|---|
-| D1 | -0.150 | -0.145 | yes | -0.120 |
-| D2 | -0.664 | -0.664 | yes | -0.618 |
-| D3 | -0.477 | -0.477 | yes | -0.432 |
-| D4 | -0.350 | -0.341 | yes | -0.346 |
-| D5 | -0.519 | -0.462 | yes | -0.575 |
-| D6 | -0.622 | -0.645 | yes | -0.575 |
-| D7 | -0.083 | -0.079 | yes | -0.124 |
-| D8 | -0.294 | -0.294 | yes | -0.180 |
-| D9 | -0.216 | -0.219 | yes | -0.232 |
-| total | -0.527 | -0.570 | yes | -0.655 |
+| Dim | delta (raw) | delta (ranks) | Same sign | delta (length-adj.) | omega2 mode (raw) | omega2 mode (length-adj.) | Reasoning - fast (raw) | Reasoning - fast (length-adj.) |
+|---|---|---|---|---|---|---|---|---|
+| D1 | -0.150 | -0.145 | yes | -0.120 | -0.013 | -0.004 | 0.000 | -0.093 |
+| D2 | -0.664 | -0.664 | yes | -0.618 | -0.001 | 0.012 | 0.067 | 0.128 |
+| D3 | -0.477 | -0.477 | yes | -0.432 | 0.003 | -0.008 | -0.100 | 0.011 |
+| D4 | -0.350 | -0.341 | yes | -0.346 | 0.021 | 0.022 | 0.167 | 0.171 |
+| D5 | -0.519 | -0.462 | yes | -0.575 | 0.034 | 0.013 | 0.333 | 0.224 |
+| D6 | -0.622 | -0.645 | yes | -0.575 | -0.007 | 0.018 | 0.000 | -0.153 |
+| D7 | -0.083 | -0.079 | yes | -0.124 | 0.046 | -0.014 | 0.200 | 0.001 |
+| D8 | -0.294 | -0.294 | yes | -0.180 | 0.065 | -0.002 | 0.267 | -0.080 |
+| D9 | -0.216 | -0.219 | yes | -0.232 | 0.057 | 0.051 | 0.433 | 0.412 |
+| total | -0.527 | -0.570 | yes | -0.655 | 0.050 | 0.008 | 1.367 | 0.621 |
 
 1. **Ranks.** Delta on ranks has the same sign as on raw scores on every dimension and the
    total. The total moves from -0.527 to -0.570. The verdict does not change.
-2. **Length.** After length adjustment, delta on the total moves further from zero (-0.527
-   to -0.655), so model > mode holds. Delta moves toward zero on D1, D2, D3, D4, D6 and D8,
-   and away from zero on D5, D7, D9 and the total. Delta is a difference of two shares, so
-   this table alone does not show whether mode's own share fell after adjustment. Whether
-   the mode effect is separable from answer length is therefore not settled here.
+2. **Length.** After removing log answer length, the mode effect on the total falls by more
+   than half: reasoning minus fast drops from 1.37 to 0.62 points, and omega squared for mode
+   from 0.050 to 0.008. Model > mode still holds (delta -0.655). As pre-registered, we
+   report that the mode effect is not separable from answer length, not that length causes
+   it. Reasoning answers are longer, and longer answers score higher; this design cannot
+   tell the two apart. The effect also shrinks on D3, D5, D7 and D8, and almost vanishes on
+   D7 and D8. It does not shrink on D9 (0.43 to 0.41), the one dimension where the gain from
+   reasoning survives the adjustment. The first version of this check judged shrinking on
+   delta rather than on the mode effect; the Deviations table records the correction
+   (Appendix D).
 3. **Per rater.** Each rater's own scores give the same H4 verdict as the consensus.
 
    | Rater | H1 (D1) | H2 (D9) | H3 (D3) | H4 (total) |
@@ -290,5 +295,9 @@ about level with them. The gaps are of the same size as the mode effect on the t
 D3, D5 and D9. `llm-b`'s overall family guesses did not beat chance (Table 7), but whether
 it recognised GPT answers in particular is not tested here.
 
-[Exploratory check, not pre-registered: H4 with each LLM rater's own-vendor scores
-replaced by the mean of the other two. Decide whether to run it.]
+Because the self-preference is as large as the mode effect, we ran one further check,
+exploratory and not pre-registered (Appendix D): H4 with each LLM rater's own-vendor scores
+replaced by the mean of the other two raters (`results/own-vendor-replaced/`). The verdict is
+unchanged, model > mode: delta -0.506 [-0.646, -0.400], omega squared 0.040 for mode and
+0.546 for family, and reasoning minus fast 1.17 [0.58, 1.73]. Self-preference does not drive
+the H4 result.
