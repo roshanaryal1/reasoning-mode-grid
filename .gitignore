@@ -32,3 +32,15 @@ data/blinding/key.csv
 paper/build/
 *.pdf
 *.docx
+
+# LaTeX build files for the JAIR version
+paper/jair/*.aux
+paper/jair/*.bbl
+paper/jair/*.bcf
+paper/jair/*.blg
+paper/jair/*.fdb_latexmk
+paper/jair/*.fls
+paper/jair/*.log
+paper/jair/*.out
+paper/jair/*.run.xml
+paper/jair/main.pdf

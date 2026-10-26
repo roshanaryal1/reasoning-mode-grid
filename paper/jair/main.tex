@@ -1,0 +1,215 @@
+%% JAIR submission. Preamble, title block, abstract, acknowledgements and the
+%% reproducibility checklist follow the JAIR Author Kit (JAIR_Example_Template.tex,
+%% 2025-09-15). The body comes from paper/*.md via paper/jair/build.py.
+%% Style commands are unchanged from the kit, as JAIR requires.
+\documentclass[manuscript, screen, review]{jair}
+
+\setcopyright{cc}
+\acmDOI{10.1613/jair.1.xxxxx}
+
+\JAIRAE{Insert JAIR AE Name}
+\JAIRTrack{}
+\acmVolume{4}
+\acmArticle{6}
+\acmMonth{8}
+\acmYear{2026}
+
+\RequirePackage[
+  datamodel=acmdatamodel,
+  style=acmauthoryear,
+  backend=biber,
+  giveninits=true,
+  uniquename=init
+  ]{biblatex}
+
+\renewcommand*{\bibopenbracket}{(}
+\renewcommand*{\bibclosebracket}{)}
+
+\addbibresource{references.bib}
+
+%% Packages the pandoc-generated tables need.
+\usepackage{longtable}
+\usepackage{calc}
+\usepackage{array}
+\providecommand{\tightlist}{\setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\graphicspath{{../../results/}}
+
+\begin{document}
+
+\title[Model, Not Mode]{Model, Not Mode: A Pre-registered Model x Mode Grid on a Constrained Design Task}
+
+\author{Roshan Aryal}
+\authornote{Corresponding Author.}
+\email{roshanaryaal@gmail.com}
+\affiliation{%
+  \institution{Independent Researcher}
+  \city{Auckland}
+  \country{New Zealand}
+}
+
+\renewcommand{\shortauthors}{Aryal}
+
+\begin{abstract}
+{\bf Background:}
+Chat apps let users choose a model and also how hard it thinks. Leaderboards name the model
+but rarely the mode, so it is unclear which choice matters more on open-ended work.
+
+{\bf Objectives:}
+We test whether the reasoning mode explains more of the variance in answer quality than the
+model family does, on a demanding design task with hard constraints.
+
+{\bf Methods:}
+Six model families were crossed with two modes, fast and reasoning, with five answers per
+cell collected in each vendor's own chat app (60 answers). Three blind raters, one human and
+two LLMs, scored every answer on a nine-dimension rubric with web verification. A
+pre-registered two-way decomposition compared the variance explained by mode and by family,
+with bootstrap intervals and permutation tests.
+
+{\bf Results:}
+Family explained far more variance in the total score than mode (difference in omega
+squared -0.527, 95\% CI [-0.666, -0.417]), so the confirmatory hypothesis was not
+supported. Reasoning scored 1.37 points higher out of 18 (95\% CI [0.77, 1.93]), but most of
+the gain came from one family and it halved once answer length was removed. Rater agreement
+fell below the pre-registered bar on seven of nine dimensions, so the secondary hypotheses
+are exploratory.
+
+{\bf Conclusions:}
+On this task, choosing the model matters more than choosing how hard it thinks.
+Comparisons should still report the mode, because its effect differs between models.
+\end{abstract}
+
+\maketitle
+
+\input{body}
+
+\begin{acks}
+We thank the human rater, who scored all 60 answers by hand and asked to remain anonymous.
+[Funding statement: to be confirmed by the author.]
+\end{acks}
+
+\printbibliography
+
+\appendix
+
+\input{appendix}
+
+\section{Reproducibility Checklist for JAIR}
+
+Select the answers that apply to your research -- one per item.
+
+\subsection*{All articles:}
+
+\begin{enumerate}
+    \item All claims investigated in this work are clearly stated.
+    \textbf{yes}
+    \item Clear explanations are given how the work reported substantiates the claims.
+    \textbf{yes}
+    \item Limitations or technical assumptions are stated clearly and explicitly.
+    \textbf{yes}
+    \item Conceptual outlines and/or pseudo-code descriptions of the AI methods introduced in this work are provided, and important implementation details are discussed.
+    \textbf{yes}
+    \item
+    Motivation is provided for all design choices, including algorithms, implementation choices, parameters, data sets and experimental protocols beyond metrics.
+    \textbf{yes}
+\end{enumerate}
+
+\subsection*{Articles containing theoretical contributions:}
+Does this paper make theoretical contributions?
+\textbf{no}
+
+\subsection*{Articles reporting on computational experiments:}
+Does this paper include computational experiments? \textbf{yes}
+
+\begin{enumerate}
+    \item
+    All source code required for conducting experiments is included in an online appendix
+    or will be made publicly available upon publication of the paper.
+    The online appendix follows best practices for source code readability and documentation as well as for long-term accessibility.
+    \textbf{yes}
+    \item The source code comes with a license that
+    allows free usage for reproducibility purposes.
+    \textbf{yes}
+    \item The source code comes with a license that
+    allows free usage for research purposes in general.
+    \textbf{yes}
+    \item
+    Raw, unaggregated data from all experiments is included in an online appendix
+    or will be made publicly available upon publication of the paper.
+    The online appendix follows best practices for long-term accessibility.
+    \textbf{yes}
+    \item The unaggregated data comes with a license that
+    allows free usage for reproducibility purposes.
+    \textbf{yes}
+    \item The unaggregated data comes with a license that
+    allows free usage for research purposes in general.
+    \textbf{yes}
+    \item If an algorithm depends on randomness, then the method used for generating random numbers and for setting seeds is described in a way sufficient to allow replication of results.
+    \textbf{yes}
+    \item The execution environment for experiments, the computing infrastructure (hardware and software) used for running them, is described, including GPU/CPU makes and models; amount of memory (cache and RAM); make and version of operating system; names and versions of relevant software libraries and frameworks.
+    \textbf{partially}
+    \item
+    The evaluation metrics used in experiments are clearly explained and their choice is explicitly motivated.
+    \textbf{yes}
+    \item
+    The number of algorithm runs used to compute each result is reported.
+    \textbf{yes}
+    \item
+    Reported results have not been ``cherry-picked'' by silently ignoring unsuccessful or unsatisfactory experiments.
+    \textbf{yes}
+    \item
+    Analysis of results goes beyond single-dimensional summaries of performance (e.g., average, median) to include measures of variation, confidence, or other distributional information.
+    \textbf{yes}
+    \item
+    All (hyper-) parameter settings for
+    the algorithms/methods used in experiments have been reported, along with the rationale or method for determining them.
+    \textbf{yes}
+    \item
+    The number and range of (hyper-) parameter settings explored prior to conducting final experiments have been indicated, along with the effort spent on (hyper-) parameter optimisation.
+    \textbf{NA}
+    \item
+    Appropriately chosen statistical hypothesis tests are used to establish statistical significance
+    in the presence of noise effects.
+    \textbf{yes}
+\end{enumerate}
+
+\subsection*{Articles using data sets:}
+Does this work rely on one or more data sets (possibly obtained from a benchmark generator or similar software artifact)?
+\textbf{yes}
+
+\begin{enumerate}
+    \item
+    All newly introduced data sets
+    are included in an online appendix
+    or will be made publicly available upon publication of the paper.
+    The online appendix follows best practices for long-term accessibility with a license
+    that allows free usage for research purposes.
+    \textbf{yes}
+    \item The newly introduced data set comes with a license that
+    allows free usage for reproducibility purposes.
+    \textbf{yes}
+    \item The newly introduced data set comes with a license that
+    allows free usage for research purposes in general.
+    \textbf{yes}
+    \item All data sets drawn from the literature or other public sources (potentially including authors' own previously published work) are accompanied by appropriate citations.
+    \textbf{yes}
+    \item All data sets drawn from the existing literature (potentially including authors' own previously published work) are publicly available. \textbf{yes}
+    \item All new data sets and data sets that are not publicly available are described in detail, including relevant statistics, the data collection process and annotation process if relevant.
+    \textbf{yes}
+    \item
+    All methods used for preprocessing, augmenting, batching or splitting data sets (e.g., in the context of hold-out or cross-validation)
+    are described in detail. \textbf{yes}
+\end{enumerate}
+
+\subsection*{Explanations on any of the answers above (optional):}
+
+Code (MIT licence) and data (CC-BY-4.0) are in a repository that will be made public, with
+an archived release, on publication. The answers were produced inside vendors' chat apps,
+whose hardware and serving software cannot be observed; the paper reports each app, model,
+mode setting and capture time instead. The analysis runs in Python 3.10 or later; minimum
+dependency versions are in \texttt{pyproject.toml}, and every random step uses a fixed seed.
+No hyper-parameters were tuned: the mode settings and the analysis were fixed in the
+pre-registration before data collection, and every later change is listed in the Deviations
+appendix.
+
+\end{document}
+\endinput

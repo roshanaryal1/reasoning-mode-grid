@@ -61,6 +61,12 @@ paper: ## Stitch the paper drafts into paper/build/manuscript.md and .html (need
 	pandoc paper/build/manuscript.md --standalone --toc --metadata title="LA-P4 manuscript draft" -o paper/build/manuscript.html
 	@echo "wrote paper/build/manuscript.md and paper/build/manuscript.html"
 
+.PHONY: jair
+jair: ## LaTeX for the JAIR submission in paper/jair/ (needs pandoc; compile with latexmk + biber, or Overleaf)
+	python paper/jair/build.py
+	@if command -v latexmk >/dev/null; then cd paper/jair && latexmk -pdf -quiet main.tex; \
+	else echo "latexmk not found: upload paper/jair/ and results/figure1.pdf to Overleaf"; fi
+
 RATERS = human llm-a llm-b
 SHEETS = $(foreach r,$(RATERS),data/scores/$(r).csv)
 UNBLINDED = $(foreach r,$(RATERS),data/scores/$(r)-unblinded.csv)
