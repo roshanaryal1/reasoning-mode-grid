@@ -1,0 +1,7 @@
+rater,guess,items,guessed,correct,accuracy,chance,p_value
+human,guess_family,60.0000,60.0000,9.0000,0.1500,0.1667,0.6880
+human,guess_mode,60.0000,60.0000,42.0000,0.7000,0.5000,0.0013
+llm-a,guess_family,60.0000,60.0000,45.0000,0.7500,0.1667,0.0000
+llm-a,guess_mode,60.0000,60.0000,41.0000,0.6833,0.5000,0.0031
+llm-b,guess_family,60.0000,60.0000,12.0000,0.2000,0.1667,0.2921
+llm-b,guess_mode,60.0000,60.0000,36.0000,0.6000,0.5000,0.0775
