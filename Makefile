@@ -78,7 +78,7 @@ results: ## After scoring: agreement, consensus, unblind, the full analysis and 
 	  modegrid unblind data/scores/$$r.csv --out data/scores/$$r-unblinded.csv && \
 	  modegrid analyze --scores data/scores/$$r-unblinded.csv --out results/$$r || exit 1; \
 	done
-	modegrid own-vendor $(UNBLINDED) --out results/own_vendor.csv
+	modegrid own-vendor $(UNBLINDED) --out results/own_vendor.csv --replaced-out results/own-vendor-replaced
 	modegrid blinding-check $(SHEETS) --out results/blinding_check.csv
 	modegrid analyze --families gpt,qwen,deepseek --out results/fast-off
 	modegrid analyze --families claude,gemini,grok --out results/fast-lowest

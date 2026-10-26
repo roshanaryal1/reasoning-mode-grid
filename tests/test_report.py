@@ -144,3 +144,26 @@ def test_report_cli_on_a_real_analysis(tmp_path, monkeypatch, grid_path, capsys)
     assert "families moved in the same direction as the average" in text
     assert "- H4 status:" in text
     assert "wrote" in capsys.readouterr().out
+
+
+def test_length_check_uses_mode_effect_and_replaced_h4_is_reported(tmp_path):
+    res = tmp_path / "results"
+    rows = [_row(d, "inconclusive") for d in (*DIMS, "total")]
+    # delta moves away from zero after length adjustment, but the mode effect halves.
+    rows[-1] = _row(
+        "total",
+        "model > mode",
+        delta_omega2="-0.500",
+        rank_delta_omega2="-0.550",
+        length_adj_delta_omega2="-0.600",
+        length_adj_mode_effect="1.000",
+    )
+    _write(res / "variance_table.csv", ROW_FIELDS, rows)
+    text = build_report(res, tmp_path)
+    assert "| total | -0.500 | -0.550 | yes | -0.600 | 2.000 | 1.000 | yes |" in text
+    assert "own-vendor scores replaced" not in text
+
+    _write(res / "own-vendor-replaced" / "variance_table.csv", ROW_FIELDS, rows)
+    text = build_report(res, tmp_path)
+    assert "Exploratory, not pre-registered: H4 with each LLM rater's own-vendor scores replaced" in text
+    assert "- verdict: model > mode (consensus model > mode)" in text

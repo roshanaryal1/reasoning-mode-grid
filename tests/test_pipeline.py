@@ -2,6 +2,7 @@ import csv
 import shutil
 from pathlib import Path
 
+import numpy as np
 import pytest
 
 from modegrid.analyze import AnalysisError, build_design, run_analysis, score_array, write_outputs
@@ -270,6 +271,35 @@ def test_analysis_recovers_synthetic_effects(grid_path, tmp_path):
     md = (tmp_path / "variance_table.md").read_text()
     assert md.count("| D") >= 9
     assert "\n\n\n" not in md  # no empty note line, markdownlint MD012
+
+
+def test_length_adjustment_reports_mode_share_and_effect(grid_path, tmp_path):
+    # Robustness check 2 asks whether the mode effect shrinks after removing log length.
+    # Delta mixes mode and family shares, so mode's own share and the reasoning-minus-fast
+    # difference are reported after adjustment too.
+    grid = load_grid(grid_path)
+    runs = build_manifest(grid)
+    fams = sorted({r.family for r in runs})
+    scores = synthetic_scores(fams, grid.replicates, "p1-v1", seed=7)
+    ids = list(scores)
+    constant = {rid: 500.0 for rid in ids}
+    _, rows = run_analysis(runs, scores, "p1-v1", n_boot=20, n_perm=20, lengths=constant)
+    by = {r["dimension"]: r for r in rows}
+    # A constant length explains nothing, so nothing moves.
+    assert by["total"]["length_adj_mode_effect"] == pytest.approx(by["total"]["mode_effect"])
+    assert by["total"]["length_adj_omega2_mode"] == pytest.approx(by["total"]["omega2_mode"])
+    # A length that tracks the total exactly removes the mode effect on the total.
+    tracking = {rid: float(np.exp(sum(scores[rid].values()))) for rid in ids}
+    design, rows = run_analysis(runs, scores, "p1-v1", n_boot=20, n_perm=20, lengths=tracking)
+    by = {r["dimension"]: r for r in rows}
+    assert abs(by["total"]["mode_effect"]) > 0.1
+    assert by["total"]["length_adj_mode_effect"] == pytest.approx(0, abs=1e-9)
+    write_outputs(design, rows, tmp_path)
+    md = (tmp_path / "variance_table.md").read_text()
+    assert "reasoning - fast (length-adjusted)" in md
+    with (tmp_path / "variance_table.csv").open() as fh:
+        header = next(csv.reader(fh))
+    assert {"length_adj_omega2_mode", "length_adj_mode_effect"} <= set(header)
 
 
 def test_variance_components_are_reported(grid_path, tmp_path):

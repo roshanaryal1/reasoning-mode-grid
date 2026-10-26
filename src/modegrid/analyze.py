@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import csv
 import math
+from collections.abc import Mapping
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, cast
@@ -13,7 +14,6 @@ import numpy as np
 from . import DIM_NAMES, DIMS, PRIMARY_MODES
 from .anova import cell_spreads, decompose, permutation_p, rank_transform, resample, residualise
 from .plan import MAIN, Run
-from .scores import Scores
 
 ALPHA_BAR = 0.667  # pre-registered; Krippendorff's lowest bar for tentative conclusions
 LOW_VARIANCE_SHARE = 0.9  # pre-registered: >= 90% identical scores -> uninformative
@@ -68,6 +68,8 @@ ROW_FIELDS = [
     "vc_residual",
     "rank_delta_omega2",
     "length_adj_delta_omega2",
+    "length_adj_omega2_mode",
+    "length_adj_mode_effect",
     "verdict",
 ]
 
@@ -99,7 +101,7 @@ def build_design(runs: list[Run], prompt_id: str) -> Design:
     return Design(families, modes, reps, ids)
 
 
-def score_array(design: Design, scores: Scores, dim: str) -> np.ndarray:
+def score_array(design: Design, scores: Mapping[str, Mapping[str, float]], dim: str) -> np.ndarray:
     missing = [rid for rid in design.run_ids.ravel() if rid not in scores]
     if missing:
         raise AnalysisError(
@@ -167,8 +169,17 @@ def analyse_dimension(
     spreads = cell_spreads(y)
     rank_d = decompose(rank_transform(y)).delta_omega2
     length_adj: float | str = ""
+    length_adj_mode: float | str = ""
+    length_adj_effect: float | str = ""
     if lengths is not None:
-        length_adj = float(decompose(residualise(y, np.log(np.maximum(lengths, 1)))).delta_omega2)
+        # Robustness check 2 asks whether the mode effect shrinks once length is removed.
+        # Delta is a difference of two shares, so report mode's own share and the
+        # reasoning-minus-fast difference as well.
+        y_adj = residualise(y, np.log(np.maximum(lengths, 1)))
+        d_adj = decompose(y_adj)
+        length_adj = float(d_adj.delta_omega2)
+        length_adj_mode = float(d_adj.omega2["mode"])
+        length_adj_effect = float(y_adj[:, reasoning, :].mean() - y_adj[:, fast, :].mean())
     no_var = float(d.ss_total) == 0
     return {
         "dimension": dim,
@@ -196,6 +207,8 @@ def analyse_dimension(
         **{f"vc_{k}": float(v) for k, v in d.var_components.items()},
         "rank_delta_omega2": float(rank_d),
         "length_adj_delta_omega2": length_adj,
+        "length_adj_omega2_mode": length_adj_mode,
+        "length_adj_mode_effect": length_adj_effect,
         "verdict": verdict(lo, hi, float(d.ss_total), bool(low_variance)),
         "family_effects": family_effects,
     }
@@ -226,7 +239,7 @@ def hypothesis_status(row: dict[str, object], h: Hypothesis, alphas: dict[str, f
 
 def run_analysis(
     runs: list[Run],
-    scores: Scores,
+    scores: Mapping[str, Mapping[str, float]],
     prompt_id: str,
     n_boot: int = 5000,
     n_perm: int = 5000,
@@ -331,13 +344,17 @@ def write_outputs(
         "",
         "## Sensitivity checks",
         "",
-        "| Dim | delta omega2 (raw) | delta omega2 (ranks) | delta omega2 (length-adjusted) |",
-        "|---|---|---|---|",
+        "| Dim | delta omega2 (raw) | delta omega2 (ranks) | delta omega2 (length-adjusted) "
+        "| omega2 mode (raw) | omega2 mode (length-adjusted) | reasoning - fast (raw) "
+        "| reasoning - fast (length-adjusted) |",
+        "|---|---|---|---|---|---|---|---|",
     ]
     for r in rows:
         lines.append(
             f"| {r['dimension']} | {_fmt(r['delta_omega2'])} | {_fmt(r['rank_delta_omega2'])} | "
-            f"{_fmt(r['length_adj_delta_omega2']) or 'not run'} |"
+            f"{_fmt(r['length_adj_delta_omega2']) or 'not run'} | {_fmt(r['omega2_mode'])} | "
+            f"{_fmt(r['length_adj_omega2_mode']) or 'not run'} | {_fmt(r['mode_effect'])} | "
+            f"{_fmt(r['length_adj_mode_effect']) or 'not run'} |"
         )
     lines += [
         "",
