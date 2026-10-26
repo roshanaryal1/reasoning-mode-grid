@@ -292,8 +292,7 @@ def write_outputs(
     lines = [
         "# Variance decomposition: mode vs model vs residual",
         "",
-        note,
-        "",
+        *([note, ""] if note else []),
         f"Design: {len(design.families)} families ({', '.join(design.families)}) x "
         f"{len(design.modes)} modes ({', '.join(design.modes)}) x {len(design.replicates)} replicates "
         f"= {design.run_ids.size} runs, {len(design.families) * len(design.modes)} cells.",

@@ -267,7 +267,9 @@ def test_analysis_recovers_synthetic_effects(grid_path, tmp_path):
     assert by["D1"]["verdict"] == "mode > model"
     assert by["D3"]["verdict"] == "model > mode"
     write_outputs(design, rows, tmp_path)
-    assert (tmp_path / "variance_table.md").read_text().count("| D") >= 9
+    md = (tmp_path / "variance_table.md").read_text()
+    assert md.count("| D") >= 9
+    assert "\n\n\n" not in md  # no empty note line, markdownlint MD012
 
 
 def test_variance_components_are_reported(grid_path, tmp_path):
