@@ -72,8 +72,10 @@ ANONYMISE = {
         "(link withheld for double-blind review; the frozen plan and its Deviations table are in the "
         "anonymised repository)"
     ),
-    "[GitHub tag and Zenodo DOI]": "[anonymised repository link]",
-    "[GitHub tag] and [Zenodo DOI]": "[anonymised repository link]",
+    "as tag `v1.0.0` of <https://github.com/roshanaryal1/reasoning-mode-grid>, archived on Zenodo "
+    "(<https://doi.org/10.5281/zenodo.23674817>)": "at [anonymised repository link]",
+    "are in tag `v1.0.0` of <https://github.com/roshanaryal1/reasoning-mode-grid>, archived at "
+    "<https://doi.org/10.5281/zenodo.23674817>": "are at [anonymised repository link]",
     # Project codes, the harness name and upstream fingerprints lead to the author's
     # public repositories, so they are replaced in the review version too.
     "An open harness, `modegrid`, that": "An open harness that",
@@ -97,6 +99,8 @@ FORBIDDEN = (
     "ba2acba8",
     "llm-architects",
     "zenodo.22245991",
+    "23674817",
+    "github.com/",
 )
 # Self-citations shown as anonymous in the review version, with neutral keys, because
 # hyperref writes citation keys into the PDF as link targets.

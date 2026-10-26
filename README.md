@@ -4,6 +4,7 @@
 ![Python](https://img.shields.io/badge/python-3.10%2B-blue)
 ![Code: MIT](https://img.shields.io/badge/code-MIT-green)
 ![Data: CC--BY--4.0](https://img.shields.io/badge/data-CC--BY--4.0-lightgrey)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23674816.svg)](https://doi.org/10.5281/zenodo.23674816)
 
 A pre-registered model x mode grid. It tested one claim:
 

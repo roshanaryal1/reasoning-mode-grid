@@ -15,7 +15,11 @@ authors:
     email: roshanaryaal@gmail.com
     affiliation: "Independent Researcher, Auckland, New Zealand"
 repository-code: "https://github.com/roshanaryal1/reasoning-mode-grid"
+doi: 10.5281/zenodo.23674816
 identifiers:
+  - type: doi
+    value: 10.5281/zenodo.23674817
+    description: "Version 1.0.0 (Zenodo)"
   - type: url
     value: "https://osf.io/nj2zp/"
     description: "Pre-registration (OSF, registered 2026-10-13)"

@@ -320,7 +320,8 @@ The Deviations table (Appendix D) lists every change. Four bear on how to read t
 ## 3.9 Materials and code
 
 The harness (`modegrid`), configuration, captures, packets' build rules, scores and analysis
-outputs are released at [GitHub tag and Zenodo DOI]. The prompt, rubric and memory checker
+outputs are released as tag `v1.0.0` of <https://github.com/roshanaryal1/reasoning-mode-grid>,
+archived on Zenodo (<https://doi.org/10.5281/zenodo.23674817>). The prompt, rubric and memory checker
 are vendored from LA-P1 at commit `d5e39e7` and pinned by SHA-256. All randomness (run
 order, reading orders, bootstrap, permutations) is seeded, so the analysis reproduces
 exactly from the released scores with `modegrid analyze --seed 20261001 --boot 5000
