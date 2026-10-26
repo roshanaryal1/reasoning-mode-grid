@@ -90,6 +90,41 @@ No study found that crosses reasoning mode with model identity and decomposes va
 open-ended, constrained design task. That gap is the paper's contribution claim. Repeat this
 search before submission.
 
+## Verification, 2026-10-26
+
+Re-checked against the arXiv API (all 18 ids), Crossref and DataCite before writing
+`paper/references.md`.
+
+- All 18 arXiv ids resolve with the titles and authors above.
+- Authors now confirmed: arXiv 2610.11765 (Thinking Inertia) is Lei, Lin, Lu, Torr and Zou,
+  accepted at NeurIPS 2026 per its arXiv comment. arXiv 2605.04488 is by Sai Sourabh Madur.
+- Venues stated in the arXiv record: Li and Ng (NeurIPS 2025), Chen et al. (ICML 2026),
+  Lei et al. (NeurIPS 2026). The other venues listed on 2026-10-14 (Snell ICLR 2025, Yuan
+  NeurIPS 2025, Atil Eval4NLP, Bjarnason ICLR 2026, Zhang ICML 2026) were not re-confirmed,
+  so the paper cites those as arXiv preprints.
+- Checked in the full text: HRBench evaluates 6 models on 5 benchmarks; Path-Lock reports
+  2.54 vs 0.39 reflective tokens in Table 4 (the abstract's figure is 6.01 vs 0.35 on a
+  different backbone); Thinking Inertia reports about 15 points lower accuracy on
+  open-ended tasks; Atil et al. set temperature 0 on hosted APIs.
+- Correction: Madur (2605.04488) uses provider APIs and a lexical heuristic, not LLM judges.
+  The "LLM judges only" note above is wrong.
+- DOI 10.1145/3772363.3799284 is CHI 2026 Extended Abstracts, same seven authors as arXiv
+  2601.21339, different title. DOI 10.5281/zenodo.22245991 is the LA-P1 dataset and code.
+
+### Literature search repeated, 2026-10-26
+
+Two web searches for newer work crossing reasoning mode with model choice. None found that
+does this on an open-ended task. Added after checking the arXiv records:
+
+| Paper | Finding (from the abstract) | Use |
+|---|---|---|
+| Potamitis et al. ReasonBENCH: Benchmarking the (In)Stability of LLM Reasoning. arXiv 2512.07795 | 30 trials across 10 strategies, 12 models, 6 tasks; three-quarters of score variance from benchmark, system and item structure | Run-to-run variance |
+| Zhao, Hooi and Ng. Test-Time Scaling in Reasoning Models Is Not Effective for Knowledge-Intensive Tasks Yet. arXiv 2509.06861, COLM 2026 per arXiv comment | 14 reasoning models; more test-time computation often adds hallucinations | H3 competing prediction |
+
+Rejected: a search summary said ActuBench (arXiv 2604.20273) reports about 3.5 points
+gained from reasoning mode across six provider pairs. Its text has no such comparison, so
+it is not cited.
+
 ## Own prior work
 
 - LA-P1, LLMs as Systems Architects (Cureus, under review; Zenodo DOI 10.5281/zenodo.22245991). Source of the prompt, rubric and the DeepSeek pilot.
