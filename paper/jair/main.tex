@@ -32,6 +32,12 @@
 \usepackage{calc}
 \usepackage{array}
 \providecommand{\tightlist}{\setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\makeatletter\@ifundefined{c@none}{\newcounter{none}}{}\makeatother
+%% Wide tables: smaller type, and code-font cells may break at hyphens and underscores.
+\usepackage{etoolbox}
+\AtBeginEnvironment{longtable}{\footnotesize}
+\usepackage[htt]{hyphenat}
+\AtBeginEnvironment{longtable}{\renewcommand{\_}{\textunderscore\allowbreak}}
 \graphicspath{{../../results/}}
 
 \begin{document}

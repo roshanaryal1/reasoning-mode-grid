@@ -23,7 +23,7 @@ than family does, and whether reasoning scores higher than fast. Three secondary
 
 ## 3.2 Task and prompt
 
-The task is the frozen prompt `prompt-v1` from LA-P1 [cite LA-P1], reused unchanged and
+The task is the frozen prompt `prompt-v1` from LA-P1 [Aryal, 2026], reused unchanged and
 pinned by SHA-256 (`ba2acba8...0370e0`). It asks the model to act as a senior AI
 infrastructure architect and design a fully local, always-on autonomous AI workstation for
 one stated machine: an Apple Mac mini with a base M6 chip, 32 GB unified memory, a 512 GB
@@ -110,8 +110,13 @@ on reasoning and returned no visible answer, and the Claude reasoning call stopp
 32,000-token limit. Neither affects the evidence that the switch works. The GPT and Grok
 checks ran on the pre-registered models (`gpt-5.6-sol`, `grok-4.6`), not on the GPT-6 and
 Grok 4.7 that the apps served, so for those two families they show the documented switch on
-the planned model only. [Results of the second checks on `gpt-6-sol` and `grok-4.7`, runbook Phase
-2b.] Claude and Gemini
+the planned model only. A second check on 2026-10-19 used the served models. GPT-6 (`gpt-6-sol`) returned 0
+reasoning tokens in fast and 6,000 in reasoning, so the switch is confirmed on the model
+the app ran. Grok 4.7 (`grok-4.7`) answered in full at effort low with 1,648 reasoning
+tokens, but at effort xhigh it stopped twice after a one-sentence preamble, with about
+300 to 360 reasoning tokens, as if waiting for a search tool the API call did not offer.
+We made no third attempt and changed no setting, so the second Grok check is
+inconclusive, and Grok stays in the lowest-available group on the first check. Claude and Gemini
 show zero reasoning tokens at their lowest setting on this call, although their
 documentation says reasoning cannot be disabled, so we keep them in the "lowest available"
 group.

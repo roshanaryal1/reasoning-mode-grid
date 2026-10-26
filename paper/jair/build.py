@@ -119,7 +119,7 @@ def cite(md: str, used: set[str]) -> str:
         md, n = re.subn(r"\[" + _ws(text) + r"\]", _latex("cite", key), md)
         if n:
             used.add(text)
-    left = re.findall(r"\[[A-Z][^\]]*(?:19|20)\d\d[^\]]*\]", md)
+    left = re.findall(r"\[(?:cite\b[^\]]*|[A-Z][^\]]*(?:19|20)\d\d[^\]]*)\]", md)
     if left:
         raise SystemExit(f"unmapped citations: {left}")
     return md
@@ -142,7 +142,8 @@ def to_latex(md: str) -> str:
         text=True,
         check=True,
     )
-    return result.stdout
+    # Long host names in narrow table cells: allow a break after the first dot.
+    return re.sub(r"\b(aistudio|chat)\.(google|deepseek)\.com", r"\1.\\allowbreak{}\2.com", result.stdout)
 
 
 def build(names: list[str], appendix: bool, used: set[str]) -> str:

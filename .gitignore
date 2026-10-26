@@ -44,3 +44,4 @@ paper/jair/*.log
 paper/jair/*.out
 paper/jair/*.run.xml
 paper/jair/main.pdf
+paper/jair/*.otf
