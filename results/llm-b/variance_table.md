@@ -1,7 +1,5 @@
 # Variance decomposition: mode vs model vs residual
 
-
-
 Design: 6 families (claude, deepseek, gemini, gpt, grok, qwen) x 2 modes (fast, reasoning) x 5 replicates = 60 runs, 12 cells.
 
 Primary statistic: delta = omega2(mode) - omega2(family), 95% bootstrap CI over replicates.
