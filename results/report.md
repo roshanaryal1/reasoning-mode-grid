@@ -72,18 +72,18 @@ No variance or uninformative: none.
 
 ## 4.5 Robustness
 
-| Dim | delta (raw) | delta (ranks) | same sign | delta (length-adjusted) | shrinks |
-|---|---|---|---|---|---|
-| D1 | -0.150 | -0.145 | yes | -0.120 | yes |
-| D2 | -0.664 | -0.664 | yes | -0.618 | yes |
-| D3 | -0.477 | -0.477 | yes | -0.432 | yes |
-| D4 | -0.350 | -0.341 | yes | -0.346 | yes |
-| D5 | -0.519 | -0.462 | yes | -0.575 | no |
-| D6 | -0.622 | -0.645 | yes | -0.575 | yes |
-| D7 | -0.083 | -0.079 | yes | -0.124 | no |
-| D8 | -0.294 | -0.294 | yes | -0.180 | yes |
-| D9 | -0.216 | -0.219 | yes | -0.232 | no |
-| total | -0.527 | -0.570 | yes | -0.655 | no |
+| Dim | delta (raw) | delta (ranks) | same sign | delta (length-adjusted) | reasoning - fast (raw) | reasoning - fast (length-adjusted) | mode effect shrinks |
+|---|---|---|---|---|---|---|---|
+| D1 | -0.150 | -0.145 | yes | -0.120 | 0.000 | -0.093 | no |
+| D2 | -0.664 | -0.664 | yes | -0.618 | 0.067 | 0.128 | no |
+| D3 | -0.477 | -0.477 | yes | -0.432 | -0.100 | 0.011 | yes |
+| D4 | -0.350 | -0.341 | yes | -0.346 | 0.167 | 0.171 | no |
+| D5 | -0.519 | -0.462 | yes | -0.575 | 0.333 | 0.224 | yes |
+| D6 | -0.622 | -0.645 | yes | -0.575 | 0.000 | -0.153 | no |
+| D7 | -0.083 | -0.079 | yes | -0.124 | 0.200 | 0.001 | yes |
+| D8 | -0.294 | -0.294 | yes | -0.180 | 0.267 | -0.080 | yes |
+| D9 | -0.216 | -0.219 | yes | -0.232 | 0.433 | 0.412 | yes |
+| total | -0.527 | -0.570 | yes | -0.655 | 1.367 | 0.621 | yes |
 
 Per rater (robustness check 3), verdict and reasoning minus fast with 95% CI:
 
@@ -158,3 +158,10 @@ Raters who did not beat chance: llm-b H4 verdict model > mode (consensus model >
 | llm-b | gpt | D7 | -0.10 | -0.02 | -0.08 [-0.29, 0.05] | includes 0 |
 | llm-b | gpt | D8 | -0.15 | 0.03 | -0.18 [-0.43, 0.05] | includes 0 |
 | llm-b | gpt | D9 | 0.30 | -0.26 | 0.56 [0.18, 0.99] | above 0 |
+
+Exploratory, not pre-registered: H4 with each LLM rater's own-vendor scores replaced by the mean of the other raters (`results/own-vendor-replaced/`).
+
+- delta omega squared: -0.506, 95% CI [-0.646, -0.400]
+- omega squared, mode: 0.040. Family: 0.546
+- reasoning minus fast: 1.167 [0.583, 1.733]
+- verdict: model > mode (consensus model > mode)
