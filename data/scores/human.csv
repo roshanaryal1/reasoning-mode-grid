@@ -1,0 +1,61 @@
+blind_id,D1,D2,D3,D4,D5,D6,D7,D8,D9,guess_family,guess_mode,notes
+B049,1,2,2,2,2,2,1,2,2,claude,reasoning,"7.6 GB at 32768 fits, 12.78 GB free; 18 GB at 16384 fits, 3.69 GB free; opened huggingface.co/Qwen/Qwen3.8-27B, ollama.com/library/qwen3.8, ollama.com/library/qwen3.5; 26 Oct 2026"
+B054,1,2,2,2,2,1,1,1,2,gpt,fast,DOES NOT FIT over by 1.62 GB; opened https://github.com/ollama/ollama/releases/tag/v0.40.0 https://huggingface.co/Qwen/Qwen3.6-35B-A3B https://llmcheck.net/blog/state-of-open-source-local-llms-october-2026; 26 Oct 2026
+B041,1,1,2,1,0,1,1,2,1,gpt,fast,"19.8 GB at ctx 32768 tight, free 0.58 GB; opened https://huggingface.co/Qwen/Qwen2.5-Coder-32B-Instruct-GGUF https://www.macrumors.com/2026/08/25/apple-reveals-m6/ https://github.com/vllm-project/vllm-metal; 26 Oct 2026"
+B010,1,1,2,2,2,1,1,2,2,claude,reasoning,FITS free 8.88 GB on 9 GB at ctx 32768 with browser; answer URLs not opened; 24 Oct 2026
+B046,1,2,2,2,1,1,1,2,0,grok,reasoning,"DOES NOT FIT over by 3.24 GB, weights 18.5 GB, ctx 65536, browser on; no full URLs in the answer; Cloister and Lume confirmed by search; 26 Oct 2026"
+B012,1,1,1,1,1,1,1,1,1,gpt,fast,"TIGHT free 1.02 GB, weights 19+2 GB, ctx 12288; Qwen3-30B-A3B confirmed by search, cited pages not opened; 24 Oct 2026"
+B002,1,2,2,2,1,2,1,2,2,claude,reasoning,"20 GB at ctx 16384 tight, free 1.69 GB; opened https://huggingface.co/Qwen/Qwen3-Coder-30B-A3B-Instruct https://huggingface.co/openai/gpt-oss-20b https://github.com/docling-project/docling https://developer.apple.com/library/archive/documentation/MacOSX/Conceptual/BPSystemStartup/Chapters/CreatingLaunchdJobs.html; 24 Oct 2026"
+B004,1,2,2,2,2,1,1,1,2,gpt,fast,DOES NOT FIT over by 2.24 GB; opened https://github.com/ollama/ollama/releases/tag/v0.40.0 https://huggingface.co/Qwen/Qwen3.6-35B-A3B https://llmcheck.net/blog/state-of-open-source-local-llms-october-2026; 24 Oct 2026
+B014,1,2,2,2,2,2,1,1,2,claude,reasoning,DOES NOT FIT over by 2.24 GB; opened https://github.com/ollama/ollama/releases/tag/v0.40.0 https://huggingface.co/Qwen/Qwen3.6-35B-A3B https://llmcheck.net/blog/state-of-open-source-local-llms-october-2026 https://docs.openhands.dev/openhands/usage/llms/local-llms https://tailscale.com/docs/concepts/macos-variants; 24 Oct 2026
+B028,1,2,2,2,1,1,1,2,2,gemini,reasoning,"20 GB at ctx 16384 tight, free 1.69 GB; opened https://huggingface.co/Qwen/Qwen3-30B-A3B https://github.com/opendatalab/MinerU https://github.com/stanford-oval/storm; launchd Concepts URL 404; 24 Oct 2026"
+B033,1,2,2,2,2,1,1,1,2,gemini,reasoning,"DOES NOT FIT over by 4.24 GB; opened https://github.com/ollama/ollama/releases/tag/v0.40.0 https://huggingface.co/Qwen/Qwen3.6-35B-A3B https://llmcheck.net/blog/state-of-open-source-local-llms-october-2026; lithos-metal, BaseRT, Cognee resolved; 25 Oct 2026"
+B037,1,2,2,2,2,1,1,1,2,claude,reasoning,DOES NOT FIT over by 2.24 GB; opened https://github.com/ollama/ollama/releases/tag/v0.40.0 https://huggingface.co/Qwen/Qwen3.6-35B-A3B https://llmcheck.net/blog/state-of-open-source-local-llms-october-2026; 25 Oct 2026
+B007,2,2,2,2,2,2,1,2,1,gemini,reasoning,"7 GB at ctx 32768 fits, free 13.38 GB; opened github.com/OpenHands/docs local-llms.mdx and https://huggingface.co/Qwen/Qwen3.6-35B-A3B; 24 Oct 2026"
+B024,1,2,2,2,2,1,1,1,2,gpt,reasoning,DOES NOT FIT over by 4.24 GB; opened https://github.com/ollama/ollama/releases/tag/v0.40.0 https://huggingface.co/Qwen/Qwen3.6-35B-A3B https://llmcheck.net/blog/state-of-open-source-local-llms-october-2026; 24 Oct 2026
+B055,2,2,2,2,2,2,2,2,1,claude,reasoning,"19 GB at ctx 16384 fits, free 2.69 GB; with browser tight, free 0.19 GB; opened https://ollama.com/library/qwen3-coder/tags https://huggingface.co/Qwen/Qwen3-Coder-30B-A3B-Instruct https://github.com/waybarrios/vllm-mlx; 26 Oct 2026"
+B040,2,1,2,2,0,1,1,1,0,grok,fast,"15.2+5.1 GB at ctx 8192 fits, free 2.04 GB; opened https://huggingface.co/Qwen/Qwen2.5-Coder-14B-Instruct-GGUF; 25 Oct 2026"
+B047,2,1,2,2,0,1,0,2,1,claude,fast,"FITS free 5.19 GB on 9+5 GB at ctx 16384 with browser; install steps are prose, not commands; answer URLs not opened; 26 Oct 2026"
+B009,2,1,2,2,2,0,1,2,2,claude,reasoning,FITS free 6.88 GB on 9+4+0.5 GB at ctx 32768; no source URLs in the answer; 24 Oct 2026
+B019,1,2,2,2,2,2,2,2,2,claude,reasoning,"7.6 GB at ctx 16384 with browser fits, free 11.59 GB; opened https://ollama.com/library/qwen3.5/tags https://ollama.com/library/qwen3.6/tags https://github.com/marcofariasmx/local-llm-apple-silicon; 24 Oct 2026"
+B060,2,1,2,2,0,1,1,1,1,claude,reasoning,FITS free 5.38 GB on 10+4+1 GB at ctx 32768; answer URLs not opened; 26 Oct 2026
+B023,1,1,2,2,1,1,2,2,2,gpt,reasoning,"13 GB at ctx 16384 fits, free 8.69 GB; 20 GB tight, free 1.69 GB; opened https://huggingface.co/Qwen/Qwen2.5-Coder-32B-Instruct https://ollama.com/library/qwen2.5-coder https://github.com/Aider-AI/aider; 24 Oct 2026"
+B030,2,1,2,2,0,1,1,2,2,gemini,reasoning,"10.5+2.2 GB at ctx 32768 fits, free 7.68 GB; opened https://huggingface.co/Qwen/Qwen2.5-Coder-14B-Instruct https://docs.orbstack.dev; 24 Oct 2026"
+B001,1,1,2,2,2,2,1,2,2,claude,reasoning,"FITS free 9.19 GB on 10 GB, ctx 16384, browser on; opened https://github.com/ggml-org/llama.cpp and https://docs.openhands.dev/; 24 Oct 2026"
+B051,1,2,1,1,0,1,1,1,1,gpt,fast,"FITS free 2.89 GB on 17+1.8 GB, ctx 16384; HF model card fetch failed; 26 Oct 2026"
+B006,1,2,1,2,2,2,1,2,2,gpt,reasoning,"20.2+0.7 GB at ctx 98304 does not fit, over by 5.76 GB; opened https://huggingface.co/datasets/RaynarDM/apple-silicon-llm-benchmarks and https://huggingface.co/Qwen/Qwen3.6-35B-A3B; 24 Oct 2026"
+B027,1,2,1,2,2,2,2,1,2,gpt,reasoning,"18-20 GB at ctx 16384 tight, free 1.69 GB; opened https://ollama.com/library/qwen3-coder and https://www.macrumors.com/2026/08/25/apple-reveals-m6/; AgentLab zip unresolved; 24 Oct 2026"
+B036,1,1,2,2,2,1,0,1,2,claude,reasoning,"FITS free 6.69 GB on 9+5+1 GB, ctx 16384; no URLs in the answer; 25 Oct 2026"
+B017,1,2,2,2,2,2,2,2,2,claude,reasoning,"15.5+0.5 GB at ctx 48000 fits, free 3.16 GB; opened https://huggingface.co/Qwen/Qwen3.8-27B and https://arxiv.org/pdf/2605.07723; 24 Oct 2026"
+B008,2,1,2,2,0,1,1,2,2,gemini,fast,FITS free 8.48 GB on 11.5+0.4 GB at ctx 32768; answer URLs not opened; 24 Oct 2026
+B052,2,1,2,2,0,1,1,2,1,deepseek,reasoning,FITS free 7.48 GB on 10.4 GB at ctx 32768 with browser; 26 Oct 2026
+B050,1,2,2,2,2,2,1,2,2,gpt,reasoning,TIGHT free 1.26 GB on 15.5+1.0 GB at ctx 65536; opened https://www.unsloth.ai/models/qwen3.8-27b and https://github.com/jundot/omlx; 26 Oct 2026
+B044,1,2,2,2,2,2,1,2,2,gpt,reasoning,DOES NOT FIT over by 2.74 GB on 20+0.5 GB at ctx 65536; opened https://lmstudio.ai/blog/splash-engine and https://github.com/jundot/omlx; 26 Oct 2026
+B056,2,1,2,2,2,2,1,2,2,gemini,reasoning,"10 GB at ctx 16384 with browser fits, free 9.19 GB; opened github.com/OpenHands/docs local-llms.mdx and https://huggingface.co/Qwen/Qwen3.6-35B-A3B; 26 Oct 2026"
+B021,2,2,2,2,2,2,2,2,2,gpt,reasoning,"16.5+1.2 GB at ctx 32768 fits, free 2.68 GB; opened https://huggingface.co/Qwen/Qwen3.8-27B and https://poolside.ai/blog/laguna-a-deeper-dive; 24 Oct 2026"
+B018,2,1,2,2,2,2,1,1,2,gemini,reasoning,"9 GB at ctx 16384 with browser fits, free 10.19 GB; opened https://support.apple.com/en-us/128108; 24 Oct 2026"
+B057,1,2,1,0,1,1,1,1,1,gpt,fast,"DOES NOT FIT over by 5.62 GB, weights 19+4.5 GB, ctx 32768, browser on; https://huggingface.co/Qwen/Qwen3-Coder-32B-Instruct failed; 26 Oct 2026"
+B053,1,2,2,2,2,1,1,1,2,gemini,reasoning,DOES NOT FIT over by 2.24 GB; opened https://github.com/ollama/ollama/releases/tag/v0.40.0 https://huggingface.co/Qwen/Qwen3.6-35B-A3B https://llmcheck.net/blog/state-of-open-source-local-llms-october-2026; 26 Oct 2026
+B016,1,2,1,0,0,1,1,1,1,gpt,fast,"DOES NOT FIT over by 1.12 GB, weights 17+2 GB, ctx 32768, browser on; HF fetch failed; 24 Oct 2026"
+B011,1,1,2,2,0,1,1,2,1,qwen,reasoning,19.8+4.5 GB at ctx 16384 over by 2.61 GB; opened https://huggingface.co/Qwen/Qwen2.5-Coder-32B-Instruct and https://qwenlm.github.io/blog/qwen2.5; 24 Oct 2026
+B059,2,1,2,2,0,1,1,1,2,gpt,fast,FITS free 3.19 GB on 18.5 GB at ctx 16384; answer URLs not opened; 26 Oct 2026
+B034,1,2,1,1,0,1,1,1,2,gpt,fast,"TIGHT free 1.17 GB, weights 17+4.5 GB, ctx 4096; opened https://github.com/ggml-org/llama.cpp; 25 Oct 2026"
+B026,1,1,2,2,0,1,1,1,1,deepseek,reasoning,"10.5+4.5 GB at ctx 32768 fits, free 5.38 GB; opened https://qwenlm.github.io/blog/qwen2.5 and https://huggingface.co/Qwen/Qwen2.5-Coder-32B-Instruct; 24 Oct 2026"
+B043,1,2,2,2,1,2,2,2,2,grok,reasoning,"DOES NOT FIT over by 3.72 GB, weights 21+0.6 GB, ctx 32768, browser on; opened https://arxiv.org/abs/2601.19139 and https://www.macrumors.com/2026/08/25/apple-announces-2026-mac-mini; 26 Oct 2026"
+B058,1,1,2,2,0,1,1,2,1,gemini,reasoning,20 GB at ctx 8192 with browser over by 0.16 GB; opened https://aider.chat/docs/benchmarks.html; https://github.com/asg01/sqlite-vec is 404; 26 Oct 2026
+B035,1,1,2,2,2,0,1,2,2,claude,reasoning,"9+4+3 GB at ctx 32768 with browser tight, free 1.88 GB; no URLs in the answer; 25 Oct 2026"
+B015,1,2,2,2,2,1,2,2,2,gpt,reasoning,DOES NOT FIT over by 2.34 GB on 19.5+0.6 GB at ctx 65536; gpt-oss-120b confirmed by search; two of this file's URLs not opened; 24 Oct 2026
+B020,1,2,2,2,2,1,1,1,2,gpt,fast,DOES NOT FIT over by 2.24 GB; opened https://github.com/ollama/ollama/releases/tag/v0.40.0 https://huggingface.co/Qwen/Qwen3.6-35B-A3B https://llmcheck.net/blog/state-of-open-source-local-llms-october-2026; 24 Oct 2026
+B022,1,1,2,2,0,0,1,1,2,claude,fast,"22+4 GB at ctx 16384 does not fit, over by 4.31 GB; no URLs in the answer; 24 Oct 2026"
+B045,1,2,2,2,2,1,1,1,2,grok,reasoning,DOES NOT FIT over by 3.24 GB; opened https://github.com/ollama/ollama/releases/tag/v0.40.0 https://huggingface.co/Qwen/Qwen3.6-35B-A3B https://llmcheck.net/blog/state-of-open-source-local-llms-october-2026; 26 Oct 2026
+B039,1,2,2,2,0,1,2,2,1,gpt,reasoning,"20+3 GB at ctx 32768 with browser does not fit, over by 5.12 GB; opened https://huggingface.co/Qwen/Qwen3-30B-A3B-GGUF and https://huggingface.co/Qwen/Qwen3.8-27B; lmstudio.ai/docs failed; 25 Oct 2026"
+B013,1,1,2,2,1,1,1,2,1,gpt,fast,14+5 GB at ctx 32768 with browser over by 1.12 GB; named tools are ordinary repos; 24 Oct 2026
+B003,2,2,2,2,2,1,1,2,2,gemini,reasoning,"10+3 GB at ctx 32768 with browser fits, free 4.88 GB; opened https://www.apple.com/nz/mac-mini; 24 Oct 2026"
+B038,1,1,2,2,0,1,1,2,0,gemini,reasoning,"10.5+3.4 GB at ctx 16384 with browser fits, free 5.29 GB, but the written budget is exactly 32.0; opened https://aider.chat/docs/benchmarks.html; 25 Oct 2026"
+B025,2,2,2,2,1,2,2,2,2,claude,reasoning,"16-18 GB at ctx 24576 fits, free 3.03 GB; opened https://huggingface.co/Qwen/Qwen3-30B-A3B and https://huggingface.co/unsloth/Qwen3-Coder-30B-A3B-Instruct-GGUF; 24 Oct 2026"
+B032,1,1,2,2,1,1,1,2,2,gpt,reasoning,"18 GB at ctx 16384 fits, free 3.69 GB; opened https://ollama.com/library/qwen3-coder https://huggingface.co/Qwen/Qwen2.5-Coder-14B-Instruct https://github.com/RooCodeInc/Roo-Code; 25 Oct 2026"
+B042,2,1,2,2,2,0,1,2,2,claude,fast,FITS free 4.69 GB on 9+5+0.5 GB at ctx 16384 with browser; no source URLs in the answer; 26 Oct 2026
+B031,2,2,2,2,1,1,1,2,0,grok,reasoning,"TIGHT free 1.54 GB, weights 18.3+0.6 GB, ctx 32000; opened https://github.com/chethanuk/Rapid-MLX; 25 Oct 2026"
+B048,1,2,2,2,2,2,2,2,2,claude,reasoning,19.5+1.3 GB at ctx 48000 over by 1.64 GB; opened https://huggingface.co/Qwen/Qwen3.8-27B and https://huggingface.co/ornith-ai/Ornith-1.5-35B-A3B; 26 Oct 2026
+B029,1,2,2,2,2,1,1,1,2,claude,reasoning,DOES NOT FIT over by 4.24 GB; opened https://github.com/ollama/ollama/releases/tag/v0.40.0 https://huggingface.co/Qwen/Qwen3.6-35B-A3B https://llmcheck.net/blog/state-of-open-source-local-llms-october-2026; 24 Oct 2026
+B005,1,2,2,2,2,2,2,2,2,gpt,reasoning,"7.6 GB at ctx 32768 fits, free 12.78 GB; 19 GB at ctx 32768 tight, free 1.38 GB; opened https://ollama.com/library/qwen3.5 https://ollama.com/library/gpt-oss https://ollama.com/library/qwen3-coder; 24 Oct 2026"
