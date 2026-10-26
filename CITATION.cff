@@ -1,8 +1,9 @@
 # https://citation-file-format.github.io/
 cff-version: 1.2.0
 message: "If you use this harness or dataset, please cite it as below, and cite LA-P1 (the source of the prompt and rubric)."
-title: "Reasoning Mode Beats Model Identity: a controlled model x mode grid (harness and dataset)"
+title: "Model, Not Mode: a pre-registered model x mode grid (harness and dataset)"
 abstract: >-
+  Code is MIT; data, prompts and documentation are CC-BY-4.0 (LICENSE-DATA).
   A pre-registered model x mode grid. Six LLM families are each run in a fast and a
   reasoning mode on one frozen, constrained systems-design prompt, five replicates per
   cell. Answers are scored blind with a nine-dimension rubric and the variance in each
@@ -18,9 +19,11 @@ identifiers:
   - type: url
     value: "https://osf.io/nj2zp/"
     description: "Pre-registration (OSF, registered 2026-10-13)"
-license: MIT
-version: "0.1.0"
-date-released: "2026-10-01"
+license:
+  - MIT
+  - CC-BY-4.0
+version: "1.0.0"
+date-released: "2026-10-27"
 keywords:
   - large language models
   - reasoning mode

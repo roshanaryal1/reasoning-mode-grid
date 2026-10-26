@@ -302,6 +302,28 @@ def test_length_adjustment_reports_mode_share_and_effect(grid_path, tmp_path):
     assert {"length_adj_omega2_mode", "length_adj_mode_effect"} <= set(header)
 
 
+def test_length_adjustment_matches_an_independent_regression(grid_path):
+    # A length that only partly tracks the score: the adjusted reasoning-minus-fast must
+    # equal an independent least-squares residualisation, and be neither raw nor zero.
+    grid = load_grid(grid_path)
+    runs = build_manifest(grid)
+    fams = sorted({r.family for r in runs})
+    scores = synthetic_scores(fams, grid.replicates, "p1-v1", seed=7)
+    rng = np.random.default_rng(3)
+    lengths = {rid: float(np.exp(0.3 * sum(row.values()) + rng.normal(0, 1))) for rid, row in scores.items()}
+    design, rows = run_analysis(runs, scores, "p1-v1", n_boot=20, n_perm=20, lengths=lengths)
+    total = {r["dimension"]: r for r in rows}["total"]
+    y = score_array(design, scores, "total").ravel()
+    x = np.log(np.maximum([lengths[rid] for rid in design.run_ids.ravel()], 1))  # word counts floor at 1
+    slope, intercept = np.polyfit(x, y, 1)
+    adj = (y - (slope * x + intercept)).reshape(design.run_ids.shape)
+    fast, reasoning = design.modes.index("fast"), design.modes.index("reasoning")
+    expected = adj[:, reasoning, :].mean() - adj[:, fast, :].mean()
+    assert total["length_adj_mode_effect"] == pytest.approx(expected)
+    assert expected != pytest.approx(total["mode_effect"])
+    assert expected != pytest.approx(0, abs=1e-6)
+
+
 def test_variance_components_are_reported(grid_path, tmp_path):
     # Pre-registration section 5 lists the random-effects components among the statistics
     # reported for every dimension, labelled exploratory.

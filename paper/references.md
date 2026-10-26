@@ -2,8 +2,12 @@
 
 Checked 2026-10-26 against each arXiv record (arXiv API), and on 2026-10-27 for published
 versions (Crossref, OpenReview, Semantic Scholar). Where a peer-reviewed version exists it is
-cited, with the author list and title of that version. Workshop presentations are noted
-beside the arXiv entry. The rest are cited as arXiv preprints.
+cited, with the author list and title of that version, with two exceptions. Haase et al. is
+cited as the arXiv preprint, because the figures quoted come from it; the shorter CHI 2026
+Extended Abstract, with a different title, is noted beside it. For Path-Lock Expert the COLM
+OpenReview record spells the second author "Van Yang"; the arXiv PDF (author metadata) says "Wang
+Yang", which is used. Workshop presentations are noted beside the arXiv
+entry. The rest are cited as arXiv preprints.
 
 Aryal, R. (2026). *Large Language Models as Systems Architects: A Controlled Study of
 Consensus, Fabrication, and Constraint Reasoning on One Hard Design Task (dataset and
@@ -71,9 +75,10 @@ Wang, K., Zheng, T., Cui, X., Chen, R., Xiong, T., and Huang, H. (2026). Mitigat
 hallucination in large reasoning models via mixed-mode advantage regularization.
 arXiv:2607.05861.
 
-Wang, S., Yang, W., Long, X., Ganguly, D., Wang, Q., Chaudhary, V., and Han, X. (2025).
-Demystifying hybrid thinking: Can LLMs truly switch between think and no-think?
-arXiv:2510.12680.
+Wang, S., Yang, W., Long, X., Ganguly, D., Wang, Q., Chaudhary, V., and Han, X. (2026).
+Demystifying hybrid thinking: Can LLMs truly switch between think and no-think? In
+*Proceedings of the 2026 Conference on Empirical Methods in Natural Language Processing
+(EMNLP)*, pp. 3491-3511. <https://aclanthology.org/2026.emnlp-main.151/>
 
 Wang, S., Yang, W., Ma, C., Ganguly, D., Singh, V., Song, C., Li, X., Long, X., Chaudhary,
 V., and Han, X. (2026). Path-Lock Expert: Separating reasoning mode in hybrid thinking via

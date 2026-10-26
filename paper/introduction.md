@@ -3,8 +3,7 @@
 Draft written 2026-10-14, before any scoring. The last paragraph was written 2026-10-26,
 after the analysis.
 
-Leaderboards rank models. People who use these models choose more than a model. In every
-major chat app they also choose how hard the model thinks: Instant or High in ChatGPT,
+Leaderboards rank models. People who use these models choose more than a model. In most major chat apps they also choose how hard the model thinks: Instant or High in ChatGPT,
 Effort Low or High in Claude, Fast or Expert in Grok, DeepThink on or off in DeepSeek. The
 same weights can then behave like a different system. If the mode switch changes answer
 quality as much as switching vendor does, a comparison that names the model but not the
@@ -36,7 +35,8 @@ run-to-run noise, and did not show a reasoning advantage. This paper is the cont
 Our contributions are:
 
 1. A crossed 6 x 2 model-by-mode design with five replicates per cell, run in the chat apps
-   people use, with an API check that each mode switch changes how much the model reasons.
+   people use, with API checks that each mode switch changes how much the model reasons
+   (one of them inconclusive, Section 3.4).
 2. A pre-registered analysis (OSF, frozen before the first capture) that decomposes
    answer-quality variance into family, mode, interaction and residual per rubric
    dimension, using bias-corrected omega squared, bootstrap intervals and permutation tests,

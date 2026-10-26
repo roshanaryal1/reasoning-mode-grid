@@ -8,8 +8,9 @@ written 2026-10-26, after the analysis, for the result that occurred (model > mo
 On this task, which model answered mattered far more than how hard it was told to think.
 Family explained 58% of the variance in the total score after bias correction, mode 5%,
 and the interval on their difference lies wholly below zero (Section 4.2). Every dimension
-points the same way, and the verdict survives rank transformation, each rater's own
-scores, both fast-mode groups and the removal of each LLM rater's own-vendor scores. That
+points the same way. The verdict holds on each rater's own scores, in both fast-mode
+groups and with each LLM rater's own-vendor scores removed, and the point estimates keep
+their direction on ranks and after length adjustment. That
 runs against the observation that motivated the study: LA-P1 saw one family's answers
 change across modes and asked whether mode could rival the choice of vendor. In a
 controlled grid it does not.
@@ -28,8 +29,9 @@ For anyone comparing models, the practical reading is twofold. First, the choice
 should come first: no mode setting closed the gap between the strongest and weakest
 families (GPT at 15.0 and 16.4, Gemini at 9.4 in both modes). Second, mode should
 still be reported, because its effect is not one number. The family x mode interaction
-(omega squared 0.184) is larger than the average mode effect (0.050), so "reasoning helps"
-is true for some models and false for others. A leaderboard that names the mode lets a
+(omega squared 0.184) is larger than the average mode effect (0.050), and the family means
+moved in both directions: up for three families, down for two. With five answers per cell
+we cannot say for which families the change is real, only that one average hides it. A leaderboard that names the mode lets a
 reader see that; one that does not hides a difference of up to 6.8 points for a single
 model.
 
@@ -48,8 +50,8 @@ consistency, both failed in direction, and all three secondary tests are explora
 because their dimensions did not reach the reliability bar.
 
 Within that pattern, the dimensions differ in how much mode moved them. D9, internal
-consistency, had the largest reasoning gain (+0.43 of 2) and the only gain that survived
-the length adjustment (+0.41). It also had the largest interaction (eta squared 0.226),
+consistency, had the largest reasoning gain (+0.43 of 2), and it barely changed after the
+length adjustment (+0.41), the largest positive estimate left. It also had the largest interaction (eta squared 0.226),
 as Claude (0.4 to 1.4) and Qwen (0.0 to 1.8) rose while Grok fell (2.0 to 1.2). If any part of the answer
 benefits from reasoning beyond writing more, it is keeping the deliverables consistent with
 each other. D9's agreement was low (alpha 0.29), so this is a lead for future work, not a
@@ -57,7 +59,9 @@ finding. D1, the memory-budget check that H1 expected reasoning to improve, did 
 all on average (0.00), even though it is the dimension where a careful calculation should
 help most.
 
-D3, tool factuality, was mode-stable, as H3 predicted. The competing account, that
+On D3, tool factuality, the exploratory variance comparison matches the direction H3
+predicted, with family dominating, and the mode-effect interval includes zero; D3's
+reliability is below the bar, so H3 is neither confirmed nor refuted. The competing account, that
 reasoning models invent more tools, did not appear: reasoning minus fast on D3 was -0.10
 with an interval that includes zero. This dimension carries a reliability warning of its
 own. Its alpha was the lowest of all (0.25), and the human rater's ranking of the 12 cells
@@ -85,8 +89,9 @@ not matched on size or price, and some are not their vendor's strongest model.
 
 **Mode is not one control.** "Fast" means reasoning switched off for GPT, Qwen and
 DeepSeek, and the lowest available level for Claude, Gemini and Grok. Even an off switch
-may not stop all reasoning on an open-ended task. The API check shows each switch changes
-how much the model reasons, but it cannot show what a chat app runs internally. The
+may not stop all reasoning on an open-ended task. The API checks show that each documented
+switch changes how much the model reasons on the planned models and on GPT-6, but the check
+on Grok 4.7 was inconclusive, and no API call can show what a chat app runs internally. The
 pre-registered split by fast-mode floor shows whether a result holds only for off versus
 on.
 
@@ -99,8 +104,8 @@ ran with search off. Differences between families may partly reflect live search
 **Model identity.** Chat apps change their models without asking. Two of six apps had
 moved to a newer model by the time of collection (GPT-6 and Grok 4.7 instead of the
 pre-registered GPT-5.6 Sol and Grok 4.6). Each still ran one model in both modes, so the
-contrasts stay mode switches, but the API evidence for those two switches comes from the
-planned models. DeepSeek's app shows no model name at all. This is the cost of testing the
+contrasts stay mode switches. A second API check confirmed the switch on GPT-6; the one on
+Grok 4.7 was inconclusive, so the Grok evidence rests on the planned Grok 4.6. DeepSeek's app shows no model name at all. This is the cost of testing the
 apps people use rather than a fixed API snapshot, and the reason every capture is dated.
 
 **Family is confounded with date and operator.** Families were captured one block at a
@@ -128,8 +133,9 @@ it, and we do not claim it does not.
 
 **Small cells.** Five replicates per cell detect a strong mode effect reliably but miss a
 moderate one about half the time, and percentile bootstrap intervals at this size can be
-too narrow. Under equal effects, 15% of simulated studies still show "mode > model". We
-report permutation p-values beside every interval.
+too narrow. Under equal effects, 15% of simulated studies still show "mode > model". That
+simulation models one dimension, not the nine-dimension total, so it is only a proxy for
+H4. We report permutation p-values beside every interval.
 
 **Single author.** No second author checked the analysis. The plan was registered before
 collection, the author did not score, and all data and code are released so anyone can
@@ -142,7 +148,7 @@ task, collected five answers per cell in the vendors' own chat apps, and had thr
 raters score all 60. On the pre-registered test, family explained far more of the variance
 in answer quality than mode did (delta omega squared -0.527, 95% CI [-0.666, -0.417]).
 Reasoning helped on average, by 1.37 points of 18, but the gain came mostly from one family
-and from switching reasoning off rather than turning it down, and it halved once answer
-length was taken into account. On this task, choosing the model matters more than choosing
+and from the families whose fast mode switches reasoning off rather than turning it down,
+and it halved once answer length was taken into account. On this task, choosing the model matters more than choosing
 how hard it thinks. Mode should still be reported, because what it does differs from one
 model to the next. The data, code and every departure from the plan are released.

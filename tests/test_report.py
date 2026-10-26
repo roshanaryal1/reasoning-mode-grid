@@ -167,3 +167,22 @@ def test_length_check_uses_mode_effect_and_replaced_h4_is_reported(tmp_path):
     text = build_report(res, tmp_path)
     assert "Exploratory, not pre-registered: H4 with each LLM rater's own-vendor scores replaced" in text
     assert "- verdict: model > mode (consensus model > mode)" in text
+
+
+def test_exploratory_h3_interaction_and_disagreement_are_reported(tmp_path):
+    res = tmp_path / "results"
+    rows = [_row(d, "inconclusive") for d in (*DIMS, "total")]
+    rows[2] = _row("D3", "model > mode")
+    # D7: interaction above both main effects, and a CI that excludes zero with p >= 0.05.
+    rows[6] = _row("D7", "inconclusive", omega2_interaction="0.400", p_mode="0.096")
+    _write(res / "variance_table.csv", ROW_FIELDS, rows)
+    rows_alpha = [
+        {"dimension": d, "alpha": 0.25 if d == "D3" else 0.9, "exact_agreement_1v2": 0.7, "status": "ok"} for d in DIMS
+    ]
+    rows_alpha.append({"dimension": "total", "alpha": 0.7, "exact_agreement_1v2": 0.2, "status": "ok"})
+    _write(res / "agreement.csv", ["dimension", "alpha", "exact_agreement_1v2", "status"], rows_alpha)
+    text = build_report(res, tmp_path)
+    assert "H3 outcome: model > mode, the direction of H3; D3's alpha 0.25 is below 0.667" in text
+    assert "which supports H3" not in text
+    assert "Interaction exceeds both main effects (average effect only): D7." in text
+    assert "CI and p mode disagree (other dimensions): D7." in text

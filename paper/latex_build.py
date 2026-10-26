@@ -51,14 +51,14 @@ PARENTHETICAL = {
     "Madur, 2026": "madur2026moral",
     "Ning et al., 2026": "ning2026hrbench",
     "Potamitis et al., 2025": "potamitis2025reasonbench",
-    "S. Wang et al., 2026": "wangs2026pathlock",
+    "S. Wang et al., 2026b": "wangs2026pathlock",
     "Snell et al., 2025": "snell2025scaling",
     "Yuan et al., 2025": "yuan2025numerical",
     "Zhang et al., 2026": "zhang2026harness",
     "Zhao et al., 2026": "zhao2026tts",
 }
 TEXTUAL = {
-    "S. Wang et al. [2025]": "wangs2025hybrid",
+    "S. Wang et al. [2026a]": "wangs2026hybrid",
     "Liu and Honavar [2026]": "liu2026leakage",
     "Sahu et al. [2026]": "sahu2026architects",
 }
@@ -68,10 +68,36 @@ CITE = {"jair": "cite", "tmlr": "citep"}
 
 # Text that identifies the author, and what the anonymous version says instead.
 ANONYMISE = {
-    "(<https://osf.io/nj2zp/>)": "(anonymised view-only link: [OSF view-only link])",
+    "(<https://osf.io/nj2zp/>)": (
+        "(link withheld for double-blind review; the frozen plan and its Deviations table are in the "
+        "anonymised repository)"
+    ),
     "[GitHub tag and Zenodo DOI]": "[anonymised repository link]",
     "[GitHub tag] and [Zenodo DOI]": "[anonymised repository link]",
+    # Project codes, the harness name and upstream fingerprints lead to the author's
+    # public repositories, so they are replaced in the review version too.
+    "An open harness, `modegrid`, that": "An open harness that",
+    "modegrid": "harness",
+    " (LA-P5)": "",
+    ", for LA-P5": "",
+    "LA-P1": "S1",
+    "(`ba2acba8...0370e0`)": "([hash withheld for review])",
+    "`d5e39e7`": "[commit withheld for review]",
 }
+# Nothing in the anonymous files may contain these (checked after every build).
+FORBIDDEN = (
+    "aryal",
+    "roshan",
+    "auckland",
+    "otago",
+    "osf.io/nj2zp",
+    "modegrid",
+    "la-p",
+    "d5e39e7",
+    "ba2acba8",
+    "llm-architects",
+    "zenodo.22245991",
+)
 # Self-citations shown as anonymous in the review version, with neutral keys, because
 # hyperref writes citation keys into the PDF as link targets.
 ANONYMOUS_KEYS = {"aryal2026lap1": "anon2026a", "aryal2026lap2": "anon2026b"}
@@ -230,6 +256,12 @@ def write(target: str, anonymous: bool) -> list[Path]:
         bib = out / f"references{suffix}.bib"
         bib.write_text(header + bibtex(BIB.read_text(encoding="utf-8"), anonymous), encoding="utf-8")
         paths.append(bib)
+    if anonymous:
+        shared = [out / "broader-impact.tex"] if target == "tmlr" else []
+        for path in paths + shared:
+            text = path.read_text(encoding="utf-8").lower()
+            if leaks := [w for w in FORBIDDEN if w in text]:
+                raise SystemExit(f"identifying text left in {path.name}: {leaks}")
     return paths
 
 

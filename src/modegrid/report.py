@@ -217,9 +217,28 @@ def build_report(results: str | Path = "results", scores: str | Path = "data/sco
             h3 = "mode > model with reasoning lower, which supports the hallucination account"
         else:
             h3 = "neither pre-stated outcome"
+        if alphas and alphas.get("D3", 1.0) < ALPHA_BAR:
+            # Pre-registration section 4: a dimension below the bar cannot confirm or refute.
+            h3 = h3.replace("which supports", "the direction of") + (
+                f"; D3's alpha {alphas['D3']:.2f} is below {ALPHA_BAR}, so this can neither confirm nor refute it"
+            )
         out += [f"H3 outcome: {h3}.", ""]
         rest = ("D2", "D4", "D5", "D6", "D7", "D8")
         out += ["Other dimensions (descriptive): " + ", ".join(f"{d} {by_dim[d]['verdict']}" for d in rest) + ".", ""]
+        # Pre-registration section 5: interaction above both main effects, and CI/p
+        # disagreements, are reported for every dimension, not only the hypotheses.
+        over = [
+            d
+            for d in (*DIMS, "total")
+            if _num(by_dim[d].get("omega2_interaction"))
+            > max(_num(by_dim[d].get("omega2_family")), _num(by_dim[d].get("omega2_mode")))
+        ]
+        out += [
+            "Interaction exceeds both main effects (average effect only): " + (", ".join(over) or "none") + ".",
+            "",
+        ]
+        disagree = [d for d in rest if _ci_p_note(by_dim[d]).startswith("disagree")]
+        out += ["CI and p mode disagree (other dimensions): " + (", ".join(disagree) or "none") + ".", ""]
         flat = [r["dimension"] for r in table if r["verdict"] in ("no variance", "uninformative (low variance)")]
         out += [f"No variance or uninformative: {', '.join(flat) or 'none'}.", ""]
 

@@ -318,7 +318,15 @@ def cmd_blinding_check(args: argparse.Namespace) -> int:
             w = csv.writer(fh, lineterminator="\n")
             w.writerow(fields)
             for row in rows:
-                w.writerow([row["rater"], row["guess"], *(f"{float(row[k]):.4f}" for k in fields[2:])])  # type: ignore[arg-type]
+                # p-values keep six decimals: four would round 0.07750 to 0.0775 and then to 0.077.
+                w.writerow(
+                    [
+                        row["rater"],
+                        row["guess"],
+                        *(f"{float(row[k]):.4f}" for k in fields[2:-1]),  # type: ignore[arg-type]
+                        f"{float(row['p_value']):.6f}",  # type: ignore[arg-type]
+                    ]
+                )
         print(f"\nwrote {out}")
     return 0
 

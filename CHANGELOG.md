@@ -5,8 +5,16 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions follo
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-10-27
+
+Scoring and analysis complete; paper drafts, JAIR and TMLR LaTeX, release metadata
+updated to the result ("Model, Not Mode").
+
 ### Changed
 
+- Blinding leak found after scoring: three Claude reasoning packets still contained the
+  author's account name or home city. Reported in Results 4.6, Appendix D2 and the
+  Deviations table; no scores changed.
 - Robustness check 2 (length) now reports omega squared for mode and reasoning minus fast after
   removing log answer length, and `modegrid report` judges a shrinking mode effect on reasoning minus
   fast, not on delta. On the total the mode effect falls from 1.37 to 0.62. Recorded in the Deviations
