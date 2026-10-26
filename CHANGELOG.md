@@ -7,6 +7,12 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions follo
 
 ### Changed
 
+- Scoring complete: `data/scores/human.csv`, `llm-a.csv` and `llm-b.csv` (60 answers each), with
+  run dates in `data/scores/raters.md`. Blinding key committed. `make results` written to `results/`.
+- Human rater replaced: Rater H1's AI-made returns are not used; Rater H2 (anonymous) scored by hand,
+  recorded after scoring. Recorded in the Deviations table.
+- 18 `llm-a` sessions computed the memory check by hand (no code execution in claude.ai); the author
+  re-ran every stated input and all results match. Recorded in the Deviations table.
 - Human rater recorded as Rater H1 (anonymous at their request), before scoring.
 - API check 2 ran on 2026-10-19. GPT-6 switch confirmed (0 vs 6,000 reasoning tokens). Grok 4.7 at
   effort xhigh stopped twice after a one-sentence preamble, so its check 2 is inconclusive; Grok stays
