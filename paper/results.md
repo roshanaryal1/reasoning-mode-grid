@@ -1,9 +1,9 @@
-# 4. Results (skeleton)
+# 4. Results (draft)
 
-Written 2026-10-14, before any scoring. Every number below has a source file and column, so
-the section can be filled in once the analysis runs, without choosing what to report after
-seeing the data. Report every row, including the ones that fail. Keep the order: the
-pre-registration ranks H4 first.
+Skeleton written 2026-10-14, before any scoring. Filled 2026-10-26 from `results/report.md`
+(main `2ed948c`), in the skeleton's order. Every number has a source file and column, listed
+below. Every row is reported, including the ones that fail. The pre-registration ranks H4
+first.
 
 Source files after Phase 4 of the runbook:
 
@@ -23,91 +23,272 @@ Source files after Phase 4 of the runbook:
 
 ## 4.1 Data and reliability
 
-[60 of 60 planned answers were scored by all three raters.] Refusals per family and mode: the
-`n_all_zero` column of `results/cell_means.csv` counts answers whose consensus is 0 on all
-nine dimensions, which the refusal rule gives an outright refusal. Check any non-zero count
-against the raters' notes before calling it a refusal. [Expected 0.]
+All 60 planned answers were scored by all three raters (the human rater, `llm-a` and
+`llm-b`), and all 60 have a consensus score. No answer has a consensus of 0 on all nine
+dimensions (`n_all_zero` is 0 in every cell of `results/cell_means.csv`), so no answer was
+treated as an outright refusal.
 
-Inter-rater reliability (Table 3, from `results/agreement.csv`): ordinal alpha per dimension
-and interval alpha on the total. Name every dimension below 0.667, which makes its test
-exploratory. State whether the total clears 0.667 (H4 stays confirmatory) and whether it
-clears 0.800 (firm, otherwise "tentative").
+**Table 3.** Inter-rater reliability, three raters: Krippendorff's alpha, ordinal per
+dimension and interval on the total.
 
-[One sentence each: human vs llm-a and human vs llm-b exact agreement, from the two
-pairwise agreement files.]
+| Dimension | alpha | Status |
+|---|---|---|
+| D1 hardware-constraint | 0.574 | below 0.667 |
+| D2 recency | 0.283 | below 0.667 |
+| D3 tool-factuality | 0.249 | below 0.667 |
+| D4 model-factuality | 0.630 | below 0.667 |
+| D5 benchmark-factuality | 0.599 | below 0.667 |
+| D6 citation-quality | 0.539 | below 0.667 |
+| D7 actionability | 0.858 | ok |
+| D8 security-model | 0.862 | ok |
+| D9 internal-consistency | 0.285 | below 0.667 |
+| Total | 0.698 | ok |
+
+Seven of nine dimensions fall below the 0.667 bar: D1, D2, D3, D4, D5, D6 and D9. Their
+tests are exploratory. This includes all three secondary hypotheses (H1 on D1, H2 on D9,
+H3 on D3). Only D7 and D8 clear the bar. The total clears 0.667 (alpha 0.698), so H4 stays
+confirmatory. It does not clear 0.800, so any supported result on the total would be
+tentative.
+
+Pairwise, the human rater and `llm-a` have a mean exact agreement of 0.72 over D1 to D9
+(range 0.18 to 0.93 across dimensions). The human rater and `llm-b` have 0.71 (range 0.45
+to 0.95).
 
 ## 4.2 Confirmatory test (H4)
 
-From the "total" row of `results/variance_table.csv`:
+On the total score (Table 4, "total" row):
 
-- delta omega squared `delta_omega2` with 95% CI [`ci_low`, `ci_high`]
-- omega squared for mode `omega2_mode` and for family `omega2_family`
-- reasoning minus fast `mode_effect` with 95% CI [`mode_effect_ci_low`, `mode_effect_ci_high`],
-  in points out of 18
-- permutation p-values `p_mode` and `p_family`, and any disagreement with the CI
-- omega squared for the interaction `omega2_interaction`, and whether it exceeds both main
-  effects
-- the verdict and the H4 status from the hypothesis table, word for word.
+- delta omega squared (mode minus family) is -0.527, 95% CI [-0.666, -0.417];
+- omega squared is 0.050 for mode and 0.577 for family;
+- reasoning scores 1.37 points higher than fast out of 18, 95% CI [0.77, 1.93];
+- permutation p is 0.007 for mode and below 0.001 for family. Both agree with their
+  intervals;
+- omega squared for the family x mode interaction is 0.184. It exceeds the mode effect
+  (0.050) but not the family effect (0.577), so it does not exceed both main effects and
+  the "average effect only" label does not apply.
 
-Then the power caveat: under equal effects 15% of simulated studies show "mode > model".
+Verdict: **model > mode**. H4 status: **no**. H4 predicted mode > model with reasoning
+higher than fast. Reasoning did score higher than fast, with a CI above zero, but family
+explained far more of the variance in the total than mode did, and the CI on delta lies
+wholly below zero.
+
+Power caveat: under equal mode and family effects, 15% of simulated studies still show
+"mode > model" (Section 3.7). The observed result is in the opposite direction, so this
+caveat does not weaken it, but it is reported as pre-registered.
 
 ## 4.3 Secondary tests (H1 to H3) and the other dimensions
 
-Table 4: the full `variance_table.md` decomposition, all nine dimensions plus the total.
+**Table 4.** Variance decomposition, all nine dimensions and the total
+(`results/variance_table.md`). Delta is omega squared for mode minus omega squared for
+family, with a 95% bootstrap CI over replicates.
 
-For H1 (D1), H2 (D9) and H3 (D3): verdict, delta with CI, direction with CI, status, and
-the multiplicity caveat. For H3, say which of the two pre-stated outcomes occurred: model >
-mode (supports H3), mode > model with reasoning lower (supports the hallucination account),
-or neither.
+| Dim | eta2 family | eta2 mode | eta2 FxM | eta2 resid | omega2 FxM | delta omega2 | 95% CI | reasoning - fast | 95% CI | p mode | p family | Verdict |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| D1 | 0.206 | 0.000 | 0.147 | 0.647 | 0.079 | -0.150 | [-0.386, -0.045] | 0.000 | [-0.200, 0.200] | 1.000 | 0.035 | model > mode |
+| D2 | 0.692 | 0.004 | 0.063 | 0.241 | 0.037 | -0.664 | [-0.840, -0.547] | 0.067 | [-0.067, 0.200] | 0.662 | 0.000 | model > mode |
+| D3 | 0.524 | 0.011 | 0.084 | 0.381 | 0.044 | -0.477 | [-0.710, -0.321] | -0.100 | [-0.233, 0.033] | 0.450 | 0.000 | model > mode |
+| D4 | 0.415 | 0.029 | 0.161 | 0.395 | 0.119 | -0.350 | [-0.637, -0.175] | 0.167 | [0.000, 0.300] | 0.187 | 0.000 | model > mode |
+| D5 | 0.582 | 0.039 | 0.125 | 0.254 | 0.098 | -0.519 | [-0.656, -0.440] | 0.333 | [0.133, 0.533] | 0.041 | 0.000 | model > mode |
+| D6 | 0.654 | 0.000 | 0.013 | 0.333 | -0.022 | -0.622 | [-0.805, -0.494] | 0.000 | [-0.133, 0.133] | 1.000 | 0.000 | model > mode |
+| D7 | 0.187 | 0.058 | 0.213 | 0.542 | 0.155 | -0.083 | [-0.300, 0.008] | 0.200 | [0.033, 0.333] | 0.096 | 0.045 | inconclusive |
+| D8 | 0.403 | 0.074 | 0.134 | 0.389 | 0.093 | -0.294 | [-0.485, -0.186] | 0.267 | [0.100, 0.400] | 0.020 | 0.000 | model > mode |
+| D9 | 0.316 | 0.066 | 0.226 | 0.392 | 0.184 | -0.216 | [-0.409, -0.095] | 0.433 | [0.167, 0.700] | 0.034 | 0.000 | model > mode |
+| total | 0.595 | 0.053 | 0.200 | 0.152 | 0.184 | -0.527 | [-0.666, -0.417] | 1.367 | [0.767, 1.933] | 0.007 | 0.000 | model > mode |
 
-The random-effects variance components (`vc_*` columns, and the exploratory section of
-`variance_table.md`) go in the appendix, labelled exploratory, as pre-registered.
+p = 0.000 means p < 0.001 at 5,000 permutations.
 
-For D2, D4 to D8: the verdict only, as descriptive. Name any "no variance" or
-"uninformative" dimension, which is a finding about the rubric.
+All three secondary tests are exploratory, because their dimensions fall below the alpha
+bar (Table 3). They are reported uncorrected for multiplicity, as pre-registered, and
+cannot by themselves carry a claim.
+
+- **H1** (D1, predicted mode > model and reasoning > fast): model > mode, delta -0.150
+  [-0.386, -0.045]. Reasoning minus fast is 0.00 [-0.20, 0.20]. The prediction fails in
+  direction. Exploratory (alpha 0.57).
+- **H2** (D9, predicted mode > model and reasoning > fast): model > mode, delta -0.216
+  [-0.409, -0.095]. Reasoning scores higher than fast, 0.43 [0.17, 0.70], but family still
+  explains more variance than mode. The prediction fails in direction. Exploratory
+  (alpha 0.29).
+- **H3** (D3, predicted model > mode): model > mode, delta -0.477 [-0.710, -0.321].
+  Reasoning minus fast is -0.10 [-0.23, 0.03]. Of the pre-stated outcomes, model > mode
+  occurred, which supports H3. The competing hallucination account (mode > model with
+  reasoning lower) did not occur. Exploratory (alpha 0.25), so the support is weak.
+
+For every hypothesis the permutation p for mode agrees with its interval.
+
+Other dimensions, descriptive: D2, D4, D5, D6 and D8 are model > mode. D7 is inconclusive
+(delta -0.083 [-0.300, 0.008]). No dimension had no variance or was uninformative in the
+full design. Delta is negative on every dimension.
+
+The random-effects variance components are in Appendix [X], labelled exploratory.
 
 ## 4.4 Where mode mattered: per-family differences
 
-Figure 1 (`results/figure1.pdf`): cell means, fast vs reasoning, one line per family, for
-the total, D1, D9 and D3.
+Figure 1 (`results/figure1.pdf`) shows cell means, fast vs reasoning, one line per family,
+for the total, D1, D9 and D3.
 
-From `results/family_mode_effects.csv`: for the total, each family's reasoning minus fast.
-Say how many of the six families moved in the same direction. If the interaction exceeded
-both main effects, interpret the per-family differences here, as the pre-registration
-requires.
+**Table 5.** Total score (out of 18) by family and mode, consensus means over five
+replicates (`results/family_mode_effects.csv`).
+
+| Family | Fast | Reasoning | Reasoning - fast |
+|---|---|---|---|
+| Claude | 13.80 | 15.60 | +1.80 |
+| DeepSeek | 11.80 | 11.20 | -0.60 |
+| Gemini | 9.40 | 9.40 | 0.00 |
+| GPT | 15.00 | 16.40 | +1.40 |
+| Grok | 13.60 | 12.40 | -1.20 |
+| Qwen | 6.80 | 13.60 | +6.80 |
+
+Three of six families (Claude, GPT, Qwen) moved in the same direction as the average
+(+1.37). Gemini did not move, and DeepSeek and Grok scored lower in reasoning. Qwen's +6.80
+is the largest single difference; without Qwen the mean of the other five is +0.28. The
+interaction did not exceed both main effects (Section 4.2), so the pre-registration does
+not require interpreting these differences. They are reported as descriptive.
 
 ## 4.5 Robustness
 
-1. Ranks: `rank_delta_omega2` per dimension. Same verdict or not.
-2. Length: `length_adj_delta_omega2`. If the mode effect shrinks, report that it is not
-   separable from answer length, not that length causes it.
-3. Per rater: H4 verdict on each rater's own scores, from `results/<rater>/`.
-4. Fast-mode floor: delta and direction in the true-off group and the lowest-available
-   group. If H1, H2 or H4 holds only in the true-off group, say the claim holds for
-   reasoning off vs on, not minimised vs on.
+**Table 6.** Robustness checks 1 and 2: delta omega squared on raw scores, on ranks and
+after removing the linear effect of log answer length.
+
+| Dim | delta (raw) | delta (ranks) | Same sign | delta (length-adjusted) |
+|---|---|---|---|---|
+| D1 | -0.150 | -0.145 | yes | -0.120 |
+| D2 | -0.664 | -0.664 | yes | -0.618 |
+| D3 | -0.477 | -0.477 | yes | -0.432 |
+| D4 | -0.350 | -0.341 | yes | -0.346 |
+| D5 | -0.519 | -0.462 | yes | -0.575 |
+| D6 | -0.622 | -0.645 | yes | -0.575 |
+| D7 | -0.083 | -0.079 | yes | -0.124 |
+| D8 | -0.294 | -0.294 | yes | -0.180 |
+| D9 | -0.216 | -0.219 | yes | -0.232 |
+| total | -0.527 | -0.570 | yes | -0.655 |
+
+1. **Ranks.** Delta on ranks has the same sign as on raw scores on every dimension and the
+   total. The total moves from -0.527 to -0.570. The verdict does not change.
+2. **Length.** After length adjustment, delta on the total moves further from zero (-0.527
+   to -0.655), so model > mode holds. Delta moves toward zero on D1, D2, D3, D4, D6 and D8,
+   and away from zero on D5, D7, D9 and the total. Delta is a difference of two shares, so
+   this table alone does not show whether mode's own share fell after adjustment. Whether
+   the mode effect is separable from answer length is therefore not settled here.
+3. **Per rater.** Each rater's own scores give the same H4 verdict as the consensus.
+
+   | Rater | H1 (D1) | H2 (D9) | H3 (D3) | H4 (total) |
+   |---|---|---|---|---|
+   | Human | model > mode, -0.10 [-0.30, 0.10] | inconclusive, 0.37 [0.13, 0.60] | model > mode, 0.17 [0.10, 0.23] | model > mode, 1.57 [1.03, 2.10] |
+   | `llm-a` | model > mode, 0.00 [-0.20, 0.20] | model > mode, 0.30 [0.10, 0.53] | model > mode, -0.13 [-0.30, 0.03] | model > mode, 1.23 [0.63, 1.80] |
+   | `llm-b` | model > mode, 0.07 [-0.10, 0.23] | model > mode, 0.20 [-0.13, 0.53] | model > mode, -0.07 [-0.23, 0.10] | model > mode, 1.20 [0.53, 1.87] |
+
+   Cells give the verdict, then reasoning minus fast with its 95% CI. All three raters give
+   model > mode on H4, with reasoning above fast and a CI above zero. On H2 the human
+   rater's verdict is inconclusive where the other two give model > mode. On H3 the human
+   rater scored reasoning higher than fast on D3 (0.17 [0.10, 0.23]), where the two LLM
+   raters show no clear difference.
+4. **Fast-mode floor.** The same analysis on the true-off families (GPT, Qwen, DeepSeek)
+   and the lowest-available families (Claude, Gemini, Grok), 30 runs each, descriptive.
+
+   | Group | Measure | delta (95% CI) | Reasoning - fast (95% CI) | Verdict |
+   |---|---|---|---|---|
+   | True-off | total | -0.348 [-0.554, -0.161] | 2.53 [1.67, 3.40] | model > mode |
+   | True-off | D1 | -0.167 [-0.425, 0.018] | -0.07 [-0.40, 0.27] | inconclusive |
+   | True-off | D9 | 0.004 [-0.291, 0.283] | 0.73 [0.40, 1.07] | inconclusive |
+   | Lowest-available | total | -0.736 [-0.853, -0.617] | 0.20 [-0.60, 1.00] | model > mode |
+   | Lowest-available | D1 | -0.163 [-0.538, 0.066] | 0.07 [-0.13, 0.27] | inconclusive |
+   | Lowest-available | D9 | -0.357 [-0.612, -0.156] | 0.13 [-0.27, 0.53] | model > mode |
+
+   H1, H2 and H4 hold in neither group, so the pre-registered true-off rule is not
+   triggered. Both groups give model > mode on the total. The mode effect on the total is
+   larger where fast mode turns reasoning off (+2.53, CI above zero) than where it only
+   lowers it (+0.20, CI includes zero), and delta is closer to zero in the true-off group.
+   The reasoning-over-fast gain in the full design comes mainly from the true-off families,
+   Qwen above all (Table 5).
 
 ## 4.6 Blinding
 
-From `modegrid blinding-check`: for each rater, the share of answers they guessed, their
-accuracy on family (chance 1/6) and mode (chance 1/2), and the one-sided binomial p-value.
-Apply the pre-registered rule: name any rater who beat chance on mode, re-run H1 to H4 on
-each rater's scores, and if all three beat chance, label a supported H4 "tentative, mode
-blinding failed". Family guesses above chance are expected (Appendix D2) and change no
-status.
+**Table 7.** Blinding check: share of answers guessed, guess accuracy against chance, and
+the exact one-sided binomial p-value (`results/blinding_check.csv`).
+
+| Rater | Guess | Guessed | Accuracy | Chance | p |
+|---|---|---|---|---|---|
+| Human | family | 60 of 60 | 0.15 | 0.17 | 0.688 |
+| Human | mode | 60 of 60 | 0.70 | 0.50 | 0.001 |
+| `llm-a` | family | 60 of 60 | 0.75 | 0.17 | < 0.001 |
+| `llm-a` | mode | 60 of 60 | 0.68 | 0.50 | 0.003 |
+| `llm-b` | family | 60 of 60 | 0.20 | 0.17 | 0.292 |
+| `llm-b` | mode | 60 of 60 | 0.60 | 0.50 | 0.077 |
+
+Two raters beat chance on mode: the human rater (0.70, p = 0.001) and `llm-a` (0.68,
+p = 0.003). `llm-b` did not (0.60, p = 0.077). As pre-registered, H1 to H4 were re-run on
+each rater's scores (Section 4.5, check 3). `llm-b`, the rater who did not beat chance,
+reaches the same H4 verdict as the consensus (model > mode). Not all three raters beat
+chance, so the "mode blinding failed" label does not apply. H4 is not supported in any
+case.
+
+On family, `llm-a` guessed right on 75% of answers (chance 17%, p < 0.001). The human rater
+(15%) and `llm-b` (20%) did not beat chance. Family leaking through recommended model names
+is expected (Appendix D2) and changes no hypothesis's status. It does mean that `llm-a`
+correctly identified the family of most answers it scored. Section 4.8 reports how each
+LLM rater scored its own vendor's answers.
 
 ## 4.7 Rubric portability (exploratory, for LA-P5)
 
-From `results/cell_rank_agreement.csv`: Kendall's W across the three raters on the 12 cell
-means for the total, and tau-b for each pair. Name the dimensions with no variance, which a
-benchmark cannot use.
+**Table 8.** Agreement of the three raters on the ranking of the 12 cell means: Kendall's W
+across raters and Kendall's tau-b for each pair (`results/cell_rank_agreement.csv`).
+
+| Measure | Kendall's W | Human ~ `llm-a` | Human ~ `llm-b` | `llm-a` ~ `llm-b` |
+|---|---|---|---|---|
+| D1 | 0.891 | 0.87 | 0.67 | 0.75 |
+| D2 | 0.675 | 0.72 | 0.39 | 0.19 |
+| D3 | 0.544 | -0.05 | 0.10 | 0.61 |
+| D4 | 0.685 | 0.48 | 0.34 | 0.63 |
+| D5 | 0.842 | 0.51 | 0.65 | 0.80 |
+| D6 | 0.875 | 0.93 | 0.62 | 0.68 |
+| D7 | 0.948 | 0.83 | 0.90 | 0.94 |
+| D8 | 0.951 | 0.86 | 0.79 | 0.95 |
+| D9 | 0.870 | 0.63 | 0.61 | 0.85 |
+| total | 0.955 | 0.88 | 0.81 | 0.80 |
+
+The raters rank the 12 cells almost the same way on the total (W = 0.955), even though
+their per-answer agreement on several dimensions is low (Table 3). D3 is the weakest: the
+human rater's ranking is unrelated to either LLM rater's (tau-b -0.05 and 0.10), while the
+two LLM raters agree moderately (0.61). D2 and D4 are also low. No dimension had no
+variance, so none is unusable as a benchmark dimension on that ground.
 
 ## 4.8 Own-vendor scores
 
-From `results/own_vendor.csv`, for `llm-a` on Claude answers and `llm-b` on GPT answers:
-the gap to the other two raters on the same answers (`own_gap`), the same gap on the other
-five families (`baseline_gap`), and their difference (`self_preference`) with its 95% CI,
-for the total and each dimension. A positive self-preference with a CI above zero means the
-rater scored its own vendor higher than it scored everyone else, relative to the other
-raters. Descriptive: no hypothesis rests on it. If it is large, an exploratory check, not
-pre-registered and labelled as such, can report H4 with that rater's own-vendor scores
-replaced by the mean of the other two.
+**Table 9.** Each LLM rater on its own vendor's family (`results/own_vendor.csv`). Own gap
+is the rater's mean score minus the mean of the other two raters on its own vendor's
+answers. Baseline gap is the same on the other five families. Self-preference is own gap
+minus baseline gap, with a 95% CI. Descriptive: no hypothesis rests on it.
+
+| Rater | Family | Measure | Own gap | Baseline gap | Self-preference (95% CI) |
+|---|---|---|---|---|---|
+| `llm-a` | Claude | total | 0.30 | -0.81 | 1.11 [0.52, 1.71] |
+| `llm-a` | Claude | D1 | -0.05 | 0.00 | -0.05 [-0.18, 0.06] |
+| `llm-a` | Claude | D2 | 0.35 | -0.09 | 0.44 [0.25, 0.62] |
+| `llm-a` | Claude | D3 | 0.05 | -0.34 | 0.39 [0.10, 0.66] |
+| `llm-a` | Claude | D4 | 0.00 | -0.02 | 0.02 [-0.13, 0.18] |
+| `llm-a` | Claude | D5 | 0.05 | 0.26 | -0.21 [-0.63, 0.18] |
+| `llm-a` | Claude | D6 | 0.25 | 0.00 | 0.25 [0.01, 0.47] |
+| `llm-a` | Claude | D7 | 0.05 | 0.04 | 0.01 [-0.19, 0.26] |
+| `llm-a` | Claude | D8 | 0.00 | -0.03 | 0.03 [-0.03, 0.09] |
+| `llm-a` | Claude | D9 | -0.40 | -0.63 | 0.23 [-0.18, 0.67] |
+| `llm-b` | GPT | total | 0.10 | -1.40 | 1.50 [0.70, 2.34] |
+| `llm-b` | GPT | D1 | 0.10 | -0.15 | 0.25 [0.01, 0.51] |
+| `llm-b` | GPT | D2 | 0.05 | -0.33 | 0.38 [0.05, 0.69] |
+| `llm-b` | GPT | D3 | 0.15 | -0.12 | 0.27 [0.06, 0.51] |
+| `llm-b` | GPT | D4 | -0.10 | -0.12 | 0.02 [-0.23, 0.22] |
+| `llm-b` | GPT | D5 | 0.00 | -0.27 | 0.27 [0.10, 0.46] |
+| `llm-b` | GPT | D6 | -0.15 | -0.16 | 0.01 [-0.34, 0.33] |
+| `llm-b` | GPT | D7 | -0.10 | -0.02 | -0.08 [-0.29, 0.05] |
+| `llm-b` | GPT | D8 | -0.15 | 0.03 | -0.18 [-0.43, 0.05] |
+| `llm-b` | GPT | D9 | 0.30 | -0.26 | 0.56 [0.18, 0.99] |
+
+Both LLM raters show self-preference on the total, with a CI above zero: `llm-a` by 1.11
+points of 18 on Claude answers and `llm-b` by 1.50 points on GPT answers. Each scores the
+other five families lower than the other two raters do, but scores its own vendor's family
+about level with them. The gaps are of the same size as the mode effect on the total
+(+1.37). For `llm-a` the preference sits in D2, D3 and D6. For `llm-b` it sits in D1, D2,
+D3, D5 and D9. `llm-b`'s overall family guesses did not beat chance (Table 7), but whether
+it recognised GPT answers in particular is not tested here.
+
+[Exploratory check, not pre-registered: H4 with each LLM rater's own-vendor scores
+replaced by the mean of the other two. Decide whether to run it.]
