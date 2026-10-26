@@ -178,7 +178,7 @@ framework and model before scoring. A name that resolves is real. A name that ca
 found either way is unresolved and scores 1, not 0. Only a name that a search shows does not
 exist, or a wrong load-bearing attribute (such as model size), scores 0. We added this rule
 because closed-book raters in LA-P1 flagged real tools released after their training cutoff
-as fabricated [cite LA-P2].
+as fabricated [Aryal, in preparation].
 
 **Raters.** The author collected the captures, so the author does not score. Three raters
 score every answer independently and blind: one human who is not an author, and two LLMs
