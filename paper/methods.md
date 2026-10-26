@@ -184,8 +184,8 @@ as fabricated [cite LA-P2].
 score every answer independently and blind: one human who is not an author, and two LLMs
 from different vendors, each with live web search: `llm-a`, Claude Opus 5.5 (Anthropic),
 and `llm-b`, GPT-6 at Thinking effort High (OpenAI). The human rater (Rater H2) is not an
-author and asked to stay anonymous; the author knows their identity. [Rater H2's background,
-if they agree to it being stated.] Rater H2 replaced an earlier human rater whose returns
+author and asked that neither their name nor their background be published; the author
+knows their identity. Rater H2 replaced an earlier human rater whose returns
 were made with AI tools and were not used (Appendix D). `llm-b` scored on 2026-10-19,
 `llm-a` from 2026-10-19 to 2026-10-20, and Rater H2 from 2026-10-24 to 2026-10-26. Both LLM raters come from vendors whose
 families are scored, so each one's scores for its own vendor's family are also reported
