@@ -31,7 +31,7 @@ internal SSD and a 1 TB external SSD. The prompt fixes the date as 31 August 202
 research into ten areas (local inference, agent runtimes, multi-agent architecture, coding
 agents, research agents, memory, computer control, always-on operation, remote access,
 storage), and requires eleven labelled deliverables (A to K), including a memory plan (C),
-an installation plan (I) and a list of what not to install (J). It is 1,782 words long.
+an installation plan (I) and deliverable J, the components the answer advises against installing. It is 1,782 words long.
 
 The task has no answer key. It has hard constraints that can be checked: the memory
 budget, internal consistency between the recommendations and deliverable J, and whether
@@ -326,3 +326,13 @@ are vendored from LA-P1 at commit `d5e39e7` and pinned by SHA-256. All randomnes
 order, reading orders, bootstrap, permutations) is seeded, so the analysis reproduces
 exactly from the released scores with `modegrid analyze --seed 20261001 --boot 5000
 --perm 5000`.
+
+## 3.10 Use of AI tools and research ethics
+
+AI tools were used to help draft text and code; the author checked all content and takes
+responsibility. AI systems also appear in the study itself, as described above: they are
+the systems under test, two of the three raters, and the browser assistant that sent three
+of the six capture blocks. No human participants were studied. One person scored model
+outputs as an annotator, with their agreement, and asked to remain anonymous; the only
+records about them are their scores, their guesses of family and mode, and their scoring
+dates.

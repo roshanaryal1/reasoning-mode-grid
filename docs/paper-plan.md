@@ -2,18 +2,20 @@
 
 ## Target
 
-Full research and dates in [venues.md](venues.md). In short:
+Decided 2026-10-27 (supersedes the plan below in venues.md, kept for the record):
 
-- **arXiv** preprint when the analysis is done (January 2027).
-- **ICLR 2027 workshop**, 4-page non-archival short paper (submit about 1 Feb 2027).
-- **TMLR** for the archival version, submitted at the same time.
-- Optional extended version for the **NeurIPS 2027 Evaluations & Datasets** track.
+- **TMLR** (double-blind journal), submitted first with the anonymous version.
+- **Preprints.org**, the named version, posted after the TMLR submission and before any
+  acceptance (TMLR allows preprints; the submission never links to it).
+- Deferred: a 4-page non-archival workshop version. Revisit when the ICLR 2027 workshop list
+  is out (late November 2026); TMLR allows overlap only with venues declared non-archival
+  in writing. The NeurIPS 2027 extended version and arXiv are dropped.
 
 ## Dependencies
 
 | Item | Why it matters | State |
 |---|---|---|
-| LA-P1 citable (Cureus or preprint) | LA-P4 reuses its prompt and rubric | Under review, cite the preprint and Zenodo DOI 10.5281/zenodo.22245991 |
+| LA-P1 citable | LA-P4 reuses its prompt and rubric (instruments only; none of its text or results, per TMLR) | Cureus: editorial review completed 2026-10-17, awaiting copy editing. Cite the Zenodo DOI 10.5281/zenodo.22245991 until the Cureus article is out |
 | v2 rubric anchors | Scoring instrument | Done in llm-architects |
 | LA-P2 finding on stale raters | Justifies mandatory web verification | Cite as in preparation if not yet public |
 

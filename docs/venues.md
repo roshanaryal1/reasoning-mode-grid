@@ -4,6 +4,10 @@ Researched 2026-10-01. Dates marked *projected* follow the previous cycle and ar
 yet confirmed. **Re-check every date on the official call for papers before you plan
 around it.**
 
+**Superseded 2026-10-27:** the venue is TMLR, then a named preprint on Preprints.org; the
+workshop version is deferred and arXiv and the NeurIPS extension are dropped. See
+[paper-plan.md](paper-plan.md). The research below is kept as the record of the original plan.
+
 ## The short answer
 
 1. **arXiv preprint** as soon as the analysis is done (target: January 2027).
