@@ -37,8 +37,9 @@ the v2 rubric from [LLMs as Systems Architects](https://github.com/roshanaryal1/
 - A pre-registered analysis: a two-way variance decomposition (model family, mode,
   interaction, residual) per rubric dimension, with bootstrap CIs, permutation tests,
   a rank-based check and a length-adjusted check.
-- Chat-app capture templates for the 60 scored runs, plus API adapters for a 12-call
-  check that each mode switch works. The reasoning switch lives in YAML, not code.
+- Chat-app capture templates for the 60 scored runs, plus API adapters for 12 initial
+  checks of the mode switches and follow-up checks on the two updated models (the Grok 4.7
+  follow-up was inconclusive). The reasoning switch lives in YAML, not code.
 - Blinded rater packets, so raters never see which model or mode wrote an answer.
 - CI that runs lint, types, tests on Python 3.10 to 3.13, and validates the data.
 

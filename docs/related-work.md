@@ -148,7 +148,7 @@ NeurIPS 2026 per the arXiv comment, conference not yet held. S. Wang et al. 2025
 (2510.12680) was withdrawn from ICLR 2026. No published version found for HRBench, Thinking
 Leakage, MARGO, Lau, Madur or Sahu et al.
 
-## Second check, 2026-10-27 (Codex verification pass)
+## Second check, 2026-10-27
 
 - 2510.12680 S. Wang et al. was published at EMNLP 2026, pp. 3491-3511
   (aclanthology.org/2026.emnlp-main.151, BibTeX checked: same seven authors). Now cited as
