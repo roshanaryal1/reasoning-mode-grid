@@ -1,0 +1,26 @@
+%% Named preprint (Preprints.org), same text as the submission. tmlr.sty's [preprint]
+%% option shows the author and removes the TMLR header, as the template intends.
+\documentclass[10pt]{article}
+\usepackage[preprint]{tmlr}
+\input{preamble}
+
+\author{\name Roshan Aryal \email roshanaryaal@gmail.com \\
+      \addr Independent Researcher, Auckland, New Zealand}
+
+\begin{document}
+\maketitle
+\input{abstract}
+
+\input{body}
+
+\subsubsection*{Acknowledgments}
+We thank the human rater, who scored all 60 answers by hand and asked to remain anonymous.
+[Funding statement: to be confirmed by the author.]
+
+\bibliography{references}
+\bibliographystyle{tmlr}
+
+\appendix
+\input{appendix}
+
+\end{document}

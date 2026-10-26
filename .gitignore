@@ -45,3 +45,9 @@ paper/jair/*.out
 paper/jair/*.run.xml
 paper/jair/main.pdf
 paper/jair/*.otf
+paper/tmlr/*.aux
+paper/tmlr/*.bbl
+paper/tmlr/*.blg
+paper/tmlr/*.log
+paper/tmlr/*.out
+paper/tmlr/*.pdf

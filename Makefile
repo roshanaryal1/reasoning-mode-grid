@@ -63,9 +63,14 @@ paper: ## Stitch the paper drafts into paper/build/manuscript.md and .html (need
 
 .PHONY: jair
 jair: ## LaTeX for the JAIR submission in paper/jair/ (needs pandoc; compile with latexmk + biber, or Overleaf)
-	python paper/jair/build.py
+	python paper/latex_build.py jair
 	@if command -v latexmk >/dev/null; then cd paper/jair && latexmk -pdf -quiet main.tex; \
 	else echo "latexmk not found: upload paper/jair/ and results/figure1.pdf to Overleaf"; fi
+
+.PHONY: tmlr
+tmlr: ## TMLR LaTeX in paper/tmlr/: anonymous main.pdf for review and named preprint.pdf (needs pandoc and tectonic)
+	python paper/latex_build.py tmlr
+	cd paper/tmlr && tectonic main.tex && tectonic preprint.tex
 
 RATERS = human llm-a llm-b
 SHEETS = $(foreach r,$(RATERS),data/scores/$(r).csv)

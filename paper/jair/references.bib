@@ -1,4 +1,6 @@
-% Every entry checked 2026-10-26 against its arXiv, Crossref or DataCite record
+% Every entry checked 2026-10-26 (arXiv records) and 2026-10-27 (published versions:
+% Crossref, OpenReview); a published version is cited where one exists.
+% Originally: every entry checked 2026-10-26 against its arXiv, Crossref or DataCite record
 % (docs/related-work.md, "Verification, 2026-10-26"). Same list as paper/references.md.
 
 @misc{aryal2026lap1,
@@ -16,12 +18,14 @@
   year = {2026}
 }
 
-@misc{atil2024nondeterminism,
-  author = {Atil, Berk and Aykent, Sarp and Chittams, Alexa and Fu, Lisheng and Passonneau, Rebecca J. and Radcliffe, Evan and Rajagopal, Guru Rajan and Sloan, Adam and Tudrej, Tomasz and Ture, Ferhan and Wu, Zhe and Xu, Lixinyu and Baldwin, Breck},
-  title = {Non-Determinism of ``Deterministic'' {LLM} Settings},
-  year = {2024},
-  eprint = {2408.04667},
-  eprinttype = {arxiv}
+@inproceedings{atil2025nondeterminism,
+  author = {At{\i}l, Berk and Aykent, Sarp and Chittams, Alexa and Fu, Lisheng and Passonneau, Rebecca J. and Radcliffe, Evan and Rajagopal, Guru Rajan and Sloan, Adam and Tudrej, Tomasz and Ture, Ferhan and Wu, Zhe and Xu, Lixinyu and Baldwin, Breck},
+  title = {Non-Determinism of ``Deterministic'' {LLM} System Settings in Hosted Environments},
+  booktitle = {Proceedings of the 5th Workshop on Evaluation and Comparison of {NLP} Systems (Eval4NLP)},
+  pages = {135--148},
+  year = {2025},
+  publisher = {Association for Computational Linguistics},
+  doi = {10.18653/v1/2025.eval4nlp-1.12}
 }
 
 @misc{bjarnason2026randomness,
@@ -29,16 +33,16 @@
   title = {On Randomness in Agentic Evals},
   year = {2026},
   eprint = {2602.07150},
-  eprinttype = {arxiv}
+  eprinttype = {arxiv},
+  note = {Presented at the ICLR 2026 workshop AIWILD}
 }
 
-@misc{chen2025factuality,
-  author = {Chen, Xilun and Kulikov, Ilia and Berges, Vincent-Pierre and O{\u{g}}uz, Barlas and Shao, Rulin and Ghosh, Gargi and Weston, Jason and Yih, Wen-tau},
+@inproceedings{chen2026factuality,
+  author = {Chen, Xilun and Kulikov, Ilia and Berges, Vincent-Pierre and O{\u{g}}uz, Barlas and Shao, Rulin and Ghosh, Gargi and Yih, Wen-tau},
   title = {Learning to Reason for Factuality},
-  year = {2025},
-  eprint = {2508.05618},
-  eprinttype = {arxiv},
-  note = {ICML 2026}
+  booktitle = {Proceedings of the 43rd International Conference on Machine Learning (ICML)},
+  year = {2026},
+  url = {https://openreview.net/forum?id=byZ7DoyDNd}
 }
 
 @misc{haase2026creative,
@@ -55,7 +59,8 @@
   title = {Reasoning Large Language Model Errors Arise from Hallucinating Critical Problem Features},
   year = {2025},
   eprint = {2505.12151},
-  eprinttype = {arxiv}
+  eprinttype = {arxiv},
+  note = {Presented at the NeurIPS 2025 workshop FoRLM}
 }
 
 @misc{lau2026judge,
@@ -72,16 +77,16 @@
   year = {2026},
   eprint = {2610.11765},
   eprinttype = {arxiv},
-  note = {Accepted at NeurIPS 2026}
+  note = {To appear at NeurIPS 2026}
 }
 
-@misc{li2025hallucinate,
+@inproceedings{li2025hallucinate,
   author = {Li, Junyi and Ng, Hwee Tou},
   title = {Reasoning Models Hallucinate More: Factuality-Aware Reinforcement Learning for Large Reasoning Models},
+  booktitle = {Advances in Neural Information Processing Systems 38 (NeurIPS 2025)},
+  pages = {167712--167733},
   year = {2025},
-  eprint = {2505.24630},
-  eprinttype = {arxiv},
-  note = {NeurIPS 2025}
+  doi = {10.52202/085713-5052}
 }
 
 @misc{liu2026leakage,
@@ -113,7 +118,8 @@
   title = {{ReasonBENCH}: Benchmarking the (In)Stability of {LLM} Reasoning},
   year = {2025},
   eprint = {2512.07795},
-  eprinttype = {arxiv}
+  eprinttype = {arxiv},
+  note = {A shorter version appeared at the ICLR 2026 workshop P-AGI}
 }
 
 @misc{sahu2026architects,
@@ -124,12 +130,12 @@
   eprinttype = {arxiv}
 }
 
-@misc{snell2024scaling,
+@inproceedings{snell2025scaling,
   author = {Snell, Charlie and Lee, Jaehoon and Xu, Kelvin and Kumar, Aviral},
-  title = {Scaling {LLM} Test-Time Compute Optimally can be More Effective than Scaling Model Parameters},
-  year = {2024},
-  eprint = {2408.03314},
-  eprinttype = {arxiv}
+  title = {Scaling {LLM} Test-Time Compute Optimally Can be More Effective than Scaling Parameters for Reasoning},
+  booktitle = {International Conference on Learning Representations (ICLR)},
+  year = {2025},
+  url = {https://openreview.net/forum?id=4FWAwZtd2n}
 }
 
 @misc{wangk2026margo,
@@ -148,20 +154,21 @@
   eprinttype = {arxiv}
 }
 
-@misc{wangs2026pathlock,
+@inproceedings{wangs2026pathlock,
   author = {Wang, Shouren and Yang, Wang and Ma, Chuang and Ganguly, Debargha and Singh, Vikash and Song, Chaoda and Li, Xinpeng and Long, Xianxuan and Chaudhary, Vipin and Han, Xiaotian},
   title = {Path-Lock Expert: Separating Reasoning Mode in Hybrid Thinking via Architecture-Level Separation},
+  booktitle = {Conference on Language Modeling (COLM)},
   year = {2026},
-  eprint = {2604.27201},
-  eprinttype = {arxiv}
+  url = {https://openreview.net/forum?id=vifGxn9AUq}
 }
 
-@misc{yuan2025numerical,
+@inproceedings{yuan2025numerical,
   author = {Yuan, Jiayi and Li, Hao and Ding, Xinheng and Xie, Wenya and Li, Yu-Jhe and Zhao, Wentian and Wan, Kun and Shi, Jing and Hu, Xia and Liu, Zirui},
   title = {Understanding and Mitigating Numerical Sources of Nondeterminism in {LLM} Inference},
+  booktitle = {Advances in Neural Information Processing Systems 38 (NeurIPS 2025)},
+  pages = {188045--188077},
   year = {2025},
-  eprint = {2506.09501},
-  eprinttype = {arxiv}
+  doi = {10.52202/085713-5653}
 }
 
 @misc{zhang2026harness,
@@ -169,14 +176,14 @@
   title = {Stop Comparing {LLM} Agents Without Disclosing the Harness},
   year = {2026},
   eprint = {2605.23950},
-  eprinttype = {arxiv}
+  eprinttype = {arxiv},
+  note = {Presented at the ICML 2026 workshop AIWILD}
 }
 
-@misc{zhao2025tts,
+@inproceedings{zhao2026tts,
   author = {Zhao, James Xu and Hooi, Bryan and Ng, See-Kiong},
   title = {Test-Time Scaling in Reasoning Models Is Not Effective for Knowledge-Intensive Tasks Yet},
-  year = {2025},
-  eprint = {2509.06861},
-  eprinttype = {arxiv},
-  note = {COLM 2026}
+  booktitle = {Conference on Language Modeling (COLM)},
+  year = {2026},
+  url = {https://openreview.net/forum?id=pSt4QKgs1j}
 }

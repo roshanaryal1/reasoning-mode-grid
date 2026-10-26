@@ -125,6 +125,29 @@ Rejected: a search summary said ActuBench (arXiv 2604.20273) reports about 3.5 p
 gained from reasoning mode across six provider pairs. Its text has no such comparison, so
 it is not cited.
 
+## Published versions, 2026-10-27
+
+Checked with Semantic Scholar, then confirmed on Crossref (DOIs) or OpenReview (venue
+records with author lists). The paper now cites these versions.
+
+| arXiv | Published version | Checked on |
+|---|---|---|
+| 2505.24630 Li and Ng | NeurIPS 2025, Advances in NeurIPS 38, pp. 167712-167733, doi:10.52202/085713-5052 | Crossref |
+| 2506.09501 Yuan et al. | NeurIPS 2025, Advances in NeurIPS 38, pp. 188045-188077, doi:10.52202/085713-5653 | Crossref |
+| 2408.03314 Snell et al. | ICLR 2025 (oral), title "... than Scaling Parameters for Reasoning", forum 4FWAwZtd2n | OpenReview |
+| 2508.05618 Chen et al. | ICML 2026, forum byZ7DoyDNd. The ICML record lists 7 authors; arXiv lists 8 (adds Jason Weston). Cited with the ICML list | OpenReview |
+| 2509.06861 Zhao et al. | COLM 2026, forum pSt4QKgs1j | OpenReview |
+| 2604.27201 S. Wang et al. | COLM 2026, forum vifGxn9AUq. The COLM record spells the second author "Van Yang"; arXiv and the CoRR record say "Wang Yang". Cited as "Wang Yang" | OpenReview |
+| 2408.04667 Atil et al. | Eval4NLP 2025 workshop proceedings (ACL), pp. 135-148, doi:10.18653/v1/2025.eval4nlp-1.12, title "... System Settings in Hosted Environments" | Crossref |
+
+Workshop only, cited as arXiv with a note: Bjarnason et al. (ICLR 2026 workshop AIWILD, not
+the main conference as noted on 2026-10-14), Zhang et al. (ICML 2026 workshop AIWILD, not a
+main-track position paper), Heyman and Zylberberg (NeurIPS 2025 workshop FoRLM), Potamitis
+et al. (ICLR 2026 workshop P-AGI, 3 authors against 6 on arXiv). Lei et al.: accepted at
+NeurIPS 2026 per the arXiv comment, conference not yet held. S. Wang et al. 2025
+(2510.12680) was withdrawn from ICLR 2026. No published version found for HRBench, Thinking
+Leakage, MARGO, Lau, Madur or Sahu et al.
+
 ## Own prior work
 
 - LA-P1, LLMs as Systems Architects (Cureus, under review; Zenodo DOI 10.5281/zenodo.22245991). Source of the prompt, rubric and the DeepSeek pilot.
