@@ -7,6 +7,13 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions follo
 
 ### Changed
 
+- Robustness check 2 (length) now reports omega squared for mode and reasoning minus fast after
+  removing log answer length, and `modegrid report` judges a shrinking mode effect on reasoning minus
+  fast, not on delta. On the total the mode effect falls from 1.37 to 0.62. Recorded in the Deviations
+  table. No earlier number changed.
+- `modegrid own-vendor --replaced-out DIR` re-runs the analysis with each LLM rater's own-vendor scores
+  replaced by the mean of the other raters (exploratory, not pre-registered). `make results` writes it
+  to `results/own-vendor-replaced/`; H4 stays model > mode. Recorded in the Deviations table.
 - Scoring complete: `data/scores/human.csv`, `llm-a.csv` and `llm-b.csv` (60 answers each), with
   run dates in `data/scores/raters.md`. Blinding key committed. `make results` written to `results/`.
 - Human rater replaced: Rater H1's AI-made returns are not used; Rater H2 (anonymous) scored by hand,
