@@ -10,17 +10,20 @@ between vendors (including live web search in three apps) and models that the ap
 change without notice. We report them to explain the variance decomposition, not to
 recommend a vendor.
 
-Two findings bear on evaluation practice beyond this paper. Both LLM raters scored their
-own vendor's answers higher than the other raters did, by about as much as the average
-effect of reasoning mode, so a study that uses a single LLM judge from a vendor it is
-comparing can mistake self-preference for an effect. And two of six models named a
+Two findings bear on evaluation practice beyond this paper. Relative to the other raters,
+each LLM rater scored its own vendor's answers higher than it scored the other families, by
+1.11 and 1.50 points of 18, about the size of the average effect of reasoning mode, so a
+study that uses a single LLM judge from a vendor it is comparing can mistake
+self-preference for an effect. And two of six models named a
 different vendor's model when asked to identify themselves, so a model's self-report is not
 reliable evidence of which model answered.
 
-Reasoning modes also use more computation per answer: in our API checks the reasoning
-setting used between 1,367 and 23,805 reasoning tokens per call, where the fast setting used
-0 to 131. Where reasoning does not improve the answer, the extra cost and energy buy little,
+Reasoning modes also use more computation per answer: in the first API check of each
+family the reasoning setting used between 1,367 and 23,805 reasoning tokens per call, where
+the fast setting used 0 to 131 (a second check on Grok 4.7 was inconclusive). Where reasoning does not improve the answer, the extra cost and energy buy little,
 which is one more reason to report the mode.
 
-The study collected no personal data. The 60 answers are model outputs to a fixed prompt
-about computer hardware. The human rater is not named, at their request.
+The study set out to collect no personal data: the 60 answers are model outputs to a
+fixed prompt about computer hardware. Three of them nonetheless contain the author's own
+account name or home city, which one chat app passed to the model (Section 4.6); no data
+about anyone else was collected. The human rater is not named, at their request.

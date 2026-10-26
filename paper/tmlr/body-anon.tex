@@ -27,7 +27,7 @@ every named tool and model. A pre-registered two-way variance decomposition then
 dimension, whether mode explains more of the variance than family does, and whether
 reasoning scores higher.
 
-The question came from an observation. LA-P1 \citep{anon2026a} captured one model family in
+The question came from an observation. S1 \citep{anon2026a} captured one model family in
 three modes and saw answers that looked different in ways that mattered, but with one answer
 per mode and no controls its adjudicated scores could not separate a mode effect from
 run-to-run noise, and did not show a reasoning advantage. This paper is the controlled test.
@@ -39,7 +39,8 @@ Our contributions are:
 \tightlist
 \item
   A crossed 6 x 2 model-by-mode design with five replicates per cell, run in the chat apps
-  people use, with an API check that each mode switch changes how much the model reasons.
+  people use, with API checks that each mode switch changes how much the model reasons
+  (one of them inconclusive, Section 3.4).
 \item
   A pre-registered analysis (OSF, frozen before the first capture) that decomposes
   answer-quality variance into family, mode, interaction and residual per rubric
@@ -48,9 +49,9 @@ Our contributions are:
 \item
   Evidence on rubric portability across a grid the rubric's authors never saw:
   inter-rater reliability per dimension and agreement between raters on how the 12 cells
-  rank, which a follow-up benchmark (LA-P5) needs.
+  rank, which a follow-up benchmark needs.
 \item
-  An open harness, \texttt{modegrid}, that covers planning, capture, blinding, scoring and
+  An open harness that covers planning, capture, blinding, scoring and
   analysis, and the full data: 60 verbatim answers, blinded packets' build rules, all rater
   sheets and every departure from the plan.
 \end{enumerate}
@@ -133,7 +134,7 @@ LLM rater's scores for its own vendor's family separately.
 
 LLMs are increasingly asked to design systems. On networked systems, \citet{sahu2026architects}
 find that LLMs cannot yet do architectural reasoning reliably and that how the LLM is
-involved changes the outcome a lot. LA-P1 \citep{anon2026a} introduced the task and rubric we
+involved changes the outcome a lot. S1 \citep{anon2026a} introduced the task and rubric we
 reuse, and captured one family (DeepSeek) in three modes, one answer each, with no
 controls. Its adjudicated totals did not show a reasoning advantage (reasoning 8, fast 9,
 of 18). That pilot cannot separate a mode effect from run-to-run noise. This paper is the
@@ -163,8 +164,8 @@ than family does, and whether reasoning scores higher than fast. Three secondary
 
 \subsection{Task and prompt}
 
-The task is the frozen prompt \texttt{prompt-v1} from LA-P1 \citep{anon2026a}, reused unchanged and
-pinned by SHA-256 (\texttt{ba2acba8...0370e0}). It asks the model to act as a senior AI
+The task is the frozen prompt \texttt{prompt-v1} from S1 \citep{anon2026a}, reused unchanged and
+pinned by SHA-256 ({[}hash withheld for review{]}). It asks the model to act as a senior AI
 infrastructure architect and design a fully local, always-on autonomous AI workstation for
 one stated machine: an Apple Mac mini with a base M6 chip, 32 GB unified memory, a 512 GB
 internal SSD and a 1 TB external SSD. The prompt fixes the date as 31 August 2026, asks for
@@ -319,7 +320,7 @@ group.
 \subsection{Collecting the answers}
 
 All 60 scored answers were collected in each vendor's web app, the way people use these
-models and the way LA-P1 was collected. The run order came from a manifest randomised with
+models and the way S1 was collected. The run order came from a manifest randomised with
 seed 20261001. Families were captured one block at a time, in the order each first appears
 in the manifest (Qwen, Grok, DeepSeek, Claude, Gemini, GPT). Inside a block, runs followed
 manifest order, which mixes fast and reasoning runs, so a vendor change during a block does
@@ -331,7 +332,7 @@ The prompt text was pasted unchanged. Web search was turned off where the app al
 (DeepSeek's Search toggle and AI Studio's Google Search grounding, both on by default).
 Three apps offer no way to turn search off in the chosen mode, and their models searched the
 web by themselves: Claude, GPT and Grok. We record this as app behaviour (section 3.8). A
-capture file was created immediately before each send with \texttt{modegrid\ new-capture}, which
+capture file was created immediately before each send with \texttt{harness\ new-capture}, which
 stamps the UTC time in a field that is never edited. Where a send time was not recorded
 exactly (Qwen runs 3 to 10, sent before their capture files were made, and the Gemini and
 GPT blocks, whose chats ran side by side), the capture gives the send time as an interval
@@ -362,13 +363,13 @@ departure from the frozen plan is listed with its date and reason in Appendix D.
 
 \subsection{Scoring}
 
-\textbf{Rubric.} Answers were scored on the nine-dimension rubric from LA-P1, each dimension
+\textbf{Rubric.} Answers were scored on the nine-dimension rubric from S1, each dimension
 0, 1 or 2 (total 0 to 18): D1 hardware-constraint adherence, D2 recency, D3 tool
 factuality, D4 model factuality, D5 benchmark factuality, D6 citation quality, D7
 actionability, D8 security model, and D9 internal consistency. We used the v2 hard anchors
 for D1, D7, D8 and D9, which were written to fix low agreement on those four dimensions in
-LA-P1. Two checks are mechanical. For D1 the rater runs the memory checker
-\texttt{memory\_budget.py} from LA-P1 on the set of models the answer keeps loaded at the same
+S1. Two checks are mechanical. For D1 the rater runs the memory checker
+\texttt{memory\_budget.py} from S1 on the set of models the answer keeps loaded at the same
 time. For D9 the rater first compares deliverable J (``what not to install'') with the rest
 of the answer, and recommending something J forbids scores 0. An outright refusal scores 0
 on every dimension.
@@ -377,7 +378,7 @@ on every dimension.
 framework and model before scoring. A name that resolves is real. A name that cannot be
 found either way is unresolved and scores 1, not 0. Only a name that a search shows does not
 exist, or a wrong load-bearing attribute (such as model size), scores 0. We added this rule
-because closed-book raters in LA-P1 flagged real tools released after their training cutoff
+because closed-book raters in S1 flagged real tools released after their training cutoff
 as fabricated \citep{anon2026b}.
 
 \textbf{Raters.} The author collected the captures, so the author does not score. Three raters
@@ -396,7 +397,7 @@ fixed rater prompt, the rubric, the scoring protocol, the memory checker and one
 answer. Each LLM rater used a new chat for every answer with memory, history and personal
 connectors off and web search on, and returned one CSV row. Each rater had their own
 random reading order. All three raters got the same instructions. The rubric, reused
-unchanged from LA-P1, still carries notes about that study: one names a model, and another
+unchanged from S1, still carries notes about that study: one names a model, and another
 describes what earlier raters missed in certain answers. A rule in the rater prompt told raters
 to ignore those parts.
 
@@ -410,7 +411,7 @@ own maker (``so discount my view on'' that vendor's product) was removed as well
 removed clutter that the chat apps add to copied text and that would name the family
 outright, such as ChatGPT's citation chips and Grok's citation tags. The original captures
 are never edited. Before scoring, an automated audit
-(\texttt{modegrid\ blinding-audit}) checked every packet for app clutter, self-disclosure and
+(\texttt{harness\ blinding-audit}) checked every packet for app clutter, self-disclosure and
 masked self-references, and found none. It also counted the model's own style habits that
 survive blinding: four habits each appear in only one family (tool-progress text and notes
 on the real date in Claude answers, ``as of my cutoff'' in DeepSeek answers, LaTeX arrows in
@@ -501,7 +502,7 @@ beats chance on mode, H1 to H4 are re-run on each rater's scores and we report w
 raters who did not beat chance reach the same conclusions. If all three beat chance, a
 supported H4 is labelled tentative.
 
-\textbf{Power.} Simulation (\texttt{modegrid\ power}, Appendix) gives power of about 0.9 to detect a
+\textbf{Power.} Simulation (\texttt{harness\ power}, Appendix) gives power of about 0.9 to detect a
 mode effect whose variance is five times the family variance, and about 0.4 to 0.6 for a
 moderate effect. Under equal effects, 15\% of simulated studies still show ``mode \textgreater{} model'',
 which we report beside the H4 result.
@@ -536,11 +537,11 @@ The Deviations table (Appendix D) lists every change. Four bear on how to read t
 
 \subsection{Materials and code}
 
-The harness (\texttt{modegrid}), configuration, captures, packets' build rules, scores and analysis
+The harness (\texttt{harness}), configuration, captures, packets' build rules, scores and analysis
 outputs are released at {[}anonymised repository link{]}. The prompt, rubric and memory checker
-are vendored from LA-P1 at commit \texttt{d5e39e7} and pinned by SHA-256. All randomness (run
+are vendored from S1 at commit {[}commit withheld for review{]} and pinned by SHA-256. All randomness (run
 order, reading orders, bootstrap, permutations) is seeded, so the analysis reproduces
-exactly from the released scores with \texttt{modegrid\ analyze\ -\/-seed\ 20261001\ -\/-boot\ 5000\ -\/-perm\ 5000}.
+exactly from the released scores with \texttt{harness\ analyze\ -\/-seed\ 20261001\ -\/-boot\ 5000\ -\/-perm\ 5000}.
 
 \section{Results}
 
@@ -612,8 +613,9 @@ explained far more of the variance in the total than mode did, and the CI on del
 wholly below zero.
 
 Power caveat: under equal mode and family effects, 15\% of simulated studies still show
-``mode \textgreater{} model'' (Section 3.7). The observed result is in the opposite direction, so this
-caveat does not weaken it, but it is reported as pre-registered.
+``mode \textgreater{} model'' (Section 3.7). The simulation models a single 0 to 2 dimension, not the
+nine-dimension total, so it is a proxy for H4 and says nothing about how often the
+opposite verdict appears by chance; it is reported as pre-registered.
 
 \subsection{Secondary tests (H1 to H3) and the other dimensions}
 
@@ -701,14 +703,23 @@ cannot by themselves carry a claim.
 \item
   \textbf{H3} (D3, predicted model \textgreater{} mode): model \textgreater{} mode, delta -0.477 {[}-0.710, -0.321{]}.
   Reasoning minus fast is -0.10 {[}-0.23, 0.03{]}. Of the pre-stated outcomes, model \textgreater{} mode
-  occurred, which supports H3. The competing hallucination account (mode \textgreater{} model with
-  reasoning lower) did not occur. Exploratory (alpha 0.25), so the support is weak.
+  occurred, the direction H3 predicted; the competing hallucination account (mode \textgreater{} model
+  with reasoning lower) did not occur. D3's alpha is 0.25, below the bar, so under the
+  pre-registered rule this pattern can neither confirm nor refute H3.
 \end{itemize}
 
-For every hypothesis the permutation p for mode agrees with its interval.
+For each of H1 to H4 the permutation p for mode agrees with its interval.
 
 Other dimensions, descriptive: D2, D4, D5, D6 and D8 are model \textgreater{} mode. D7 is inconclusive
-(delta -0.083 {[}-0.300, 0.008{]}). No dimension had no variance or was uninformative in the
+(delta -0.083 {[}-0.300, 0.008{]}). On D7 the interaction explains more than both main effects
+(omega squared 0.155, against 0.129 for family and 0.046 for mode), so as pre-registered
+its main-effect comparison is labelled ``average effect only; interaction exceeds both main
+effects'' and the per-family differences are the better summary: reasoning minus fast was
++0.8 for GPT, +0.4 for Claude and Qwen, 0.0 for Gemini and Grok, and -0.4 for DeepSeek. D7
+also shows a disagreement the pre-registration asks us to report: its reasoning-minus-fast
+interval is above zero ({[}0.033, 0.333{]}) while the mode permutation p is 0.096. The
+permutation tests the strict null that mode changes nothing in any family, which is a
+different question from the average effect, so we report both and resolve neither. No dimension had no variance or was uninformative in the
 full design. Delta is negative on every dimension.
 
 The random-effects variance components are in Appendix B, labelled exploratory.
@@ -811,7 +822,9 @@ total & -0.527 & -0.570 & yes & -0.655 & 0.050 & 0.008 & 1.367 & 0.621 \\
 \def\labelenumi{\arabic{enumi}.}
 \item
   \textbf{Ranks.} Delta on ranks has the same sign as on raw scores on every dimension and the
-  total. The total moves from -0.527 to -0.570. The verdict does not change.
+  total. The total moves from -0.527 to -0.570. These are point estimates; the
+  sensitivity checks have no bootstrap intervals, so they show that the direction holds,
+  not a verdict.
 \item
   \textbf{Length.} After removing log answer length, the mode effect on the total falls by more
   than half: reasoning minus fast drops from 1.37 to 0.62 points, and omega squared for mode
@@ -819,8 +832,9 @@ total & -0.527 & -0.570 & yes & -0.655 & 0.050 & 0.008 & 1.367 & 0.621 \\
   report that the mode effect is not separable from answer length, not that length causes
   it. Reasoning answers are longer, and longer answers score higher; this design cannot
   tell the two apart. The effect also shrinks on D3, D5, D7 and D8, and almost vanishes on
-  D7 and D8. It does not shrink on D9 (0.43 to 0.41), the one dimension where the gain from
-  reasoning survives the adjustment. The first version of this check judged shrinking on
+  D7 and D8. On D9 it barely changes (0.43 to 0.41), the largest positive estimate left
+  after adjustment; D2, D4 and D5 also stay positive (0.13, 0.17 and 0.22). These adjusted
+  values are point estimates without intervals. The first version of this check judged shrinking on
   delta rather than on the mode effect; the Deviations table records the correction
   (Appendix D).
 \item
@@ -946,7 +960,7 @@ raters guessed ``reasoning'' for all three packets, and \texttt{llm-a} guessed C
 (the human rater and \texttt{llm-b} for one each). Three of 60 answers cannot move the rates in
 Table 7 by more than 0.05; no scores were changed (Appendix D).
 
-\subsection{Rubric portability (exploratory, for LA-P5)}
+\subsection{Rubric portability (exploratory)}
 
 \textbf{Table 8.} Agreement of the three raters on the ranking of the 12 cell means: Kendall's W
 across raters and Kendall's tau-b for each pair (\texttt{results/cell\_rank\_agreement.csv}).
@@ -1052,8 +1066,9 @@ Self-preference (95\% CI)
 Both LLM raters show self-preference on the total, with a CI above zero: \texttt{llm-a} by 1.11
 points of 18 on Claude answers and \texttt{llm-b} by 1.50 points on GPT answers. Each scores the
 other five families lower than the other two raters do, but scores its own vendor's family
-about level with them. The gaps are of the same size as the mode effect on the total
-(+1.37). For \texttt{llm-a} the preference sits in D2, D3 and D6. For \texttt{llm-b} it sits in D1, D2,
+about level with them. These self-preference estimates (1.11 and 1.50, own gap minus
+baseline gap) are of the same size as the mode effect on the total (+1.37); the direct gaps
+on their own vendor's answers are only 0.30 and 0.10. For \texttt{llm-a} the preference sits in D2, D3 and D6. For \texttt{llm-b} it sits in D1, D2,
 D3, D5 and D9. \texttt{llm-b}'s overall family guesses did not beat chance (Table 7), but whether
 it recognised GPT answers in particular is not tested here.
 
@@ -1071,9 +1086,10 @@ the H4 result.
 On this task, which model answered mattered far more than how hard it was told to think.
 Family explained 58\% of the variance in the total score after bias correction, mode 5\%,
 and the interval on their difference lies wholly below zero (Section 4.2). Every dimension
-points the same way, and the verdict survives rank transformation, each rater's own
-scores, both fast-mode groups and the removal of each LLM rater's own-vendor scores. That
-runs against the observation that motivated the study: LA-P1 saw one family's answers
+points the same way. The verdict holds on each rater's own scores, in both fast-mode
+groups and with each LLM rater's own-vendor scores removed, and the point estimates keep
+their direction on ranks and after length adjustment. That
+runs against the observation that motivated the study: S1 saw one family's answers
 change across modes and asked whether mode could rival the choice of vendor. In a
 controlled grid it does not.
 
@@ -1091,8 +1107,9 @@ For anyone comparing models, the practical reading is twofold. First, the choice
 should come first: no mode setting closed the gap between the strongest and weakest
 families (GPT at 15.0 and 16.4, Gemini at 9.4 in both modes). Second, mode should
 still be reported, because its effect is not one number. The family x mode interaction
-(omega squared 0.184) is larger than the average mode effect (0.050), so ``reasoning helps''
-is true for some models and false for others. A leaderboard that names the mode lets a
+(omega squared 0.184) is larger than the average mode effect (0.050), and the family means
+moved in both directions: up for three families, down for two. With five answers per cell
+we cannot say for which families the change is real, only that one average hides it. A leaderboard that names the mode lets a
 reader see that; one that does not hides a difference of up to 6.8 points for a single
 model.
 
@@ -1111,8 +1128,8 @@ consistency, both failed in direction, and all three secondary tests are explora
 because their dimensions did not reach the reliability bar.
 
 Within that pattern, the dimensions differ in how much mode moved them. D9, internal
-consistency, had the largest reasoning gain (+0.43 of 2) and the only gain that survived
-the length adjustment (+0.41). It also had the largest interaction (eta squared 0.226),
+consistency, had the largest reasoning gain (+0.43 of 2), and it barely changed after the
+length adjustment (+0.41), the largest positive estimate left. It also had the largest interaction (eta squared 0.226),
 as Claude (0.4 to 1.4) and Qwen (0.0 to 1.8) rose while Grok fell (2.0 to 1.2). If any part of the answer
 benefits from reasoning beyond writing more, it is keeping the deliverables consistent with
 each other. D9's agreement was low (alpha 0.29), so this is a lead for future work, not a
@@ -1120,7 +1137,9 @@ finding. D1, the memory-budget check that H1 expected reasoning to improve, did 
 all on average (0.00), even though it is the dimension where a careful calculation should
 help most.
 
-D3, tool factuality, was mode-stable, as H3 predicted. The competing account, that
+On D3, tool factuality, the estimates point the way H3 predicted, with family dominating
+and no mode effect, but D3's reliability is below the bar, so H3 is neither confirmed nor
+refuted. The competing account, that
 reasoning models invent more tools, did not appear: reasoning minus fast on D3 was -0.10
 with an interval that includes zero. This dimension carries a reliability warning of its
 own. Its alpha was the lowest of all (0.25), and the human rater's ranking of the 12 cells
@@ -1148,13 +1167,14 @@ not matched on size or price, and some are not their vendor's strongest model.
 
 \textbf{Mode is not one control.} ``Fast'' means reasoning switched off for GPT, Qwen and
 DeepSeek, and the lowest available level for Claude, Gemini and Grok. Even an off switch
-may not stop all reasoning on an open-ended task. The API check shows each switch changes
-how much the model reasons, but it cannot show what a chat app runs internally. The
+may not stop all reasoning on an open-ended task. The API checks show that each documented
+switch changes how much the model reasons on the planned models and on GPT-6, but the check
+on Grok 4.7 was inconclusive, and no API call can show what a chat app runs internally. The
 pre-registered split by fast-mode floor shows whether a result holds only for off versus
 on.
 
 \textbf{Chat apps, not the API.} Each vendor's app adds its own system prompt and may change
-without notice. This matches how people use these models and how LA-P1 collected its
+without notice. This matches how people use these models and how S1 collected its
 answers, but it trades away control. In particular, three apps (Claude, GPT and Grok)
 searched the web by themselves with no way to turn it off, while two (Gemini and DeepSeek)
 ran with search off. Differences between families may partly reflect live search.
@@ -1162,8 +1182,8 @@ ran with search off. Differences between families may partly reflect live search
 \textbf{Model identity.} Chat apps change their models without asking. Two of six apps had
 moved to a newer model by the time of collection (GPT-6 and Grok 4.7 instead of the
 pre-registered GPT-5.6 Sol and Grok 4.6). Each still ran one model in both modes, so the
-contrasts stay mode switches, but the API evidence for those two switches comes from the
-planned models. DeepSeek's app shows no model name at all. This is the cost of testing the
+contrasts stay mode switches. A second API check confirmed the switch on GPT-6; the one on
+Grok 4.7 was inconclusive, so the Grok evidence rests on the planned Grok 4.6. DeepSeek's app shows no model name at all. This is the cost of testing the
 apps people use rather than a fixed API snapshot, and the reason every capture is dated.
 
 \textbf{Family is confounded with date and operator.} Families were captured one block at a
@@ -1191,8 +1211,9 @@ it, and we do not claim it does not.
 
 \textbf{Small cells.} Five replicates per cell detect a strong mode effect reliably but miss a
 moderate one about half the time, and percentile bootstrap intervals at this size can be
-too narrow. Under equal effects, 15\% of simulated studies still show ``mode \textgreater{} model''. We
-report permutation p-values beside every interval.
+too narrow. Under equal effects, 15\% of simulated studies still show ``mode \textgreater{} model''. That
+simulation models one dimension, not the nine-dimension total, so it is only a proxy for
+H4. We report permutation p-values beside every interval.
 
 \textbf{Single author.} No second author checked the analysis. The plan was registered before
 collection, the author did not score, and all data and code are released so anyone can
@@ -1205,7 +1226,7 @@ task, collected five answers per cell in the vendors' own chat apps, and had thr
 raters score all 60. On the pre-registered test, family explained far more of the variance
 in answer quality than mode did (delta omega squared -0.527, 95\% CI {[}-0.666, -0.417{]}).
 Reasoning helped on average, by 1.37 points of 18, but the gain came mostly from one family
-and from switching reasoning off rather than turning it down, and it halved once answer
-length was taken into account. On this task, choosing the model matters more than choosing
+and from the families whose fast mode switches reasoning off rather than turning it down,
+and it halved once answer length was taken into account. On this task, choosing the model matters more than choosing
 how hard it thinks. Mode should still be reported, because what it does differs from one
 model to the next. The data, code and every departure from the plan are released.

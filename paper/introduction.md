@@ -36,7 +36,8 @@ run-to-run noise, and did not show a reasoning advantage. This paper is the cont
 Our contributions are:
 
 1. A crossed 6 x 2 model-by-mode design with five replicates per cell, run in the chat apps
-   people use, with an API check that each mode switch changes how much the model reasons.
+   people use, with API checks that each mode switch changes how much the model reasons
+   (one of them inconclusive, Section 3.4).
 2. A pre-registered analysis (OSF, frozen before the first capture) that decomposes
    answer-quality variance into family, mode, interaction and residual per rubric
    dimension, using bias-corrected omega squared, bootstrap intervals and permutation tests,

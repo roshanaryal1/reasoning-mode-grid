@@ -72,8 +72,9 @@ explained far more of the variance in the total than mode did, and the CI on del
 wholly below zero.
 
 Power caveat: under equal mode and family effects, 15% of simulated studies still show
-"mode > model" (Section 3.7). The observed result is in the opposite direction, so this
-caveat does not weaken it, but it is reported as pre-registered.
+"mode > model" (Section 3.7). The simulation models a single 0 to 2 dimension, not the
+nine-dimension total, so it is a proxy for H4 and says nothing about how often the
+opposite verdict appears by chance; it is reported as pre-registered.
 
 ## 4.3 Secondary tests (H1 to H3) and the other dimensions
 
@@ -109,13 +110,22 @@ cannot by themselves carry a claim.
   (alpha 0.29).
 - **H3** (D3, predicted model > mode): model > mode, delta -0.477 [-0.710, -0.321].
   Reasoning minus fast is -0.10 [-0.23, 0.03]. Of the pre-stated outcomes, model > mode
-  occurred, which supports H3. The competing hallucination account (mode > model with
-  reasoning lower) did not occur. Exploratory (alpha 0.25), so the support is weak.
+  occurred, the direction H3 predicted; the competing hallucination account (mode > model
+  with reasoning lower) did not occur. D3's alpha is 0.25, below the bar, so under the
+  pre-registered rule this pattern can neither confirm nor refute H3.
 
-For every hypothesis the permutation p for mode agrees with its interval.
+For each of H1 to H4 the permutation p for mode agrees with its interval.
 
 Other dimensions, descriptive: D2, D4, D5, D6 and D8 are model > mode. D7 is inconclusive
-(delta -0.083 [-0.300, 0.008]). No dimension had no variance or was uninformative in the
+(delta -0.083 [-0.300, 0.008]). On D7 the interaction explains more than both main effects
+(omega squared 0.155, against 0.129 for family and 0.046 for mode), so as pre-registered
+its main-effect comparison is labelled "average effect only; interaction exceeds both main
+effects" and the per-family differences are the better summary: reasoning minus fast was
++0.8 for GPT, +0.4 for Claude and Qwen, 0.0 for Gemini and Grok, and -0.4 for DeepSeek. D7
+also shows a disagreement the pre-registration asks us to report: its reasoning-minus-fast
+interval is above zero ([0.033, 0.333]) while the mode permutation p is 0.096. The
+permutation tests the strict null that mode changes nothing in any family, which is a
+different question from the average effect, so we report both and resolve neither. No dimension had no variance or was uninformative in the
 full design. Delta is negative on every dimension.
 
 The random-effects variance components are in Appendix B, labelled exploratory.
@@ -163,15 +173,18 @@ log answer length (`results/variance_table.md`, sensitivity checks).
 | total | -0.527 | -0.570 | yes | -0.655 | 0.050 | 0.008 | 1.367 | 0.621 |
 
 1. **Ranks.** Delta on ranks has the same sign as on raw scores on every dimension and the
-   total. The total moves from -0.527 to -0.570. The verdict does not change.
+   total. The total moves from -0.527 to -0.570. These are point estimates; the
+   sensitivity checks have no bootstrap intervals, so they show that the direction holds,
+   not a verdict.
 2. **Length.** After removing log answer length, the mode effect on the total falls by more
    than half: reasoning minus fast drops from 1.37 to 0.62 points, and omega squared for mode
    from 0.050 to 0.008. Model > mode still holds (delta -0.655). As pre-registered, we
    report that the mode effect is not separable from answer length, not that length causes
    it. Reasoning answers are longer, and longer answers score higher; this design cannot
    tell the two apart. The effect also shrinks on D3, D5, D7 and D8, and almost vanishes on
-   D7 and D8. It does not shrink on D9 (0.43 to 0.41), the one dimension where the gain from
-   reasoning survives the adjustment. The first version of this check judged shrinking on
+   D7 and D8. On D9 it barely changes (0.43 to 0.41), the largest positive estimate left
+   after adjustment; D2, D4 and D5 also stay positive (0.13, 0.17 and 0.22). These adjusted
+   values are point estimates without intervals. The first version of this check judged shrinking on
    delta rather than on the mode effect; the Deviations table records the correction
    (Appendix D).
 3. **Per rater.** Each rater's own scores give the same H4 verdict as the consensus.
@@ -297,8 +310,9 @@ minus baseline gap, with a 95% CI. Descriptive: no hypothesis rests on it.
 Both LLM raters show self-preference on the total, with a CI above zero: `llm-a` by 1.11
 points of 18 on Claude answers and `llm-b` by 1.50 points on GPT answers. Each scores the
 other five families lower than the other two raters do, but scores its own vendor's family
-about level with them. The gaps are of the same size as the mode effect on the total
-(+1.37). For `llm-a` the preference sits in D2, D3 and D6. For `llm-b` it sits in D1, D2,
+about level with them. These self-preference estimates (1.11 and 1.50, own gap minus
+baseline gap) are of the same size as the mode effect on the total (+1.37); the direct gaps
+on their own vendor's answers are only 0.30 and 0.10. For `llm-a` the preference sits in D2, D3 and D6. For `llm-b` it sits in D1, D2,
 D3, D5 and D9. `llm-b`'s overall family guesses did not beat chance (Table 7), but whether
 it recognised GPT answers in particular is not tested here.
 

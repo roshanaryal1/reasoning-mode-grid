@@ -51,9 +51,13 @@ H2 (D9, predicted mode > model): verdict model > mode. delta -0.216 [-0.409, -0.
 
 H3 (D3, predicted model > mode): verdict model > mode. delta -0.477 [-0.710, -0.321]. Reasoning minus fast -0.100 [-0.233, 0.033]. CI and p mode: agree. Status: exploratory (alpha 0.25 below 0.667).
 
-H3 outcome: model > mode, which supports H3.
+H3 outcome: model > mode, the direction of H3; D3's alpha 0.25 is below 0.667, so this can neither confirm nor refute it.
 
 Other dimensions (descriptive): D2 model > mode, D4 model > mode, D5 model > mode, D6 model > mode, D7 inconclusive, D8 model > mode.
+
+Interaction exceeds both main effects (average effect only): D7.
+
+CI and p mode disagree (other dimensions): D7.
 
 No variance or uninformative: none.
 

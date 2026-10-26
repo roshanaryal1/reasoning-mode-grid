@@ -102,7 +102,7 @@ def replaced_consensus(sheets: Mapping[str, Scores], pairs: list[tuple[str, str]
     ids = set(sheets[names[0]])
     if any(set(s) != ids for s in sheets.values()):
         raise ValueError("all raters must score the same answers")
-    own = dict(pairs)
+    own = set(pairs)  # a rater may be paired with more than one family
     out: dict[str, dict[str, float]] = {}
     for uid in sorted(ids):
         family = uid.split("__")[0]
@@ -110,7 +110,7 @@ def replaced_consensus(sheets: Mapping[str, Scores], pairs: list[tuple[str, str]
         for d in DIMS:
             values = []
             for name in names:
-                if own.get(name) == family:
+                if (name, family) in own:
                     values.append(float(np.mean([sheets[o][uid][d] for o in names if o != name])))
                 else:
                     values.append(float(sheets[name][uid][d]))

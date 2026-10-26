@@ -2,8 +2,12 @@
 
 Checked 2026-10-26 against each arXiv record (arXiv API), and on 2026-10-27 for published
 versions (Crossref, OpenReview, Semantic Scholar). Where a peer-reviewed version exists it is
-cited, with the author list and title of that version. Workshop presentations are noted
-beside the arXiv entry. The rest are cited as arXiv preprints.
+cited, with the author list and title of that version, with two exceptions. Haase et al. is
+cited as the arXiv preprint, because the figures quoted come from it; the shorter CHI 2026
+Extended Abstract, with a different title, is noted beside it. For Path-Lock Expert the COLM
+record spells the second author "Van Yang" and arXiv "Wang Yang"; the arXiv spelling is used
+until the published PDF is checked. Workshop presentations are noted beside the arXiv
+entry. The rest are cited as arXiv preprints.
 
 Aryal, R. (2026). *Large Language Models as Systems Architects: A Controlled Study of
 Consensus, Fabrication, and Constraint Reasoning on One Hard Design Task (dataset and

@@ -115,3 +115,14 @@ def test_cli_writes_replaced_analysis(tmp_path, grid_path, monkeypatch):
     md = (out_dir / "variance_table.md").read_text()
     assert "Exploratory, not pre-registered" in md
     assert "llm-a on claude" in md
+
+
+def test_replaced_consensus_keeps_every_pair_for_one_rater():
+    # A rater paired with two families must have both replaced, not only the last one.
+    ids = ["claude__fast__p1-v1__r1", "gpt__fast__p1-v1__r1"]
+    a = {k: {d: 0 for d in DIMS} for k in ids}
+    b = {k: {d: 1 for d in DIMS} for k in ids}
+    c = {k: {d: 2 for d in DIMS} for k in ids}
+    merged = replaced_consensus({"human": a, "llm-a": c, "llm-b": b}, [("llm-a", "claude"), ("llm-a", "gpt")])
+    assert merged["claude__fast__p1-v1__r1"]["D1"] == 0.5
+    assert merged["gpt__fast__p1-v1__r1"]["D1"] == 0.5
