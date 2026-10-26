@@ -1,6 +1,7 @@
 # Appendix (draft)
 
-Draft written 2026-10-14, before any scoring. Appendix B is filled after the analysis.
+Draft written 2026-10-14, before any scoring. Appendix B filled 2026-10-26, after the
+analysis.
 Sources: `docs/mode-registry.md`, `results/mode_check.md`, `data/pilot/`, and the
 Deviations table in `docs/preregistration.md` (section 10).
 
@@ -48,9 +49,41 @@ Notes on the evidence:
 
 ## B. Per-cell scores
 
-[After the analysis: `results/cell_means.csv` (mean of each dimension and the total per
-family and mode), `results/family_mode_effects.csv` (reasoning minus fast per family and
-dimension), and the full `results/variance_table.md`.]
+Consensus means per family and mode, five answers per cell (`results/cell_means.csv`).
+Each dimension is scored 0 to 2, the total 0 to 18. No cell has an answer scored 0 on all
+nine dimensions.
+
+| Family | Mode | D1 | D2 | D3 | D4 | D5 | D6 | D7 | D8 | D9 | Total |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| Claude | fast | 1.0 | 2.0 | 2.0 | 2.0 | 1.6 | 1.6 | 1.2 | 2.0 | 0.4 | 13.8 |
+| Claude | reasoning | 1.2 | 2.0 | 2.0 | 1.8 | 2.0 | 1.6 | 1.6 | 2.0 | 1.4 | 15.6 |
+| DeepSeek | fast | 1.4 | 1.0 | 1.8 | 1.8 | 1.2 | 0.8 | 1.2 | 1.8 | 0.8 | 11.8 |
+| DeepSeek | reasoning | 1.2 | 1.0 | 1.4 | 2.0 | 1.4 | 0.6 | 0.8 | 1.8 | 1.0 | 11.2 |
+| Gemini | fast | 1.4 | 1.0 | 1.4 | 1.8 | 0.0 | 1.0 | 1.0 | 1.6 | 0.2 | 9.4 |
+| Gemini | reasoning | 1.4 | 1.0 | 1.0 | 1.8 | 0.0 | 1.0 | 1.0 | 1.8 | 0.4 | 9.4 |
+| GPT | fast | 1.8 | 1.4 | 2.0 | 2.0 | 2.0 | 1.8 | 1.0 | 1.4 | 1.6 | 15.0 |
+| GPT | reasoning | 1.2 | 2.0 | 1.8 | 2.0 | 2.0 | 2.0 | 1.8 | 1.8 | 1.8 | 16.4 |
+| Grok | fast | 1.0 | 2.0 | 2.0 | 2.0 | 1.6 | 1.0 | 1.0 | 1.0 | 2.0 | 13.6 |
+| Grok | reasoning | 1.0 | 1.8 | 2.0 | 2.0 | 1.4 | 1.0 | 1.0 | 1.0 | 1.2 | 12.4 |
+| Qwen | fast | 0.6 | 1.2 | 1.0 | 0.6 | 0.4 | 1.0 | 1.0 | 1.0 | 0.0 | 6.8 |
+| Qwen | reasoning | 1.2 | 1.2 | 1.4 | 1.6 | 2.0 | 1.0 | 1.4 | 2.0 | 1.8 | 13.6 |
+
+Reasoning minus fast per family and dimension is in `results/family_mode_effects.csv`.
+The full decomposition is Table 4. The random-effects variance components, exploratory as
+pre-registered, are below.
+
+| Dim | Family | Mode | Family x mode | Residual |
+|---|---|---|---|---|
+| D1 | 0.016 | 0.000 | 0.043 | 0.183 |
+| D2 | 0.188 | 0.000 | 0.022 | 0.075 |
+| D3 | 0.120 | 0.000 | 0.024 | 0.108 |
+| D4 | 0.072 | 0.000 | 0.068 | 0.117 |
+| D5 | 0.389 | 0.020 | 0.168 | 0.225 |
+| D6 | 0.200 | 0.000 | 0.000 | 0.108 |
+| D7 | 0.000 | 0.005 | 0.065 | 0.117 |
+| D8 | 0.077 | 0.023 | 0.054 | 0.117 |
+| D9 | 0.077 | 0.029 | 0.317 | 0.350 |
+| total | 4.136 | 0.233 | 3.872 | 1.658 |
 
 ## C. Pilot data and why it is excluded
 
@@ -89,7 +122,8 @@ summary:
 | Model self-reports | DeepSeek and Gemini answers named Claude models, which is wrong. GPT ("GPT-6") and Grok ("Grok 4.7") answers named themselves correctly | DeepSeek contrast described as a vendor chat setting |
 | Reasoning traces | Kept where the app showed them. One GPT trace not captured | None. Raters never see traces |
 | Blinding, before scoring | Four fixes: chat-app clutter removed, bare "Model:" label lines removed, removed header lines leave no marker, and self-disclosures naming the answer's maker removed | Same rule for every packet. Key unchanged |
-| Raters | Two LLM raters named after the freeze, as the plan requires. One answer per session from a fixed kit, instructions hashed before scoring | None |
+| Raters | Two LLM raters named after the freeze, as the plan requires. One answer per session from a fixed kit, instructions hashed before scoring. The first human rater's returns were made with AI tools and are not used; Rater H2 scored by hand and was recorded after scoring. 18 `llm-a` sessions worked the memory check by hand; the author re-ran every input and all results match | None on the analysis plan. Rater H2's scores are the human scores |
+| Analysis, after scoring | The length check (robustness check 2) first judged shrinking on delta instead of the mode effect; corrected, and the mode effect is reported as not separable from length. One exploratory check added, not pre-registered: H4 with own-vendor LLM scores replaced | No pre-registered number changed. H4 verdict unchanged in the added check |
 
 ## D2. Pre-scoring blinding audit
 

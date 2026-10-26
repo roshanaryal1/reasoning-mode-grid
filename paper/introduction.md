@@ -1,8 +1,7 @@
 # 1. Introduction (draft)
 
-Draft written 2026-10-14, before any scoring. The last paragraph has placeholders for the
-results. Write it, and the title, to match the result whichever way it goes, as the outline
-says.
+Draft written 2026-10-14, before any scoring. The last paragraph was written 2026-10-26,
+after the analysis.
 
 Leaderboards rank models. People who use these models choose more than a model. In every
 major chat app they also choose how hard the model thinks: Instant or High in ChatGPT,
@@ -49,7 +48,12 @@ Our contributions are:
    analysis, and the full data: 60 verbatim answers, blinded packets' build rules, all rater
    sheets and every departure from the plan.
 
-[Results paragraph. One sentence each: the H4 verdict with delta omega squared and its
-95% CI, the direction of the mode effect with its CI, the dimensions where mode or family
-dominated, and the rubric-portability result. Then one sentence on the implication for
-evaluation practice.]
+Family, not mode, dominated. On the total score, family explained far more variance than
+mode (delta omega squared -0.527, 95% CI [-0.666, -0.417]), so the confirmatory hypothesis
+is not supported. Reasoning still scored higher than fast, by 1.37 points of 18 (95% CI
+[0.77, 1.93]), but the gain came mostly from one family, Qwen, and halved once answer
+length was removed. Family dominated eight of nine rubric dimensions, and the ninth was
+inconclusive. Per-answer agreement between raters was low on most dimensions, yet the
+three raters ranked the 12 cells almost identically on the total (Kendall's W 0.955). For
+evaluation practice: name the model first, but report the mode too, because what it does
+differs from one model to the next.
