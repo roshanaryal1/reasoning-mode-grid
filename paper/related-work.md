@@ -43,7 +43,8 @@ of a fixed model, crossed with model identity, on a constrained task.
 Reasoning does not only help. Reasoning-oriented RL fine-tuning raises hallucination rates
 [Li and Ng, 2025], reasoning LLMs hallucinate more than non-reasoning models on long-form
 factuality [Chen et al., 2025], and thinking can turn a correct direct answer into a wrong
-one [K. Wang et al., 2026]. Reasoning-model errors on constrained problems often come
+one [K. Wang et al., 2026]. On closed-book knowledge tasks, more test-time computation
+does not reliably raise accuracy and often adds hallucinations [Zhao et al., 2025]. Reasoning-model errors on constrained problems often come
 from inventing problem features that were never given [Heyman and Zylberberg, 2025]. These
 works compare differently trained models or study training methods, not one model with
 reasoning switched on and off at inference time. They motivate a competing prediction for
@@ -56,7 +57,9 @@ Repeated runs of one model with fixed settings give different outputs. Sources i
 hosted-service non-determinism at temperature 0 [Atil et al., 2024], floating-point
 non-associativity that shifts reasoning-model accuracy by up to 9% [Yuan et al., 2025], and
 early divergence in agent trajectories that moves single-run scores by 2 to 6 points
-[Bjarnason et al., 2026]. We therefore collect five replicates per cell and treat
+[Bjarnason et al., 2026]. Across 12 models, 10 reasoning strategies and 30 trials
+each, about three-quarters of score variance comes from benchmark, system and item
+structure, with a residual that single runs absorb [Potamitis et al., 2025]. We therefore collect five replicates per cell and treat
 replicate variance as the residual. LLM judges score the same input differently across
 models and settings [Lau, 2026], and closed-book raters flag real tools released after
 their training cutoff as fabricated [Aryal, in preparation]. We use three blind raters, one of them human,

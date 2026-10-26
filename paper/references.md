@@ -47,6 +47,9 @@ instant-vs-thinking comparison across five frontier models. arXiv:2605.04488.
 Ning, Y., Liu, M., Ye, J., Zhang, W., and Liu, H. (2026). HRBench: Benchmarking and
 understanding thinking-mode switch strategies in hybrid-reasoning LLMs. arXiv:2605.28398.
 
+Potamitis, N., Ramani, V., Arora, H. A., Kuchhal, D., Klein, L., and Arora, A. (2025).
+ReasonBENCH: Benchmarking the (in)stability of LLM reasoning. arXiv:2512.07795.
+
 Sahu, P., Bothra, R., Arun, V., Godfrey, B., Narayan, A., and Saeed, A. (2026).
 Assistants, not architects: The role of LLMs in networked systems design.
 arXiv:2604.25506.
@@ -72,3 +75,6 @@ inference. arXiv:2506.09501.
 
 Zhang, Y., Wang, J., Ge, Y., Xu, W., Hamm, J., and Reddy, C. K. (2026). Stop comparing LLM
 agents without disclosing the harness. arXiv:2605.23950.
+
+Zhao, J. X., Hooi, B., and Ng, S.-K. (2025). Test-time scaling in reasoning models is not
+effective for knowledge-intensive tasks yet. arXiv:2509.06861. COLM 2026.

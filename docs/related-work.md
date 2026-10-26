@@ -111,6 +111,20 @@ Re-checked against the arXiv API (all 18 ids), Crossref and DataCite before writ
 - DOI 10.1145/3772363.3799284 is CHI 2026 Extended Abstracts, same seven authors as arXiv
   2601.21339, different title. DOI 10.5281/zenodo.22245991 is the LA-P1 dataset and code.
 
+### Literature search repeated, 2026-10-26
+
+Two web searches for newer work crossing reasoning mode with model choice. None found that
+does this on an open-ended task. Added after checking the arXiv records:
+
+| Paper | Finding (from the abstract) | Use |
+|---|---|---|
+| Potamitis et al. ReasonBENCH: Benchmarking the (In)Stability of LLM Reasoning. arXiv 2512.07795 | 30 trials across 10 strategies, 12 models, 6 tasks; three-quarters of score variance from benchmark, system and item structure | Run-to-run variance |
+| Zhao, Hooi and Ng. Test-Time Scaling in Reasoning Models Is Not Effective for Knowledge-Intensive Tasks Yet. arXiv 2509.06861, COLM 2026 per arXiv comment | 14 reasoning models; more test-time computation often adds hallucinations | H3 competing prediction |
+
+Rejected: a search summary said ActuBench (arXiv 2604.20273) reports about 3.5 points
+gained from reasoning mode across six provider pairs. Its text has no such comparison, so
+it is not cited.
+
 ## Own prior work
 
 - LA-P1, LLMs as Systems Architects (Cureus, under review; Zenodo DOI 10.5281/zenodo.22245991). Source of the prompt, rubric and the DeepSeek pilot.
