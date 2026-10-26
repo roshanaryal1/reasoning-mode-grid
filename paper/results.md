@@ -118,7 +118,7 @@ Other dimensions, descriptive: D2, D4, D5, D6 and D8 are model > mode. D7 is inc
 (delta -0.083 [-0.300, 0.008]). No dimension had no variance or was uninformative in the
 full design. Delta is negative on every dimension.
 
-The random-effects variance components are in Appendix [X], labelled exploratory.
+The random-effects variance components are in Appendix B, labelled exploratory.
 
 ## 4.4 Where mode mattered: per-family differences
 

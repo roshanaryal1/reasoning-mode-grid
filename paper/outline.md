@@ -1,16 +1,17 @@
-# Reasoning Mode Beats Model Identity? A Controlled Model x Mode Grid on a Constrained Design Task
+# Model, Not Mode: A Pre-registered Model x Mode Grid on a Constrained Design Task
 
 Roshan Aryal, Independent Researcher, Auckland, New Zealand
 
-The question mark stays in the title until the data is in. Change the title to match the
-result, whichever way it goes.
+Title changed 2026-10-26 to match the result (model > mode). The working title before the
+data was "Reasoning Mode Beats Model Identity? A Controlled Model x Mode Grid on a
+Constrained Design Task".
 
 Drafts written before scoring (nothing in them depends on scores):
 [introduction](introduction.md), [related work](related-work.md), [method](methods.md),
 [discussion, limitations only](discussion.md), [appendix](appendix.md), and a
 [results skeleton](results.md) that names the source of every number. Figure 1 comes from `modegrid cells --figure figure1.pdf`.
 
-## Abstract (write last, 150 words)
+## Abstract (written 2026-10-26, see [abstract](abstract.md))
 
 Problem. Design. Headline numbers (delta omega2 with CI for the total and for H1 to H3).
 One-sentence implication for evaluation practice.

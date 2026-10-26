@@ -157,7 +157,7 @@ and wrong models as reasons to replace. We treated an operator choosing the wron
 same way as a wrong model, and we treated the usage limit as the app being unavailable, so
 those three redos did not count toward the two-replacement limit per cell. One extra Qwen
 fast chat was sent by mistake and is kept but assigned to no run. No family was dropped.
-[No answer was an outright refusal: confirm from `n_all_zero` and the raters' notes.] Every
+No answer was an outright refusal: no consensus score is 0 on all nine dimensions. Every
 departure from the frozen plan is listed with its date and reason in Appendix D.
 
 ## 3.6 Scoring
@@ -183,8 +183,11 @@ as fabricated [cite LA-P2].
 **Raters.** The author collected the captures, so the author does not score. Three raters
 score every answer independently and blind: one human who is not an author, and two LLMs
 from different vendors, each with live web search: `llm-a`, Claude Opus 5.5 (Anthropic),
-and `llm-b`, GPT-6 at Thinking effort High (OpenAI). [Human rater: name, background,
-with permission. Rating dates for all three raters.] Both LLM raters come from vendors whose
+and `llm-b`, GPT-6 at Thinking effort High (OpenAI). The human rater (Rater H2) is not an
+author and asked that neither their name nor their background be published; the author
+knows their identity. Rater H2 replaced an earlier human rater whose returns
+were made with AI tools and were not used (Appendix D). `llm-b` scored on 2026-10-19,
+`llm-a` from 2026-10-19 to 2026-10-20, and Rater H2 from 2026-10-24 to 2026-10-26. Both LLM raters come from vendors whose
 families are scored, so each one's scores for its own vendor's family are also reported
 separately.
 
