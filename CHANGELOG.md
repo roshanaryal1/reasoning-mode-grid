@@ -5,6 +5,11 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions follo
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-10-27
+
+Scoring and analysis complete; paper drafts, JAIR and TMLR LaTeX, release metadata
+updated to the result ("Model, Not Mode").
+
 ### Changed
 
 - Blinding leak found after scoring: three Claude reasoning packets still contained the

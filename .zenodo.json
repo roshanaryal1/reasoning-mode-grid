@@ -1,5 +1,5 @@
 {
-  "title": "Reasoning Mode Beats Model Identity? A controlled model x mode grid (harness and dataset)",
+  "title": "Model, Not Mode: a pre-registered model x mode grid (harness and dataset)",
   "upload_type": "software",
   "description": "<p>A pre-registered model x mode grid (LA-P4). Six LLM families are each run in a fast and a reasoning mode on one frozen, constrained systems-design prompt, five replicates per cell, 60 answers collected in each vendor's own web app. Answers are scored blind by three raters with a nine-dimension rubric, and the variance in each dimension is decomposed into model, mode, interaction and residual shares.</p><p>The release holds the <code>modegrid</code> harness (code, MIT), the configuration, the randomised manifest, all captures, the blinding rules, the rater sheets, the consensus scores and every analysis output (data, prompts and docs, CC-BY-4.0).</p>",
   "creators": [

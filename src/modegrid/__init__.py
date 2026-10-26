@@ -1,4 +1,4 @@
-"""modegrid: model x mode grid harness for LA-P4, "Reasoning Mode Beats Model Identity".
+"""modegrid: model x mode grid harness for LA-P4, "Model, Not Mode".
 
 The package covers the whole study pipeline:
 
@@ -10,7 +10,7 @@ The package covers the whole study pipeline:
     analyze  variance decomposition (mode vs model vs residual) per dimension
 """
 
-__version__ = "0.1.0"
+__version__ = "1.0.0"
 
 DIMS: tuple[str, ...] = tuple(f"D{i}" for i in range(1, 10))
 

@@ -1,30 +1,34 @@
-# Reasoning Mode Beats Model Identity
+# Model, Not Mode
 
 [![CI](https://github.com/roshanaryal1/reasoning-mode-grid/actions/workflows/ci.yml/badge.svg)](https://github.com/roshanaryal1/reasoning-mode-grid/actions/workflows/ci.yml)
 ![Python](https://img.shields.io/badge/python-3.10%2B-blue)
 ![Code: MIT](https://img.shields.io/badge/code-MIT-green)
 ![Data: CC--BY--4.0](https://img.shields.io/badge/data-CC--BY--4.0-lightgrey)
 
-A controlled model x mode grid. It tests one claim:
+A pre-registered model x mode grid. It tested one claim:
 
 > Holding weights and prompt fixed, switching a model's reasoning mode on or off changes
 > the grounding and constraint-reasoning quality of its answer more than switching
 > between comparable models does.
 
+**Result: not supported.** Model family explained far more of the variance in the total
+score than mode (delta omega squared -0.527, 95% CI [-0.666, -0.417]). Reasoning scored
+1.37 points higher out of 18 (95% CI [0.77, 1.93]), but most of the gain came from one
+family and it halved once answer length was removed. Full numbers:
+[`results/report.md`](results/report.md); paper draft: [`paper/`](paper/).
+
 This is paper **LA-P4** in the llm-architects programme. It reuses the frozen prompt and
 the v2 rubric from [LLMs as Systems Architects](https://github.com/roshanaryal1/llm-architects)
-(LA-P1), and it unblocks LA-P5 (the benchmark), which needs proof that the rubric is
-portable across a grid.
+(LA-P1).
 
 ## Status
 
 | | |
 |---|---|
-| Stage | Harness built and tested. Pre-registration frozen 2026-10-13 (tag `prereg-v1`) and registered on OSF: <https://osf.io/nj2zp/>. **All 60 chat captures and the 12 API checks are collected** (2026-10-13 to 2026-10-15). No scores yet. |
-| Pilot | n = 1 family (DeepSeek, 3 modes, web app, v1 rubric). See [the pilot note](data/pilot/README.md): the adjudicated pilot scores do **not** yet support the claim. |
+| Stage | Complete. Pre-registration frozen 2026-10-13 (tag `prereg-v1`), registered on OSF: <https://osf.io/nj2zp/>. 60 chat captures and 12 API checks collected 2026-10-13 to 2026-10-15. Scored by three blind raters 2026-10-19 to 2026-10-26. Every departure from the plan is in the Deviations table of [`docs/preregistration.md`](docs/preregistration.md). |
+| Pilot | n = 1 family (DeepSeek, 3 modes, web app, v1 rubric), excluded from the analysis. See [the pilot note](data/pilot/README.md). |
 | Design | 6 families x 2 modes x 5 replicates = 60 chat-app runs, 12 cells, plus 12 API calls that verify each mode switch |
-| Venue | arXiv, then an ICLR 2027 workshop (about Feb 2027) plus TMLR. See [venues](docs/venues.md) |
-| Next | Blind scoring by three raters ([runbook](docs/runbook.md) Phase 3). The LLM raters are named in [`data/scores/raters.md`](data/scores/raters.md). The human rater is still to be named. API check results: [`results/mode_check.md`](results/mode_check.md) |
+| Venue | Preprint, then TMLR. LaTeX: `make tmlr` (anonymous submission and named preprint) |
 
 ## What you get
 
