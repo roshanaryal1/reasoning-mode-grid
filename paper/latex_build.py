@@ -68,7 +68,10 @@ CITE = {"jair": "cite", "tmlr": "citep"}
 
 # Text that identifies the author, and what the anonymous version says instead.
 ANONYMISE = {
-    "(<https://osf.io/nj2zp/>)": "(anonymised view-only link: [OSF view-only link])",
+    "(<https://osf.io/nj2zp/>)": (
+        "(link withheld for double-blind review; the frozen plan and its Deviations table are in the "
+        "anonymised repository)"
+    ),
     "[GitHub tag and Zenodo DOI]": "[anonymised repository link]",
     "[GitHub tag] and [Zenodo DOI]": "[anonymised repository link]",
     # Project codes, the harness name and upstream fingerprints lead to the author's
