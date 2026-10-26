@@ -72,6 +72,13 @@ tmlr: ## TMLR LaTeX in paper/tmlr/: anonymous main.pdf for review and named prep
 	python paper/latex_build.py tmlr
 	cd paper/tmlr && tectonic main.tex && tectonic preprint.tex
 
+.PHONY: preprint-zip
+preprint-zip: tmlr ## LaTeX source zip of the named preprint for Preprints.org (paper/tmlr/preprint-source.zip)
+	rm -f paper/tmlr/preprint-source.zip
+	cd paper/tmlr && zip -q -j preprint-source.zip preprint.tex preamble.tex abstract.tex body.tex appendix.tex \
+	  broader-impact.tex references.bib tmlr.sty tmlr.bst fancyhdr.sty LICENSE-tmlr-style ../../results/figure1.pdf
+	@echo "wrote paper/tmlr/preprint-source.zip"
+
 RATERS = human llm-a llm-b
 SHEETS = $(foreach r,$(RATERS),data/scores/$(r).csv)
 UNBLINDED = $(foreach r,$(RATERS),data/scores/$(r)-unblinded.csv)
