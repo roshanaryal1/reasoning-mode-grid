@@ -5,9 +5,9 @@ Raters never receive the key, the captures, the manifest or the reasoning traces
 
 | Sheet | Rater | Vendor | Model / person | Web search | Run date |
 | --- | --- | --- | --- | --- | --- |
-| `human.csv` | Human, not an author and not the observer | n/a | Rater H1, anonymous at their own request (identity known to the author; named 2026-10-19, before scoring) | Yes, for D3 and D4 | To be recorded |
-| `llm-a.csv` | LLM | Anthropic | Claude Opus 5.5 (`claude-opus-5-5`) | Yes | To be recorded |
-| `llm-b.csv` | LLM | OpenAI | GPT-6, Thinking effort High (changed from GPT-5.6 Sol on 2026-10-15, before scoring) | Yes | To be recorded |
+| `human.csv` | Human, not an author and not the observer | n/a | Rater H2, anonymous at their own request (identity known to the author). Replaced Rater H1, none of whose returns are used; recorded after scoring (Deviations table) | Yes, for D3 and D4 | 2026-10-24 to 2026-10-26 |
+| `llm-a.csv` | LLM | Anthropic | Claude Opus 5.5 (`claude-opus-5-5`) | Yes | 2026-10-19 to 2026-10-20 |
+| `llm-b.csv` | LLM | OpenAI | GPT-6, Thinking effort High (changed from GPT-5.6 Sol on 2026-10-15, before scoring) | Yes | 2026-10-19 |
 
 Both LLM raters come from vendors whose families are scored. Their scores for their own
 vendor's family (`llm-a` on `claude`, `llm-b` on `gpt`) are also reported separately.
