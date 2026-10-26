@@ -939,6 +939,13 @@ is expected (Appendix D2) and changes no hypothesis's status. It does mean that 
 correctly identified the family of most answers it scored. Section 4.8 reports how each
 LLM rater scored its own vendor's answers.
 
+One leak was found after scoring. Three packets, all Claude reasoning answers, still
+contained the author's account name or home city, which the claude.ai app had passed to
+the model although memory was off; the pre-scoring audit had no probe for it. All three
+raters guessed ``reasoning'' for all three packets, and \texttt{llm-a} guessed Claude for all three
+(the human rater and \texttt{llm-b} for one each). Three of 60 answers cannot move the rates in
+Table 7 by more than 0.05; no scores were changed (Appendix D).
+
 \subsection{Rubric portability (exploratory, for LA-P5)}
 
 \textbf{Table 8.} Agreement of the three raters on the ranking of the 12 cell means: Kendall's W

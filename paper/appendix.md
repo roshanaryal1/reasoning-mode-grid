@@ -144,6 +144,10 @@ is confined to a single family but balanced across modes, so it can reveal famil
 mode. Family guesses above chance are expected and do not change any hypothesis's status
 (pre-registration section 4).
 
+The audit had no probe for the author's own name. A check after scoring found it, or the
+author's home city, in three packets, all Claude reasoning answers (Section 4.6 and the
+Deviations table).
+
 ## E. Data and code availability
 
 Code (MIT) and data (CC-BY-4.0) at [GitHub tag] and [Zenodo DOI]. The release holds the
