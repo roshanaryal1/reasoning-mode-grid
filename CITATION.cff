@@ -20,6 +20,9 @@ identifiers:
   - type: doi
     value: 10.5281/zenodo.23674817
     description: "Version 1.0.0 (Zenodo)"
+  - type: doi
+    value: 10.20944/preprints202610.2826.v1
+    description: "Preprint v1 (Preprints.org, posted 2026-10-28)"
   - type: url
     value: "https://osf.io/nj2zp/"
     description: "Pre-registration (OSF, registered 2026-10-13)"
