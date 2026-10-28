@@ -147,7 +147,7 @@ Deviations table).
 Code (MIT) and data (CC-BY-4.0) are in tag `v1.0.0` of
 <https://github.com/roshanaryal1/reasoning-mode-grid>, archived at
 <https://doi.org/10.5281/zenodo.23674817>. The release holds the
-configuration, the randomised manifest, all 72 captures (60 scored, 12 API checks) and the
+configuration, the randomised manifest, all 76 captures (60 scored; 16 API checks, 12 initial and 4 follow-up) and the
 superseded attempts, the blinding rules (packets are rebuilt from the captures and the
 committed key), the three rater sheets, the consensus scores and every analysis output.
 The prompt, rubric and memory checker are vendored from LA-P1 at commit `d5e39e7` and
