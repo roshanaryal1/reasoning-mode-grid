@@ -29,7 +29,7 @@ the v2 rubric from [LLMs as Systems Architects](https://github.com/roshanaryal1/
 | Stage | Complete. Pre-registration frozen 2026-10-13 (tag `prereg-v1`), registered on OSF: <https://osf.io/nj2zp/>. 60 chat captures and 12 API checks collected 2026-10-13 to 2026-10-15, plus 4 follow-up API checks on 2026-10-19. Scored by three blind raters 2026-10-19 to 2026-10-26. Every departure from the plan is in the Deviations table of [`docs/preregistration.md`](docs/preregistration.md). |
 | Pilot | n = 1 family (DeepSeek, 3 modes, web app, v1 rubric), excluded from the analysis. See [the pilot note](data/pilot/README.md). |
 | Design | 6 families x 2 modes x 5 replicates = 60 chat-app runs, 12 cells, plus 12 initial API checks of the mode switches and follow-up checks on the two models the apps had updated; the follow-up on Grok 4.7 was inconclusive |
-| Venue | Under review at TMLR (submitted 2026-10-28). Named preprint submitted to Preprints.org 2026-10-28 (screening; DOI to follow). LaTeX: `make tmlr` builds both |
+| Venue | Under review (submitted 2026-10-28). Named preprint submitted to Preprints.org 2026-10-28 (screening; DOI to follow). LaTeX: `make tmlr` builds both |
 
 ## What you get
 
