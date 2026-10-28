@@ -5,7 +5,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions follo
 
 ## [Unreleased]
 
-- 2026-10-28: submitted to TMLR (double-blind) and to Preprints.org (named preprint, in
+- 2026-10-28: submitted for double-blind review and to Preprints.org (named preprint, in
   screening). OSF registration linked to the v1.0.0 Zenodo record as data and analytic code.
 
 ## [1.0.0] - 2026-10-27
