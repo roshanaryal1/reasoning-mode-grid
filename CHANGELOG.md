@@ -7,6 +7,8 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions follo
 
 - 2026-10-28: submitted for double-blind review and to Preprints.org (named preprint, in
   screening). OSF registration linked to the v1.0.0 Zenodo record as data and analytic code.
+- 2026-10-28: preprint posted on Preprints.org, doi:10.20944/preprints202610.2826.v1. Its
+  Appendix E says 72 captures; the correct count is 76 (fixed on main, see PR #62).
 
 ## [1.0.0] - 2026-10-27
 
