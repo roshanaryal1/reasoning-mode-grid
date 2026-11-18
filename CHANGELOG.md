@@ -5,6 +5,11 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions follo
 
 ## [Unreleased]
 
+- 2026-11-19: next venue changed to NEJLT (no fees; anonymous review). New `paper/nejlt/`
+  with the official NEJLT template and `make nejlt`; `latex_build.py nejlt` writes the
+  anonymous body, turning the body's long tables into full-width floats with captions below
+  for the two-column layout. Removed a stale anonymisation rule for text the introduction no
+  longer has.
 - 2026-11-18: TMLR desk-rejected the submission on 2026-11-08 without review or reasons. Next
   venue is JAIR (no submission or publication fees; preprints allowed). JAIR title changed to
   "Is 'Thinking Mode' Worth It? Model Choice Beats Reasoning Mode on a Real Design Task".

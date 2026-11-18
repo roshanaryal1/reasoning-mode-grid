@@ -72,6 +72,11 @@ tmlr: ## TMLR LaTeX in paper/tmlr/: anonymous main.pdf for review and named prep
 	python paper/latex_build.py tmlr
 	cd paper/tmlr && tectonic main.tex && tectonic preprint.tex
 
+.PHONY: nejlt
+nejlt: ## NEJLT anonymous review PDF in paper/nejlt/main.pdf (needs pandoc and tectonic)
+	python paper/latex_build.py nejlt
+	cd paper/nejlt && tectonic main.tex
+
 .PHONY: preprint-zip
 preprint-zip: tmlr ## LaTeX source zip of the named preprint for Preprints.org (paper/tmlr/preprint-source.zip)
 	rm -f paper/tmlr/preprint-source.zip

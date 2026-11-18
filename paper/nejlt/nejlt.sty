@@ -1,0 +1,159 @@
+%%% NEJLT style file
+%%% (c) Leon Derczynski 2020,2023
+%%%     hints from from ACM Large, CVPR, EMNLP2020, Political Analysis, LREC
+%%% Bibliography is URL-free ACL version
+
+%% OPTIONS
+% draft mode
+\newif\ifcrversion
+\crversionfalse
+\newif\ifletter
+\letterfalse
+\DeclareOption{final}{\crversiontrue}
+\DeclareOption{letter}{\lettertrue}
+% end options segment
+\ProcessOptions
+
+\RequirePackage{enumitem}
+
+%% LAYOUT AND GENERAL APPEARANCE
+% Libertine font
+\IfFileExists{libertine.sty}{}{\ClassWarning{\@classname}{Libertine package is missing; please upgrade}}
+% switch to biolinum, the libertine sans font
+\RequirePackage[tt=false, type1=true, sfdefault]{libertine}
+\RequirePackage[libertine]{newtxmath}
+% colour enabled
+\RequirePackage{xcolor}
+\definecolor{nejltblue}{RGB}{63,81,181}
+\definecolor{flagred}{RGB}{198, 12, 48}
+% simplify use of complex input glyphs
+\usepackage[utf8]{inputenc}
+% set page size and margins
+\RequirePackage[a4paper,portrait]{geometry}
+\geometry{
+    textwidth=170mm,
+    textheight=235mm,
+    footskip=12mm,
+    voffset=10mm,
+    headsep=14mm,
+}
+% try to balance page end
+\flushbottom
+% don't break lines unless we really have to
+\sloppy
+\RequirePackage[]{hyperref}
+\hypersetup{colorlinks=true,linkcolor=nejltblue,filecolor=nejltblue,urlcolor=nejltblue,citecolor=nejltblue,anchorcolor=nejltblue}
+
+%% COLUMNS
+\twocolumn
+\setlength{\columnsep}{12mm}
+
+%% BIBLOGRAPHY
+\RequirePackage{natbib}
+% ease ACL format transitions
+\renewcommand\cite{\citep}
+\newcommand\shortcite{\citeyearpar}
+\newcommand\newcite{\citet}
+
+%% TITLE BLOCK
+\newlength\titlebox
+\setlength\titlebox{50mm}
+% author blanking in drafts
+\newcommand\outauthor{
+ \begin{itemize}[leftmargin=0mm]
+ \itemsep=0pt\labelwidth=0mm\leftmargin=0mm
+ \ifcrversion
+  \item[] \@author
+ \else
+  \item[] {Anonymous authors}
+ \fi
+ \end{itemize}
+}
+% abstract box
+\def\abstractname{Abstract}
+\ifletter
+  \def\abstractname{ Letter abstract }
+\fi
+\def\abstract#1{\gdef\@abstract{
+  {
+    \setlength{\baselineskip}{10pt}
+    \noindent\rule{\textwidth}{0.2pt}
+    \parbox{\textwidth}{\vskip 3mm \small {\bf \color{nejltblue}\abstractname } #1 \vskip 3mm \par}
+    \noindent\rule{\textwidth}{0.2pt}
+  }
+}}
+% title
+\def\maketitle{\par
+ \begingroup
+   \def\thefootnote{\fnsymbol{footnote}}
+   \def\@makefnmark{\hbox to 0pt{$^{\@thefnmark}$\hss}}
+   \twocolumn[\@maketitle] \@thanks %twocol's already asserted but this is quick
+ \endgroup
+ \setcounter{footnote}{0} % reset footnotes
+ \let\maketitle\relax \let\@maketitle\relax % blank existing titles
+ \gdef\@thanks{}\gdef\@author{}\gdef\@title{}\let\thanks\relax}
+% put everything in maketitle
+\def\@maketitle{
+%\vbox to \titlebox
+ \hsize\textwidth \linewidth\hsize
+ {\LARGE \@title \par}
+ \vskip 10mm
+ {
+  \def\and{\item[]}
+  \hbox to \linewidth
+  {\hfil}
+  {\large \outauthor}
+  }
+  \vskip 2mm
+  \@abstract
+  \vskip 17mm
+}
+
+
+%% ACCESSIBILITY
+
+
+%% HEADERS AND FOOTERS
+\RequirePackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\newcommand\headtitle{UNDEFINED}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{.8pt}
+\fancyhead[C]{\itshape\headtitle}
+\ifcrversion
+  \fancyfoot[C]{Northern European Journal of Language Technology}
+\else
+  % confidential footer for draft
+  \fancyfoot[C]{\sc\color{flagred} Confidential NEJLT review copy. Do not distribute.}
+  % page numbers only appear on the draft — are added by the editor for final copy
+  \fancyfoot[R]{\thepage}
+\fi
+
+\fancypagestyle{title}{
+  \fancyhf{}
+  \ifletter
+    \fancyhead[L]{\sc NEJLT Letter}
+  \fi
+  \ifcrversion
+    \fancyfoot[C]{Northern European Journal of Language Technology}
+  \else
+    % confidential header/footer for draft
+    \fancyfoot[C]{\sc\color{flagred} Confidential NEJLT review copy. Do not distribute.}
+    % page numbers only appear on the draft — are added by the editor for final copy
+    \fancyfoot[R]{\thepage}
+  \fi
+  \renewcommand{\headrulewidth}{0pt}
+  \renewcommand{\footrulewidth}{.8pt}% or however thick
+}
+
+
+
+%% LINE NUMBERS FOR DRAFTING
+\RequirePackage{lineno}
+\ifcrversion
+\else
+ \setlength\linenumbersep{1.5mm}
+ \renewcommand{\linenumberfont}{\footnotesize\bfseries\textcolor{flagred}}
+ \linenumbers
+\fi
