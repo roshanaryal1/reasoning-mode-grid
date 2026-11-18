@@ -5,6 +5,21 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions follo
 
 ## [Unreleased]
 
+- 2026-11-19: submitted to NEJLT for anonymous review (NLP engineering experiment paper).
+  Per NEJLT policy the Preprints.org preprint is not updated or promoted during review.
+- 2026-11-19: next venue changed to NEJLT (no fees; anonymous review). New `paper/nejlt/`
+  with the official NEJLT template and `make nejlt`; `latex_build.py nejlt` writes the
+  anonymous body, turning the body's long tables into full-width floats with captions below
+  for the two-column layout. Removed a stale anonymisation rule for text the introduction no
+  longer has.
+- 2026-11-18: TMLR desk-rejected the submission on 2026-11-08 without review or reasons. Next
+  venue is JAIR (no submission or publication fees; preprints allowed). JAIR title changed to
+  "Is 'Thinking Mode' Worth It? Model Choice Beats Reasoning Mode on a Real Design Task".
+  The Zenodo record and Preprints.org preprint keep the original title.
+- 2026-11-18: introduction reframed for JAIR: opens with the practical question, gives the
+  findings before the contributions, and reports the rater-ranking result as a finding about
+  evaluation. JAIR abstract conclusions updated to match. No number changed; the TMLR files
+  are left as submitted.
 - 2026-10-28: submitted for double-blind review and to Preprints.org (named preprint, in
   screening). OSF registration linked to the v1.0.0 Zenodo record as data and analytic code.
 - 2026-10-28: preprint posted on Preprints.org, doi:10.20944/preprints202610.2826.v1. Its

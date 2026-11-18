@@ -52,3 +52,10 @@ paper/tmlr/*.log
 paper/tmlr/*.out
 paper/tmlr/*.pdf
 paper/tmlr/preprint-source.zip
+paper/nejlt/*.aux
+paper/nejlt/*.bbl
+paper/nejlt/*.blg
+paper/nejlt/*.log
+paper/nejlt/*.out
+paper/nejlt/*.pdf
+paper/nejlt/source.zip

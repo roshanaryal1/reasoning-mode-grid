@@ -7,8 +7,10 @@ appendix and, for TMLR, the BibTeX files next to it.
     python paper/latex_build.py jair    # paper/jair/body.tex, appendix.tex
     python paper/latex_build.py tmlr    # paper/tmlr/body.tex, appendix.tex (named preprint)
                                         # and body-anon.tex, appendix-anon.tex, references*.bib
+    python paper/latex_build.py nejlt   # paper/nejlt/body-anon.tex, appendix-anon.tex,
+                                        # references-anon.bib (anonymous review copy only)
 
-The anonymous TMLR files drop links that identify the author and cite the author's
+The anonymous TMLR and NEJLT files drop links that identify the author and cite the author's
 own earlier work as "Anonymous", as double-blind review requires.
 
 Needs pandoc on PATH.
@@ -63,8 +65,10 @@ TEXTUAL = {
     "Sahu et al. [2026]": "sahu2026architects",
 }
 
-# Parenthetical citation command per target: biblatex (JAIR) or natbib (TMLR).
-CITE = {"jair": "cite", "tmlr": "citep"}
+# Parenthetical citation command per target: biblatex (JAIR) or natbib (TMLR, NEJLT).
+CITE = {"jair": "cite", "tmlr": "citep", "nejlt": "citep"}
+# Targets that use BibTeX, so get a converted copy of the BibLaTeX list.
+BIBTEX_TARGETS = ("tmlr", "nejlt")
 
 # Text that identifies the author, and what the anonymous version says instead.
 ANONYMISE = {
@@ -80,7 +84,6 @@ ANONYMISE = {
     # public repositories, so they are replaced in the review version too.
     "An open harness, `modegrid`, that": "An open harness that",
     "modegrid": "harness",
-    " (LA-P5)": "",
     ", for LA-P5": "",
     "LA-P1": "S1",
     "(`ba2acba8...0370e0`)": "([hash withheld for review])",
@@ -190,6 +193,49 @@ def add_figure(md: str) -> str:
     return head + r"Figure\ \ref{fig:cells} shows" + tail[:para_end] + "\n\n" + FIGURE_1 + tail[para_end:]
 
 
+LONGTABLE = re.compile(
+    r"(?:\\textbf\{Table (?P<num>\d+)\.\}(?P<caption>.*?)\n\n)?"
+    r"(?:\{\\def\\LTcaptype\{none\} % do not increment counter\n)?"
+    r"\\begin\{longtable\}\[\]\{(?P<spec>@\{\}.*?@\{\})\}\n(?P<rows>.*?)\\end\{longtable\}(?:\n\})?",
+    re.S,
+)
+
+
+def float_tables(tex: str, count: int = 0) -> tuple[str, int]:
+    """Longtables as full-width table* floats, for two-column templates (NEJLT).
+
+    longtable cannot run in two-column mode. The bold "Table N." paragraph before a table
+    becomes its caption, placed below the table as NEJLT asks. Numbers are checked against
+    LaTeX's own count so "Table N" in the text still points at the right table; ``count``
+    is the number of captioned tables before this text, and the new total is returned.
+    """
+
+    def one(m: re.Match[str]) -> str:
+        nonlocal count
+        rows = m.group("rows")
+        rows = re.sub(r"[ \t]*\\bottomrule\\noalign\{\}\n[ \t]*\\endlastfoot\n", "", rows)
+        rows = re.sub(r"[ \t]*\\end(?:first)?head\n", "", rows)
+        rows = rows.replace("\\noalign{}", "")
+        if "\\endfoot" in rows or "\\endlastfoot" in rows:
+            raise SystemExit("longtable footer layout not handled by float_tables")
+        caption = ""
+        if m.group("num"):
+            count += 1
+            if int(m.group("num")) != count:
+                raise SystemExit(f"Table {m.group('num')} would be numbered {count} by LaTeX")
+            caption = f"\\caption{{{m.group('caption').strip()}}}\\label{{tab:{count}}}\n"
+        return (
+            "\\begin{table*}[tp]\n\\centering\\footnotesize\n"
+            f"\\begin{{tabular}}{{{m.group('spec')}}}\n{rows.rstrip()}\n\\bottomrule\n\\end{{tabular}}\n"
+            f"{caption}\\end{{table*}}"
+        )
+
+    tex = LONGTABLE.sub(one, tex)
+    if "longtable" in tex:
+        raise SystemExit("a longtable was not converted")
+    return tex, count
+
+
 def to_latex(md: str) -> str:
     result = subprocess.run(
         ["pandoc", "-f", "markdown-auto_identifiers", "-t", "latex", "--wrap=preserve"],
@@ -204,6 +250,7 @@ def to_latex(md: str) -> str:
 
 def build(names: list[str], appendix: bool, target: str, anonymous: bool, used: set[str]) -> str:
     parts = []
+    tables = 0
     for name in names:
         md = strip_notes((PAPER / f"{name}.md").read_text(encoding="utf-8"))
         if anonymous:
@@ -212,7 +259,11 @@ def build(names: list[str], appendix: bool, target: str, anonymous: bool, used: 
         if anonymous:
             for key, neutral in ANONYMOUS_KEYS.items():
                 md = md.replace(f"{{{key}}}", f"{{{neutral}}}")
-        parts.append(to_latex(md))
+        tex = to_latex(md)
+        if target == "nejlt" and not appendix:  # the appendix is set in one column
+            tex, tables = float_tables(tex, tables)
+            tex = tex.replace("{figure}", "{figure*}")
+        parts.append(tex)
     return "\n".join(parts)
 
 
@@ -251,8 +302,8 @@ def write(target: str, anonymous: bool) -> list[Path]:
     paths = [out / f"body{suffix}.tex", out / f"appendix{suffix}.tex"]
     paths[0].write_text(header + body, encoding="utf-8")
     paths[1].write_text(header + appendix, encoding="utf-8")
-    if target == "tmlr":
-        if not anonymous:  # the same text serves both versions; it names no one
+    if target in BIBTEX_TARGETS:
+        if target == "tmlr" and not anonymous:  # the same text serves both versions; it names no one
             impact = strip_notes((PAPER / "broader-impact.md").read_text(encoding="utf-8"))
             impact = re.sub(r"^# .*\n", "", impact.lstrip())
             paths.append(out / "broader-impact.tex")
@@ -274,8 +325,8 @@ def main(argv: list[str]) -> int:
         print(f"usage: python paper/latex_build.py {{{'|'.join(CITE)}}}")
         return 2
     target = argv[0]
-    paths = write(target, anonymous=False)
-    if target == "tmlr":
+    paths = [] if target == "nejlt" else write(target, anonymous=False)
+    if target in BIBTEX_TARGETS:
         paths += write(target, anonymous=True)
     for p in paths:
         print(f"wrote {p.relative_to(PAPER.parent)}")

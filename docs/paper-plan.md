@@ -2,6 +2,20 @@
 
 ## Target
 
+Updated 2026-11-19: the target is now **NEJLT** (Northern European Journal of Language
+Technology), chosen over JAIR for fit and a less crowded queue. Checked 2026-11-19 on
+<https://www.nejlt.org/policies/> and <https://nejlt.ep.liu.se/about/submissions>: no fees to
+submit or publish; anonymous review; existing preprints are allowed, but authors must not
+publish, promote or update a preprint during review; full papers have no length limit
+(about twelve pages recommended, longer papers held to a higher standard). LaTeX is in
+`paper/nejlt/` (`make nejlt`), from the official template. The JAIR files stay for a later
+attempt if needed.
+
+Updated 2026-11-18: TMLR desk-rejected the paper on 2026-11-08 (no reasons given). The target
+is now **JAIR**, chosen because it charges nothing to submit or publish and allows preprints
+(<https://jair.org/index.php/jair/about/submissions>, checked 2026-11-18). The JAIR version
+uses the title "Is 'Thinking Mode' Worth It? Model Choice Beats Reasoning Mode on a Real Design Task". The plan below is kept for the record.
+
 Decided 2026-10-27 (supersedes the plan below in venues.md, kept for the record):
 
 - **TMLR** (double-blind journal), submitted first with the anonymous version.
