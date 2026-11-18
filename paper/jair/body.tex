@@ -2,12 +2,15 @@
 
 \section{Introduction}
 
-Leaderboards rank models. People who use these models choose more than a model. In most major chat apps they also choose how hard the model thinks: Instant or High in ChatGPT,
-Effort Low or High in Claude, Fast or Expert in Grok, DeepThink on or off in DeepSeek. The
-same weights can then behave like a different system. If the mode switch changes answer
-quality as much as switching vendor does, a comparison that names the model but not the
-mode is confounded, and a user who picks a vendor carefully but leaves the mode on its
-default may be optimising the smaller factor.
+When people compare AI chat assistants, they usually ask which model is best. In most major
+chat apps they also make a second choice: how hard the model thinks. ChatGPT offers Instant
+or High, Claude offers Effort Low or High, Grok offers Fast or Expert, and DeepSeek has
+DeepThink on or off. Thinking harder costs time and sometimes money, so a practical question
+follows: is ``thinking mode'' worth it, and does it matter as much as which model you pick?
+The answer matters for evaluation too. If the mode switch changes answer quality as much as
+switching vendor does, a comparison that names the model but not the mode is confounded, and
+a user who picks a vendor carefully but leaves the mode on its default may be optimising the
+smaller factor.
 
 Prior work on reasoning modes mostly measures accuracy on tasks with an answer key, such as
 math, code and science questions, and usually within one model family or one training
@@ -26,10 +29,23 @@ every named tool and model. A pre-registered two-way variance decomposition then
 dimension, whether mode explains more of the variance than family does, and whether
 reasoning scores higher.
 
-The question came from an observation. LA-P1 \cite{aryal2026lap1} captured one model family in
+The question came from an observation. An earlier study \cite{aryal2026lap1} captured one model family in
 three modes and saw answers that looked different in ways that mattered, but with one answer
 per mode and no controls its adjudicated scores could not separate a mode effect from
 run-to-run noise, and did not show a reasoning advantage. This paper is the controlled test.
+
+The short answer is that the model matters far more than the mode. On the total score,
+family explained far more variance than mode (delta omega squared -0.527, 95\% CI {[}-0.666, -0.417{]}), so the confirmatory hypothesis
+is not supported. Reasoning still scored higher than fast, by 1.37 points of 18 (95\% CI
+{[}0.77, 1.93{]}), but the gain came mostly from one family, Qwen, and halved once answer
+length was removed. Family dominated eight of nine rubric dimensions, and the ninth was
+inconclusive.
+
+A second finding concerns evaluation itself. Per-answer agreement between raters was low
+on most dimensions, yet the three raters ranked the 12 cells almost identically on the total
+(Kendall's W 0.955). This suggests that rubric scores from mixed human and LLM raters are
+more trustworthy for comparing systems than for judging single answers, at least on this
+task.
 
 Our contributions are:
 
@@ -48,22 +64,15 @@ Our contributions are:
 \item
   Evidence on rubric portability across a grid the rubric's authors never saw:
   inter-rater reliability per dimension and agreement between raters on how the 12 cells
-  rank, which a follow-up benchmark (LA-P5) needs.
+  rank, which anyone reusing the rubric as a benchmark needs.
 \item
   An open harness, \texttt{modegrid}, that covers planning, capture, blinding, scoring and
   analysis, and the full data: 60 verbatim answers, blinded packets' build rules, all rater
   sheets and every departure from the plan.
 \end{enumerate}
 
-Family, not mode, dominated. On the total score, family explained far more variance than
-mode (delta omega squared -0.527, 95\% CI {[}-0.666, -0.417{]}), so the confirmatory hypothesis
-is not supported. Reasoning still scored higher than fast, by 1.37 points of 18 (95\% CI
-{[}0.77, 1.93{]}), but the gain came mostly from one family, Qwen, and halved once answer
-length was removed. Family dominated eight of nine rubric dimensions, and the ninth was
-inconclusive. Per-answer agreement between raters was low on most dimensions, yet the
-three raters ranked the 12 cells almost identically on the total (Kendall's W 0.955). For
-evaluation practice: name the model first, but report the mode too, because what it does
-differs from one model to the next.
+For evaluation practice: name the model first, but report the mode too, because what it
+does differs from one model to the next.
 
 \section{Related work}
 

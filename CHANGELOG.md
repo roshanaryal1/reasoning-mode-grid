@@ -9,6 +9,10 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions follo
   venue is JAIR (no submission or publication fees; preprints allowed). JAIR title changed to
   "Is 'Thinking Mode' Worth It? Model Choice Beats Reasoning Mode on a Real Design Task".
   The Zenodo record and Preprints.org preprint keep the original title.
+- 2026-11-18: introduction reframed for JAIR: opens with the practical question, gives the
+  findings before the contributions, and reports the rater-ranking result as a finding about
+  evaluation. JAIR abstract conclusions updated to match. No number changed; the TMLR files
+  are left as submitted.
 - 2026-10-28: submitted for double-blind review and to Preprints.org (named preprint, in
   screening). OSF registration linked to the v1.0.0 Zenodo record as data and analytic code.
 - 2026-10-28: preprint posted on Preprints.org, doi:10.20944/preprints202610.2826.v1. Its
