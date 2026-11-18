@@ -5,8 +5,7 @@
 Updated 2026-11-18: TMLR desk-rejected the paper on 2026-11-08 (no reasons given). The target
 is now **JAIR**, chosen because it charges nothing to submit or publish and allows preprints
 (<https://jair.org/index.php/jair/about/submissions>, checked 2026-11-18). The JAIR version
-uses the title "Choose the Model, Not the Mode: Which AI You Use Matters More Than Whether It
-'Thinks'". The plan below is kept for the record.
+uses the title "Is 'Thinking Mode' Worth It? Model Choice Beats Reasoning Mode on a Real Design Task". The plan below is kept for the record.
 
 Decided 2026-10-27 (supersedes the plan below in venues.md, kept for the record):
 

@@ -7,7 +7,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions follo
 
 - 2026-11-18: TMLR desk-rejected the submission on 2026-11-08 without review or reasons. Next
   venue is JAIR (no submission or publication fees; preprints allowed). JAIR title changed to
-  "Choose the Model, Not the Mode: Which AI You Use Matters More Than Whether It 'Thinks'".
+  "Is 'Thinking Mode' Worth It? Model Choice Beats Reasoning Mode on a Real Design Task".
   The Zenodo record and Preprints.org preprint keep the original title.
 - 2026-10-28: submitted for double-blind review and to Preprints.org (named preprint, in
   screening). OSF registration linked to the v1.0.0 Zenodo record as data and analytic code.
