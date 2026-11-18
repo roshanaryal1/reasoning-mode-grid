@@ -5,6 +5,8 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions follo
 
 ## [Unreleased]
 
+- 2026-11-19: submitted to NEJLT for anonymous review (NLP engineering experiment paper).
+  Per NEJLT policy the Preprints.org preprint is not updated or promoted during review.
 - 2026-11-19: next venue changed to NEJLT (no fees; anonymous review). New `paper/nejlt/`
   with the official NEJLT template and `make nejlt`; `latex_build.py nejlt` writes the
   anonymous body, turning the body's long tables into full-width floats with captions below
